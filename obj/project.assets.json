@@ -8,19 +8,19 @@
     ".NETCoreApp,Version=v3.1": []
   },
   "packageFolders": {
-    "C:\\Users\\darkr\\.nuget\\packages\\": {}
+    "C:\\Users\\Mads Nymann Jensen\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\darkr\\source\\repos\\Web_API_Service\\Web_API_Service.csproj",
+      "projectUniqueName": "C:\\Users\\Mads Nymann Jensen\\Source\\Repos\\Aidan717\\Sem4Company\\Web_API_Service.csproj",
       "projectName": "Web_API_Service",
-      "projectPath": "C:\\Users\\darkr\\source\\repos\\Web_API_Service\\Web_API_Service.csproj",
-      "packagesPath": "C:\\Users\\darkr\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\darkr\\source\\repos\\Web_API_Service\\obj\\",
+      "projectPath": "C:\\Users\\Mads Nymann Jensen\\Source\\Repos\\Aidan717\\Sem4Company\\Web_API_Service.csproj",
+      "packagesPath": "C:\\Users\\Mads Nymann Jensen\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Mads Nymann Jensen\\Source\\Repos\\Aidan717\\Sem4Company\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\darkr\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Mads Nymann Jensen\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
