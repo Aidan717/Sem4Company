@@ -1,8 +1,8 @@
 {
   "runtimeOptions": {
     "additionalProbingPaths": [
-      "C:\\Users\\darkr\\.dotnet\\store\\|arch|\\|tfm|",
-      "C:\\Users\\darkr\\.nuget\\packages"
+      "C:\\Users\\nitra\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\nitra\\.nuget\\packages"
     ]
   }
 }
