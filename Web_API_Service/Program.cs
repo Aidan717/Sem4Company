@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-//this knew plox
+//some knew
 namespace Web_API_Service {
 	public class Program {
 		public static void Main(string[] args) {
