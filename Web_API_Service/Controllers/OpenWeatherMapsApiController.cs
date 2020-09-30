@@ -22,8 +22,8 @@ namespace Web_API_Service.Controllers {
 		}
 
 		// GET <OpenWeatherMapsApiController>/cityname
-		[HttpGet("{cityName}")]
-		public async Task<ActionResult<OpenWeatherMapsApi>> Get(string cityName) {
+		[HttpGet("{APIQuery}")]
+		public async Task<ActionResult<OpenWeatherMapsApi>> Get(string APIQuery) {
 			
 			using (var client = new HttpClient()) {
 				var result = new OpenWeatherMapsApi();
@@ -31,15 +31,15 @@ namespace Web_API_Service.Controllers {
 				client.BaseAddress = new Uri("http://api.openweathermap.org/data/2.5/weather");
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-				HttpResponseMessage response = await client.GetAsync("?q=" + cityName + "&appid=" + key + "");
-				//string tempresult = await response.Content.ReadAsStringAsync();
-				result = JsonSerializer.Deserialize<OpenWeatherMapsApi>(await response.Content.ReadAsStringAsync());
-				if (response.IsSuccessStatusCode) {
-					return result;
-				} else {
-					return result;
-				}
-			}
+                HttpResponseMessage response = await client.GetAsync("?q=" + APIQuery + "&appid=" + key + "");
+                string tempresult = await response.Content.ReadAsStringAsync();
+                result = JsonSerializer.Deserialize<OpenWeatherMapsApi>(await response.Content.ReadAsStringAsync());
+                if (response.IsSuccessStatusCode) {
+                    return result;
+                } else {
+                    return result;
+                }
+            }
 		}
 
 		// POST api/<OpenWeatherMapsApiController>
