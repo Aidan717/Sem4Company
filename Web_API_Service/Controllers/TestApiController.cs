@@ -14,16 +14,16 @@ using System.Text.Json;
 namespace Web_API_Service.Controllers {
 	[Route("[controller]")]
 	[ApiController]
-	public class OpenWeatherMapsApiController : ControllerBase {
+	public class TestApiController: ControllerBase {
 		// GET: api/<OpenWeatherMapsApiController>
 		[HttpGet]
 		public IEnumerable<string> Get() {
 			return new string[] { "value1", "value2" };
 		}
 
-		// GET <OpenWeatherMapsApiController>/cityname
-		[HttpGet("{APIQuery}")]
-		public async Task<ActionResult<OpenWeatherMapsApi>> Get(string APIQuery) {
+		// GET <OpenWeatherMapsApiController>/weather/APIQuery
+		[HttpGet("weather/{APIQuery}")]
+		public async Task<ActionResult<OpenWeatherMapsApi>> GetWeather(string APIQuery) {
 			
 			using (var client = new HttpClient()) {
 				var result = new OpenWeatherMapsApi();
@@ -40,6 +40,26 @@ namespace Web_API_Service.Controllers {
                     return result;
                 }
             }
+		}
+
+		//GET <OpenWeatherMapsApiController>/forecast/APIQuery
+		[HttpGet("addr/{AddressAPIQuery}")]
+		public async Task<ActionResult<AddressModel>> GetAddress(string AddressAPIQuery) {
+
+			using (var client = new HttpClient()) {
+				var result = new AddressModel();
+				client.BaseAddress = new Uri("https://dawa.aws.dk/adresser");
+				client.DefaultRequestHeaders.Accept.Clear();
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+				HttpResponseMessage response = await client.GetAsync("?q=" + AddressAPIQuery);
+				string tempresult = await response.Content.ReadAsStringAsync();
+                result = JsonSerializer.Deserialize<AddressModel>(await response.Content.ReadAsStringAsync());
+				if (response.IsSuccessStatusCode) {
+					return result;
+				} else {
+					return result;
+				}
+			}
 		}
 
 		// POST api/<OpenWeatherMapsApiController>
