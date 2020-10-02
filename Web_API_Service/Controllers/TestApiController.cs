@@ -95,7 +95,6 @@ namespace Web_API_Service.Controllers {
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 				HttpResponseMessage response = await client.GetAsync("");
-				//string tempresult = await response.Content.ReadAsStringAsync();
 				result = JsonSerializer.Deserialize<ElkLog>(await response.Content.ReadAsStringAsync());
 				if (response.IsSuccessStatusCode) {
 					return result;
