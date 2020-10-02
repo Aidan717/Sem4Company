@@ -6,12 +6,18 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using Web_API_Service.Models;
+using Web_API_Service.util;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Web_API_Service.Controllers {
+
+	
+
+
 	[Route("[controller]")]
 	[ApiController]
 	public class TestApiController: ControllerBase {
@@ -32,29 +38,48 @@ namespace Web_API_Service.Controllers {
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 HttpResponseMessage response = await client.GetAsync("?q=" + APIQuery + "&appid=" + key + "");
-                string tempresult = await response.Content.ReadAsStringAsync();
-                result = JsonSerializer.Deserialize<OpenWeatherMapsApi>(await response.Content.ReadAsStringAsync());
+
                 if (response.IsSuccessStatusCode) {
-                    return result;
+					result = JsonSerializer.Deserialize<OpenWeatherMapsApi>(await response.Content.ReadAsStringAsync());
+					return result;
                 } else {
                     return result;
                 }
             }
 		}
 
-		[HttpGet("elks")]
-		public async Task<ActionResult<ElkSearch>> GetElkSearch(string APIQuery) {
+		[HttpGet("wp/{APIQuery}")]
+		public async Task<ActionResult<forcast>> GetWeathers(string APIQuery) {
 
 			using (var client = new HttpClient()) {
-				var result = new ElkSearch();
-				//string key = "e7f9dce3dd5e96bc3faf4f5ca8014fcb";
+				var result = new forcast();
+				string key = "e7f9dce3dd5e96bc3faf4f5ca8014fcb";
+				client.BaseAddress = new Uri("http://api.openweathermap.org/data/2.5/");
+				client.DefaultRequestHeaders.Accept.Clear();
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+				HttpResponseMessage response = await client.GetAsync("forecast?q=aalborg&appid=e7f9dce3dd5e96bc3faf4f5ca8014fcb");
+
+				if (response.IsSuccessStatusCode) {
+					result = JsonSerializer.Deserialize<forcast>(await response.Content.ReadAsStringAsync());
+					return result;
+				} else {
+					return result;
+				}
+			}
+		}
+
+		[HttpGet("elks")]
+		public async Task<ActionResult<Elksearch>> Getelks(string APIQuery) {
+
+			using (var client = new HttpClient()) {
+				var result = new Elksearch();
 				client.BaseAddress = new Uri("http://localhost:9200");
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 				HttpResponseMessage response = await client.GetAsync("");
-				string tempresult = await response.Content.ReadAsStringAsync();
-				result = JsonSerializer.Deserialize<ElkSearch>(await response.Content.ReadAsStringAsync());
+				
 				if (response.IsSuccessStatusCode) {
+					result = JsonSerializer.Deserialize<Elksearch>(await response.Content.ReadAsStringAsync());
 					return result;
 				} else {
 					return result;
@@ -62,19 +87,19 @@ namespace Web_API_Service.Controllers {
 			}
 		}
 
-		[HttpGet("elklog")]
-		public async Task<ActionResult<ElkLog>> GetElkLog(string APIQuery) {
+
+		[HttpGet("elkl")]
+		public async Task<ActionResult<ElkLog>> Getelkl(string APIQuery) {
 
 			using (var client = new HttpClient()) {
 				var result = new ElkLog();
-				//string key = "e7f9dce3dd5e96bc3faf4f5ca8014fcb";
 				client.BaseAddress = new Uri("http://localhost:9600");
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 				HttpResponseMessage response = await client.GetAsync("");
-				string tempresult = await response.Content.ReadAsStringAsync();
-				result = JsonSerializer.Deserialize<ElkLog>(await response.Content.ReadAsStringAsync());
+
 				if (response.IsSuccessStatusCode) {
+					result = JsonSerializer.Deserialize<ElkLog>(await response.Content.ReadAsStringAsync());
 					return result;
 				} else {
 					return result;
@@ -82,25 +107,46 @@ namespace Web_API_Service.Controllers {
 			}
 		}
 
-		//GET <OpenWeatherMapsApiController>/forecast/APIQuery
-		[HttpGet("addr/{AddressAPIQuery}")]
-		public async Task<ActionResult<AddressModel>> GetAddress(string AddressAPIQuery) {
 
-			using (var client = new HttpClient()) {
-				var result = new AddressModel();
-				client.BaseAddress = new Uri("https://dawa.aws.dk/adresser");
-				client.DefaultRequestHeaders.Accept.Clear();
-				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-				HttpResponseMessage response = await client.GetAsync("?q=" + AddressAPIQuery);
-				string tempresult = await response.Content.ReadAsStringAsync();
-                result = JsonSerializer.Deserialize<AddressModel>(await response.Content.ReadAsStringAsync());
-				if (response.IsSuccessStatusCode) {
-					return result;
-				} else {
-					return result;
-				}
-			}
-		}
+		//DOES NOT WORK
+		//GET<OpenWeatherMapsApiController>
+		//[HttpGet("addr/{AddressAPIQuery}")]
+		//public async Task<ActionResult<Address>> GetAddress(string AddressAPIQuery) {
+
+
+		//	using (var client = new HttpClient()) {
+		//		var result = new Address();
+		//		client.BaseAddress = new Uri("https://dawa.aws.dk/adresser");
+		//		client.DefaultRequestHeaders.Accept.Clear();
+		//		client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+		//		HttpResponseMessage response = await client.GetAsync("?q=" + AddressAPIQuery);
+		//		string test = await response.Content.ReadAsStringAsync();
+
+
+		//		var options = new JsonSerializerOptions {
+		//			PropertyNameCaseInsensitive = true,
+		//			Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All)
+		//		};
+		//		options.Converters.Add(new LongtoStringConverter());
+		//		var netest = JsonSerializer.Deserialize<Address>(test, options);
+
+		//		var newtest = JsonSerializer.Deserialize<IEnumerable<string>>(test, options);
+		//		Address result = JsonSerializer.Deserialize<Address>(test);
+
+
+		//		var result = Enumerable.Range(1, 5).Select(newtest => new Address);
+
+		//		return newtest;
+		//		return result;
+
+
+		//		if (response.IsSuccessStatusCode) {
+		//			return result;
+		//		} else {
+		//			return netest;
+		//		}
+		//	}
+		//}
 
 		// POST api/<OpenWeatherMapsApiController>
 		[HttpPost]
@@ -116,5 +162,10 @@ namespace Web_API_Service.Controllers {
 		[HttpDelete("{id}")]
 		public void Delete(int id) {
 		}
+
+
+
+
+
 	}
 }
