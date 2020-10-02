@@ -38,7 +38,6 @@ namespace Web_API_Service.Controllers {
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 HttpResponseMessage response = await client.GetAsync("?q=" + APIQuery + "&appid=" + key + "");
-               // string tempresult = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode) {
 					result = JsonSerializer.Deserialize<OpenWeatherMapsApi>(await response.Content.ReadAsStringAsync());
 					return result;
@@ -58,7 +57,6 @@ namespace Web_API_Service.Controllers {
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 				HttpResponseMessage response = await client.GetAsync("forecast?q=aalborg&appid=e7f9dce3dd5e96bc3faf4f5ca8014fcb");
-				//string tempresult = await response.Content.ReadAsStringAsync();
 				if (response.IsSuccessStatusCode) {
 					result = JsonSerializer.Deserialize<forcast>(await response.Content.ReadAsStringAsync());
 					return result;
@@ -77,7 +75,6 @@ namespace Web_API_Service.Controllers {
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 				HttpResponseMessage response = await client.GetAsync("");
-				//string tempresult = await response.Content.ReadAsStringAsync();
 				
 				if (response.IsSuccessStatusCode) {
 					result = JsonSerializer.Deserialize<Elksearch>(await response.Content.ReadAsStringAsync());
