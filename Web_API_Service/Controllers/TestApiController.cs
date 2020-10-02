@@ -62,6 +62,45 @@ namespace Web_API_Service.Controllers {
 			}
 		}
 
+		[HttpGet("elkLog")]
+		public async Task<ActionResult<ELKLog>> GetLog(string elkAPIQuery) {
+
+			using (var client = new HttpClient()) {
+				var result = new ELKLog();
+				client.BaseAddress = new Uri("http://localhost:9600");
+				client.DefaultRequestHeaders.Accept.Clear();
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+				HttpResponseMessage response = await client.GetAsync("");
+				string tempresult = await response.Content.ReadAsStringAsync();
+				result = JsonSerializer.Deserialize<ELKLog>(await response.Content.ReadAsStringAsync());
+				if (response.IsSuccessStatusCode) {
+					return result;
+				} else {
+					return result;
+				}
+			}
+		}
+
+		[HttpGet("elks")]
+		public async Task<ActionResult<ELKSearch>> GetElk(string elkAPIQuery) {
+
+			using (var client = new HttpClient()) {
+				var result = new ELKSearch();
+				client.BaseAddress = new Uri("http://localhost:9200");
+				client.DefaultRequestHeaders.Accept.Clear();
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+				HttpResponseMessage response = await client.GetAsync("");
+				string tempresult = await response.Content.ReadAsStringAsync();
+				result = JsonSerializer.Deserialize<ELKSearch>(await response.Content.ReadAsStringAsync());
+				if (response.IsSuccessStatusCode) {
+					return result;
+				} else {
+					return result;
+				}
+			}
+		}
+
+
 		// POST api/<OpenWeatherMapsApiController>
 		[HttpPost]
 		public void Post([FromBody] string value) {
