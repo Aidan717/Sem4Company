@@ -7,6 +7,8 @@ using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using Web_API_Service.Models;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+
 
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -48,12 +50,50 @@ namespace Web_API_Service.Controllers {
 
 			using (var client = new HttpClient()) {
 				var result = new AddressModel();
-				client.BaseAddress = new Uri("https://dawa.aws.dk/adresser");
+				client.BaseAddress = new Uri("http://dawa.aws.dk/adresser");
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 				HttpResponseMessage response = await client.GetAsync("?q=" + AddressAPIQuery);
 				string tempresult = await response.Content.ReadAsStringAsync();
                 result = JsonSerializer.Deserialize<AddressModel>(await response.Content.ReadAsStringAsync());
+                if (response.IsSuccessStatusCode) {
+					return result;
+				} else {
+					return result;
+				}
+			}
+		}
+
+		[HttpGet("Elklog")]
+		public async Task<ActionResult<ELKLog>> GetElkLog(string ElkLog) {
+
+			using (var client = new HttpClient()) {
+				var result = new ELKLog();
+				client.BaseAddress = new Uri("http://localhost:9600");
+				client.DefaultRequestHeaders.Accept.Clear();
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                HttpResponseMessage response = await client.GetAsync("");
+                string tempresult = await response.Content.ReadAsStringAsync();
+				result = JsonSerializer.Deserialize<ELKLog>(await response.Content.ReadAsStringAsync());
+				if (response.IsSuccessStatusCode) {
+					return result;
+				} else {
+					return result;
+				}
+			}
+		}
+
+		[HttpGet("elks")]
+		public async Task<ActionResult<ELKSearch>> GetElkSearch(string elkPort) {
+
+			using (var client = new HttpClient()) {
+				var result = new ELKSearch();
+				client.BaseAddress = new Uri("http://localhost:9200");
+				client.DefaultRequestHeaders.Accept.Clear();
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+				HttpResponseMessage response = await client.GetAsync("");
+				string tempresult = await response.Content.ReadAsStringAsync();
+				result = JsonSerializer.Deserialize<ELKSearch>(await response.Content.ReadAsStringAsync());
 				if (response.IsSuccessStatusCode) {
 					return result;
 				} else {
