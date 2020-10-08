@@ -68,23 +68,38 @@ namespace Web_API_Service.Controllers {
 			}
 		}
 
-		[HttpGet("elks")]
-		public async Task<ActionResult<string>> Getelks(string APIQuery) {
+		[HttpGet("db/{chosenDB}/{SearchParameter}")]
+		public async Task<ActionResult<Schools>> GetSchool(string chosenDB, string SearchParameter) {
 
 			using (var client = new HttpClient()) {
-				//var result = new Elksearch();
-				client.BaseAddress = new Uri("http://localhost:9200/_search");
+				var result = new Schools();
+				client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_search");
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-				HttpResponseMessage response = await client.GetAsync("");
-
-
-				string result = "";
-				result = await response.Content.ReadAsStringAsync();
+				HttpResponseMessage response = await client.GetAsync("?q=" + SearchParameter);
 
 				if (response.IsSuccessStatusCode) {
-					//result = JsonSerializer.Deserialize<string>(await response.Content.ReadAsStringAsync());
+                    result = JsonSerializer.Deserialize<Schools>(await response.Content.ReadAsStringAsync());
+                    return result;
+				} else {
 					return result;
+				}
+			}
+		}
+
+		[HttpGet("schools/del/{id}")]
+		public async Task<ActionResult<DeleteStatus>> DelSchool(string id) {
+
+			using (var client = new HttpClient()) {
+                var result = new DeleteStatus();
+                client.BaseAddress = new Uri("http://localhost:9200/schools/_doc/");
+				client.DefaultRequestHeaders.Accept.Clear();
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+				HttpResponseMessage response = await client.DeleteAsync(id);
+
+				if (response.IsSuccessStatusCode) {
+                    result = JsonSerializer.Deserialize<DeleteStatus>(await response.Content.ReadAsStringAsync());
+                    return result;
 				} else {
 					return result;
 				}
@@ -92,8 +107,7 @@ namespace Web_API_Service.Controllers {
 		}
 
 
-
-	[HttpGet("elkl")]
+		[HttpGet("elkl")]
 		public async Task<ActionResult<ElkLog>> Getelkl(string APIQuery) {
 
 			using (var client = new HttpClient()) {
