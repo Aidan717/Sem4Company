@@ -69,17 +69,21 @@ namespace Web_API_Service.Controllers {
 		}
 
 		[HttpGet("elks")]
-		public async Task<ActionResult<Elksearch>> Getelks(string APIQuery) {
+		public async Task<ActionResult<string>> Getelks(string APIQuery) {
 
 			using (var client = new HttpClient()) {
-				var result = new Elksearch();
-				client.BaseAddress = new Uri("http://localhost:9200");
+				//var result = new Elksearch();
+				client.BaseAddress = new Uri("http://localhost:9200/_search");
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 				HttpResponseMessage response = await client.GetAsync("");
-				
+
+
+				string result = "";
+				result = await response.Content.ReadAsStringAsync();
+
 				if (response.IsSuccessStatusCode) {
-					result = JsonSerializer.Deserialize<Elksearch>(await response.Content.ReadAsStringAsync());
+					//result = JsonSerializer.Deserialize<string>(await response.Content.ReadAsStringAsync());
 					return result;
 				} else {
 					return result;
@@ -88,7 +92,8 @@ namespace Web_API_Service.Controllers {
 		}
 
 
-		[HttpGet("elkl")]
+
+	[HttpGet("elkl")]
 		public async Task<ActionResult<ElkLog>> Getelkl(string APIQuery) {
 
 			using (var client = new HttpClient()) {
