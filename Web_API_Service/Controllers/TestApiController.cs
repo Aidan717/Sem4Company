@@ -86,19 +86,19 @@ namespace Web_API_Service.Controllers {
 			}
 		}
 
-		[HttpDelete("schools/del/{id}")]
+		[HttpGet("schools/del/{id}")]
 		public async Task<ActionResult<DeleteStatus>> DelSchool(string id) {
 
 			using (var client = new HttpClient()) {
-				var result = new DeleteStatus();
-				client.BaseAddress = new Uri("http://localhost:9200/schools/_doc");
+                var result = new DeleteStatus();
+                client.BaseAddress = new Uri("http://localhost:9200/schools/_doc/");
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-				HttpResponseMessage response = await client.GetAsync("/" + id);
+				HttpResponseMessage response = await client.DeleteAsync(id);
 
 				if (response.IsSuccessStatusCode) {
-					result = JsonSerializer.Deserialize<DeleteStatus>(await response.Content.ReadAsStringAsync());
-					return result;
+                    result = JsonSerializer.Deserialize<DeleteStatus>(await response.Content.ReadAsStringAsync());
+                    return result;
 				} else {
 					return result;
 				}
