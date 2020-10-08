@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Web_API_Service.Models {
-    public class School {
+    public class Schools {
         public int took { get; set; }
         public bool timed_out { get; set; }
         public _Shards _shards { get; set; }

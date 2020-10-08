@@ -68,18 +68,37 @@ namespace Web_API_Service.Controllers {
 			}
 		}
 
-		[HttpGet("schools/{SearchParameter}")]
-		public async Task<ActionResult<School>> GetSchool(string SearchParameter) {
+		[HttpGet("schools/search/{SearchParameter}")]
+		public async Task<ActionResult<Schools>> GetSchool(string SearchParameter) {
 
 			using (var client = new HttpClient()) {
-				var result = new School();
+				var result = new Schools();
 				client.BaseAddress = new Uri("http://localhost:9200/schools/_search");
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 				HttpResponseMessage response = await client.GetAsync("?q=" + SearchParameter);
 
 				if (response.IsSuccessStatusCode) {
-					result = JsonSerializer.Deserialize<School>(await response.Content.ReadAsStringAsync());
+					result = JsonSerializer.Deserialize<Schools>(await response.Content.ReadAsStringAsync());
+					return result;
+				} else {
+					return result;
+				}
+			}
+		}
+
+		[HttpDelete("schools/del/{id}")]
+		public async Task<ActionResult<DeleteStatus>> DelSchool(string id) {
+
+			using (var client = new HttpClient()) {
+				var result = new DeleteStatus();
+				client.BaseAddress = new Uri("http://localhost:9200/schools/_doc");
+				client.DefaultRequestHeaders.Accept.Clear();
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+				HttpResponseMessage response = await client.GetAsync("/" + id);
+
+				if (response.IsSuccessStatusCode) {
+					result = JsonSerializer.Deserialize<DeleteStatus>(await response.Content.ReadAsStringAsync());
 					return result;
 				} else {
 					return result;
