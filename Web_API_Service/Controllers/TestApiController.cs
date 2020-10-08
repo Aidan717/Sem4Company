@@ -68,19 +68,19 @@ namespace Web_API_Service.Controllers {
 			}
 		}
 
-		[HttpGet("schools/search/{SearchParameter}")]
-		public async Task<ActionResult<Schools>> GetSchool(string SearchParameter) {
+		[HttpGet("db/{chosenDB}/{SearchParameter}")]
+		public async Task<ActionResult<Schools>> GetSchool(string chosenDB, string SearchParameter) {
 
 			using (var client = new HttpClient()) {
 				var result = new Schools();
-				client.BaseAddress = new Uri("http://localhost:9200/schools/_search");
+				client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_search");
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 				HttpResponseMessage response = await client.GetAsync("?q=" + SearchParameter);
 
 				if (response.IsSuccessStatusCode) {
-					result = JsonSerializer.Deserialize<Schools>(await response.Content.ReadAsStringAsync());
-					return result;
+                    result = JsonSerializer.Deserialize<Schools>(await response.Content.ReadAsStringAsync());
+                    return result;
 				} else {
 					return result;
 				}
