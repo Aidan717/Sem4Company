@@ -87,18 +87,40 @@ namespace Web_API_Service.Controllers {
 		}
 
 		[HttpGet("schools/del/{id}")]
-		public async Task<ActionResult<DeleteStatus>> DelSchool(string id) {
+		public async Task<ActionResult<ResponseStatus>> DelSchool(string id) {
 
 			using (var client = new HttpClient()) {
-                var result = new DeleteStatus();
+                var result = new ResponseStatus();
                 client.BaseAddress = new Uri("http://localhost:9200/schools/_doc/");
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 				HttpResponseMessage response = await client.DeleteAsync(id);
 
 				if (response.IsSuccessStatusCode) {
-                    result = JsonSerializer.Deserialize<DeleteStatus>(await response.Content.ReadAsStringAsync());
+                    result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
                     return result;
+				} else {
+					return result;
+				}
+			}
+		}
+
+
+		// POST api/<OpenWeatherMapsApiController>
+		[HttpPost]
+		public async Task<ActionResult<ResponseStatus>> Post([FromBody]Jtok HttpCon parameter) {
+			using (var client = new HttpClient()) {
+				
+				var result = new ResponseStatus();
+				client.BaseAddress = new Uri("http://localhost:9200/schools");
+				client.DefaultRequestHeaders.Accept.Clear();
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+				var postObject = new StringContent(JsonSerializer.Serialize<Schools>(parameter));
+				HttpResponseMessage response = await client.PostAsync("/_doc/", postObject);
+
+				if (response.IsSuccessStatusCode) {
+					result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+					return result;
 				} else {
 					return result;
 				}
