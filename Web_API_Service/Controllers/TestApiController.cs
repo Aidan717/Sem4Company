@@ -9,8 +9,8 @@ using Web_API_Service.Models;
 using Web_API_Service.util;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Newtonsoft.Json.Linq;
 using System.Text;
+
 
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -109,16 +109,16 @@ namespace Web_API_Service.Controllers {
 
 
 		// POST api/<OpenWeatherMapsApiController>
-		[HttpPost("Schools/post")]
-		public async Task<ActionResult<ResponseStatus>> Post([FromBody] object postData) {
+		[HttpPost("schools/post")]
+		public async Task<ActionResult<ResponseStatus>> Post([FromBody] object parameter) {
 			using (var client = new HttpClient()) {
 				
 				var result = new ResponseStatus();
-				client.BaseAddress = new Uri("http://localhost:9200/schools");
+				client.BaseAddress = new Uri("http://localhost:9200/schools/_doc/");
 				client.DefaultRequestHeaders.Accept.Clear();
-				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-				var postObject = new StringContent(JsonSerializer.Serialize(postData), Encoding.UTF8);
-				HttpResponseMessage response = await client.PostAsync("/doc/", postObject);
+
+                var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
+				HttpResponseMessage response = await client.PostAsync("", jsonstring);
 
 				if (response.IsSuccessStatusCode) {
 					result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
@@ -191,9 +191,9 @@ namespace Web_API_Service.Controllers {
 		//}
 
 		// POST api/<OpenWeatherMapsApiController>
-		[HttpPost]
-		public void Post([FromBody] string value) {
-		}
+		//[HttpPost]
+		//public void Post([FromBody] string value) {
+		//}
 
 		// PUT api/<OpenWeatherMapsApiController>/5
 		[HttpPut("{id}")]
