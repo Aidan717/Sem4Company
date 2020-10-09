@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Web_API_Service.Models {
-    public class DeleteStatus {
+    public class ResponseStatus {
         public string _index { get; set; }
         public string _type { get; set; }
         public string _id { get; set; }
