@@ -9,6 +9,7 @@ using Web_API_Service.Models;
 using Web_API_Service.util;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text;
 
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -169,7 +170,26 @@ namespace Web_API_Service.Controllers {
 
 		// POST api/<OpenWeatherMapsApiController>
 		[HttpPost]
-		public void Post([FromBody] string value) {
+		public async Task<ActionResult<DeleteStatus>> Post([FromBody] Schools myValues) {
+
+			using (var client = new HttpClient()) {
+				var result = new DeleteStatus();
+				client.BaseAddress = new Uri("http://localhost:9200/schools/_doc");
+				client.DefaultRequestHeaders.Accept.Clear();
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+				
+				
+				var json = new StringContent(JsonSerializer.Serialize(myValues), Encoding.UTF8, "application/json");
+				HttpResponseMessage response = await client.PostAsync("", json);
+
+				if (response.IsSuccessStatusCode) {
+					result = JsonSerializer.Deserialize<DeleteStatus>(await response.Content.ReadAsStringAsync());
+					return result;
+				} else {
+					return result;
+				}
+			}
+
 		}
 
 		// PUT api/<OpenWeatherMapsApiController>/5
