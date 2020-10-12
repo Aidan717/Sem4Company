@@ -1,3 +1,4 @@
+using MailKit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -17,6 +18,7 @@ namespace Web_API_Service {
 		public void ConfigureServices(IServiceCollection services) {
 			services.AddControllers();
 			services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
+			services.AddTransient<IMailService, Services.MailService>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
