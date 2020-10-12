@@ -5,10 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Mail;
 using System.Threading.Tasks;
 using Web_API_Service.Models;
-using MailKit;
+using MailKit.Net.Smtp;
 
 namespace Web_API_Service.Service {
     public class MailService : IMailService {
