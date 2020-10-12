@@ -7,5 +7,6 @@ using Web_API_Service.Models;
 namespace Web_API_Service.Service {
     public interface IMailService {
         Task SendEmailAsync(MailRequest mailRequest);
+        Task SendWelcomeEmailAsync(WelcomeRequest request);
     }
 }
