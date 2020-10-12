@@ -106,16 +106,36 @@ namespace Web_API_Service.Controllers {
 
 
 		// POST api/<OpenWeatherMapsApiController>
-		[HttpPost("schools/post")]
-		public async Task<ActionResult<ResponseStatus>> Post([FromBody] object parameter) {
+		[HttpPost("{chosenDB}/post")]
+		public async Task<ActionResult<ResponseStatus>> Post(string chosenDB, [FromBody] object parameter) {
 			using (var client = new HttpClient()) {
 				
 				var result = new ResponseStatus();
-				client.BaseAddress = new Uri("http://localhost:9200/schools/_doc/");
+				client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
 				client.DefaultRequestHeaders.Accept.Clear();
 
                 var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
 				HttpResponseMessage response = await client.PostAsync("", jsonstring);
+
+				if (response.IsSuccessStatusCode) {
+					result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+					return result;
+				} else {
+					return result;
+				}
+			}
+		}
+
+		[HttpPut("{chosenDB}/put/{id}")]
+		public async Task<ActionResult<ResponseStatus>> Put(string chosenDB, string id, [FromBody] object value) {
+			using (var client = new HttpClient()) {
+
+				var result = new ResponseStatus();
+				client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
+				client.DefaultRequestHeaders.Accept.Clear();
+
+				var jsonstring = new StringContent(JsonSerializer.Serialize(value), Encoding.UTF8, "application/json");
+				HttpResponseMessage response = await client.PutAsync("" + id, jsonstring);
 
 				if (response.IsSuccessStatusCode) {
 					result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
@@ -193,9 +213,9 @@ namespace Web_API_Service.Controllers {
 		//}
 
 		// PUT api/<OpenWeatherMapsApiController>/5
-		[HttpPut("{id}")]
-		public void Put(int id, [FromBody] string value) {
-		}
+		//[HttpPut("{id}")]
+		//public void Put(int id, [FromBody] string value) {
+		//}
 
 		// DELETE api/<OpenWeatherMapsApiController>/5
 		[HttpDelete("{id}")]
