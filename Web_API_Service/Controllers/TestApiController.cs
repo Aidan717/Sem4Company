@@ -17,9 +17,6 @@ using System.Text;
 
 namespace Web_API_Service.Controllers {
 
-	
-
-
 	[Route("[controller]")]
 	[ApiController]
 	public class TestApiController: ControllerBase {
