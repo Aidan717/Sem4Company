@@ -1,8 +1,10 @@
+using MailKit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Web_API_Service.Models;
 
 namespace Web_API_Service {
 	public class Startup {
@@ -15,7 +17,8 @@ namespace Web_API_Service {
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services) {
 			services.AddControllers();
-			
+			services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
+			services.AddTransient<IMailService, MailService>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
