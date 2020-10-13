@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using Web_API_Service.Models;
-using Web_API_Service.util;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text;
@@ -109,15 +108,15 @@ namespace Web_API_Service.Controllers {
 
 
 		// POST api/<OpenWeatherMapsApiController>
-		[HttpPost("{ChosenDB}/post")]
-		public async Task<ActionResult<ResponseStatus>> Post(string ChosenDB, [FromBody] Schools._Source parameter) {
+		[HttpPost("{chosenDB}/post")]
+		public async Task<ActionResult<ResponseStatus>> Post(string chosenDB, [FromBody] Schools._Source parameter) {
 			var result = new ResponseStatus();
 
 			//if (parameter != null) {
 			using (var client = new HttpClient()) {
 				var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
 
-					client.BaseAddress = new Uri("http://localhost:9200/" + ChosenDB + "/_doc/");
+					client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
 					client.DefaultRequestHeaders.Accept.Clear();
 					HttpResponseMessage response = await client.PostAsync("", jsonstring);
 

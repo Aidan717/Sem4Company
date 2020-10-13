@@ -1,7 +1,5 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -39,26 +37,16 @@ namespace Web_API_Service.Models {
             public _Source _source { get; set; }
         }
 
-        public class _Source {
-            [Required]
-            public string name { get; set; }
-            [Required]
-            public string description { get; set; }
-            [Required]
-            public string street { get; set; }
-            [Required]
-            public string city { get; set; }
-            [Required]
-            public string state { get; set; }
-            [Required]
-            public string zip { get; set; }
-            [Required]
-            public float[] location { get; set; }
-            [Required]
-            public int fees { get; set; }
-            [Required]
-            public string[] tags { get; set; }
-            [Required]
+        public class _Source {            
+            public string name { get; set; }            
+            public string description { get; set; }            
+            public string street { get; set; }            
+            public string city { get; set; }            
+            public string state { get; set; }            
+            public string zip { get; set; }           
+            public float[] location { get; set; }            
+            public int fees { get; set; }            
+            public string[] tags { get; set; }            
             public string rating { get; set; }
         }
 
