@@ -130,19 +130,23 @@ namespace Web_API_Service.Controllers {
 		public async Task<ActionResult<ResponseStatus>> Put(string chosenDB, string id, [FromBody] object value) {
 			using (var client = new HttpClient()) {
 
-				var result = new ResponseStatus();
-				client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
-				client.DefaultRequestHeaders.Accept.Clear();
 
-				var jsonstring = new StringContent(JsonSerializer.Serialize(value), Encoding.UTF8, "application/json");
-				HttpResponseMessage response = await client.PutAsync("" + id, jsonstring);
+					var result = new ResponseStatus();
+					client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
+					client.DefaultRequestHeaders.Accept.Clear();
 
-				if (response.IsSuccessStatusCode) {
-					result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
-					return result;
-				} else {
-					return result;
-				}
+					var jsonstring = new StringContent(JsonSerializer.Serialize(value), Encoding.UTF8, "application/json");
+
+
+					HttpResponseMessage response = await client.PutAsync("" + id, jsonstring);
+
+					if (response.IsSuccessStatusCode) {
+						result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+						return result;
+					} else {
+						result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+						return result;
+					}
 			}
 		}
 

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Web_API_Service.Models {
-    public class Schools {
+    public class SchoolsFake {
         public int took { get; set; }
         public bool timed_out { get; set; }
         public _Shards _shards { get; set; }
@@ -48,8 +48,6 @@ namespace Web_API_Service.Models {
             public string city { get; set; }
             [Required]
             public string state { get; set; }
-            [Required]
-            public string zip { get; set; }
             [Required]
             public float[] location { get; set; }
             [Required]
