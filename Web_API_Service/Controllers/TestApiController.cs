@@ -154,6 +154,16 @@ namespace Web_API_Service.Controllers {
 
 					var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
 					HttpResponseMessage response = await client.PostAsync("", jsonstring);
+		[HttpPost("{ChosenDB}/post")]
+		public async Task<ActionResult<ResponseStatus>> Post(string ChosenDB, [FromBody] Schools._Source parameter) {
+			var result = new ResponseStatus();
+			//if (parameter != null) {
+				using (var client = new HttpClient()) {
+					var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
+
+					client.BaseAddress = new Uri("http://localhost:9200/" + ChosenDB + "/_docs/");
+					client.DefaultRequestHeaders.Accept.Clear();
+					HttpResponseMessage response = await client.PostAsync("", jsonstring);
 
 					if (response.IsSuccessStatusCode) {
 						result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
@@ -172,17 +182,15 @@ namespace Web_API_Service.Controllers {
             }
 		}
 
-
-		[HttpPut("{chosenDB}/put/{id}")]
-		public async Task<ActionResult<ResponseStatus>> Put(string chosenDB, string id, [FromBody] object value) {
+		[HttpPut("{ChosenDB}/put/{id}")]
+		public async Task<ActionResult<ResponseStatus>> Put(string ChosenDB, string id,[FromBody] object parameter) {
 			using (var client = new HttpClient()) {
 
 				var result = new ResponseStatus();
-				client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
-				client.DefaultRequestHeaders.Accept.Clear();
-
-				var jsonstring = new StringContent(JsonSerializer.Serialize(value), Encoding.UTF8, "application/json");
-				HttpResponseMessage response = await client.PutAsync("" + id, jsonstring);
+				client.BaseAddress = new Uri("http://localhost:9200/" + ChosenDB + "/_doc/");
+				client.DefaultRequestHeaders.Accept.Clear();				
+				var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");				
+				HttpResponseMessage response = await client.PostAsync("" + id, jsonstring);
 
 				if (response.IsSuccessStatusCode) {
 					result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
@@ -192,7 +200,6 @@ namespace Web_API_Service.Controllers {
 				}
 			}
 		}
-
 
 		[HttpGet("elkl")]
 		public async Task<ActionResult<ElkLog>> Getelkl(string APIQuery) {
@@ -260,9 +267,9 @@ namespace Web_API_Service.Controllers {
 		//}
 
 		// PUT api/<OpenWeatherMapsApiController>/5
-		//[HttpPut("{id}")]
-		//public void Put(int id, [FromBody] string value) {
-		//}
+		[HttpPut("{id}")]
+		public void Put(int id, [FromBody] string value) {
+		}
 
 		// DELETE api/<OpenWeatherMapsApiController>/5
 		[HttpDelete("{id}")]
