@@ -1,10 +1,12 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Web_API_Service.Models {
     public class Schools {
+
         public int took { get; set; }
         public bool timed_out { get; set; }
         public _Shards _shards { get; set; }
