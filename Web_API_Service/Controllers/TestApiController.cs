@@ -117,7 +117,7 @@ namespace Web_API_Service.Controllers {
 			using (var client = new HttpClient()) {
 				var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
 
-				client.BaseAddress = new Uri("http://localhost:9200/" + ChosenDB + "/_docs/");
+				client.BaseAddress = new Uri("http://localhost:9200/" + ChosenDB + "/_doc/");
 				client.DefaultRequestHeaders.Accept.Clear();
 				HttpResponseMessage response = await client.PostAsync("", jsonstring);
 
