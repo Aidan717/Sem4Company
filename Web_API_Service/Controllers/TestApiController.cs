@@ -10,7 +10,6 @@ using Web_API_Service.util;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 
 
@@ -113,24 +112,25 @@ namespace Web_API_Service.Controllers {
 		[HttpPost("{ChosenDB}/post")]
 		public async Task<ActionResult<ResponseStatus>> Post(string ChosenDB, [FromBody] Schools._Source parameter) {
 			var result = new ResponseStatus();
+
 			//if (parameter != null) {
-				using (var client = new HttpClient()) {
-					var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
+			using (var client = new HttpClient()) {
 
-					client.BaseAddress = new Uri("http://localhost:9200/" + ChosenDB + "/_docs/");
-					client.DefaultRequestHeaders.Accept.Clear();
-					HttpResponseMessage response = await client.PostAsync("", jsonstring);
+				client.BaseAddress = new Uri("http://localhost:9200/"+ ChosenDB + "/_doc/");
+				client.DefaultRequestHeaders.Accept.Clear();
 
-					if (response.IsSuccessStatusCode) {
-						result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
-						return result;
-					} else {
+				var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
+				HttpResponseMessage response = await client.PostAsync("", jsonstring);
 
-					// use mail service to report back
-
+				if (response.IsSuccessStatusCode) {
+					result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
 					return result;
-					}
+				} else {
+				// use mail service to report back
+
+				return result;
 				}
+			}
 			//} 
 			//return result;
 			
@@ -221,14 +221,14 @@ namespace Web_API_Service.Controllers {
 		//}
 
 		// PUT api/<OpenWeatherMapsApiController>/5
-		[HttpPut("{id}")]
-		public void Put(int id, [FromBody] string value) {
-		}
+		//[HttpPut("{id}")]
+		//public void Put(int id, [FromBody] string value) {
+		//}
 
 		// DELETE api/<OpenWeatherMapsApiController>/5
-		[HttpDelete("{id}")]
-		public void Delete(int id) {
-		}
+		//[HttpDelete("{id}")]
+		//public void Delete(int id) {
+		//}
 
 
 
