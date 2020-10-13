@@ -110,14 +110,14 @@ namespace Web_API_Service.Controllers {
 
 
 		// POST api/<OpenWeatherMapsApiController>
-		[HttpPost("schools/post")]
-		public async Task<ActionResult<ResponseStatus>> Post([FromBody] Schools._Source parameter) {
+		[HttpPost("{ChosenDB}/post")]
+		public async Task<ActionResult<ResponseStatus>> Post(string ChosenDB, [FromBody] Schools._Source parameter) {
 			var result = new ResponseStatus();
 			//if (parameter != null) {
 				using (var client = new HttpClient()) {
 					var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
 
-					client.BaseAddress = new Uri("http://localhost:9200/schools/_docs/");
+					client.BaseAddress = new Uri("http://localhost:9200/" + ChosenDB + "/_docs/");
 					client.DefaultRequestHeaders.Accept.Clear();
 					HttpResponseMessage response = await client.PostAsync("", jsonstring);
 
@@ -136,12 +136,12 @@ namespace Web_API_Service.Controllers {
 			
 		}
 
-		[HttpPut("schools/put/{id}")]
-		public async Task<ActionResult<ResponseStatus>> Put(string id,[FromBody] object parameter) {
+		[HttpPut("{ChosenDB}/put/{id}")]
+		public async Task<ActionResult<ResponseStatus>> Put(string ChosenDB, string id,[FromBody] object parameter) {
 			using (var client = new HttpClient()) {
 
 				var result = new ResponseStatus();
-				client.BaseAddress = new Uri("http://localhost:9200/schools/_doc/");
+				client.BaseAddress = new Uri("http://localhost:9200/" + ChosenDB + "/_doc/");
 				client.DefaultRequestHeaders.Accept.Clear();				
 				var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");				
 				HttpResponseMessage response = await client.PostAsync("" + id, jsonstring);
