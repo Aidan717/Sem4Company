@@ -115,29 +115,66 @@ namespace Web_API_Service.Controllers {
 
 			//if (parameter != null) {
 			using (var client = new HttpClient()) {
-
-				client.BaseAddress = new Uri("http://localhost:9200/"+ ChosenDB + "/_doc/");
-				client.DefaultRequestHeaders.Accept.Clear();
-
 				var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
-				HttpResponseMessage response = await client.PostAsync("", jsonstring);
+
+					client.BaseAddress = new Uri("http://localhost:9200/" + ChosenDB + "/_doc/");
+					client.DefaultRequestHeaders.Accept.Clear();
+					HttpResponseMessage response = await client.PostAsync("", jsonstring);
 
 				if (response.IsSuccessStatusCode) {
 					result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
 					return result;
 				} else {
-				// use mail service to report back
-
-				return result;
+					// use mail service to report back
+					return result;
 				}
 			}
-			//} 
-			//return result;
-			
+		}
+
+		[HttpPost("{chosenDB}/postwithfewcities")]
+		public async Task<ActionResult<ResponseStatus>> PostParametersNotMet(string chosenDB, [FromBody] Schools._Source parameter) {
+			using (var client = new HttpClient()) {
+
+				var result = new ResponseStatus();
+
+				String[] avalibleCities = {"Aalborg", "Brønderslev", "Hjørring", "Skagen"};
+				Boolean avalibleCityCheck = false;
+
+				foreach (String element in avalibleCities) {
+					if (parameter.city == element) {
+						avalibleCityCheck = true;
+						//contact halles mail
+						//return error
+						//fyld op response status
+					}
+				}
+
+                if (avalibleCityCheck == true) {
+					client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
+					client.DefaultRequestHeaders.Accept.Clear();
+
+					var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
+					HttpResponseMessage response = await client.PostAsync("", jsonstring);
+
+					if (response.IsSuccessStatusCode) {
+						result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+						return result;
+					} else {
+						return result;
+					}
+				} else {
+                    //Send email to be made
+                    ResponseStatus failedResponse = new ResponseStatus();
+					failedResponse.result = "failed";
+					failedResponse._shards.failed = 1;
+					result = failedResponse;
+                    return result;
+                }
+            }
 		}
 
 		[HttpPut("{ChosenDB}/put/{id}")]
-		public async Task<ActionResult<ResponseStatus>> Put(string ChosenDB, string id,[FromBody] object parameter) {
+		public async Task<ActionResult<ResponseStatus>> Put(string ChosenDB, string id,[FromBody] Schools._Source parameter) {
 			using (var client = new HttpClient()) {
 
 				var result = new ResponseStatus();
