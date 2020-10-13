@@ -10,6 +10,7 @@ using Web_API_Service.util;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text;
+using Newtonsoft.Json.Linq;
 
 
 
@@ -128,6 +129,49 @@ namespace Web_API_Service.Controllers {
 				}
 			}
 		}
+
+		[HttpPost("{chosenDB}/postwithfewcities")]
+		public async Task<ActionResult<ResponseStatus>> PostParametersNotMet(string chosenDB, [FromBody] Schools._Source parameter) {
+			using (var client = new HttpClient()) {
+
+				var result = new ResponseStatus();
+
+				String[] avalibleCities = {"Aalborg", "Brønderslev", "Hjørring", "Skagen"};
+				Boolean avalibleCityCheck = false;
+
+				foreach (String element in avalibleCities) {
+					if (parameter.city == element) {
+						avalibleCityCheck = true;
+						//contact halles mail
+						//return error
+						//fyld op response status
+					}
+				}
+
+                if (avalibleCityCheck == true) {
+					client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
+					client.DefaultRequestHeaders.Accept.Clear();
+
+					var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
+					HttpResponseMessage response = await client.PostAsync("", jsonstring);
+
+					if (response.IsSuccessStatusCode) {
+						result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+						return result;
+					} else {
+						return result;
+					}
+				} else {
+                    //Send email to be made
+                    ResponseStatus failedResponse = new ResponseStatus();
+					failedResponse.result = "failed";
+					failedResponse._shards.failed = 1;
+					result = failedResponse;
+                    return result;
+                }
+            }
+		}
+
 
 		[HttpPut("{chosenDB}/put/{id}")]
 		public async Task<ActionResult<ResponseStatus>> Put(string chosenDB, string id, [FromBody] object value) {
