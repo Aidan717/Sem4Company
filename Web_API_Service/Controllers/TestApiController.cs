@@ -10,6 +10,7 @@ using Web_API_Service.util;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 
 
@@ -110,15 +111,40 @@ namespace Web_API_Service.Controllers {
 
 		// POST api/<OpenWeatherMapsApiController>
 		[HttpPost("schools/post")]
-		public async Task<ActionResult<ResponseStatus>> Post([FromBody] object parameter) {
+		public async Task<ActionResult<ResponseStatus>> Post([FromBody] Schools._Source parameter) {
+			var result = new ResponseStatus();
+			//if (parameter != null) {
+				using (var client = new HttpClient()) {
+					var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
+
+					client.BaseAddress = new Uri("http://localhost:9200/schools/_docs/");
+					client.DefaultRequestHeaders.Accept.Clear();
+					HttpResponseMessage response = await client.PostAsync("", jsonstring);
+
+					if (response.IsSuccessStatusCode) {
+						result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+						return result;
+					} else {
+
+					// use mail service to report back
+
+					return result;
+					}
+				}
+			//} 
+			//return result;
+			
+		}
+
+		[HttpPut("schools/put/{id}")]
+		public async Task<ActionResult<ResponseStatus>> Put(string id,[FromBody] object parameter) {
 			using (var client = new HttpClient()) {
-				
+
 				var result = new ResponseStatus();
 				client.BaseAddress = new Uri("http://localhost:9200/schools/_doc/");
-				client.DefaultRequestHeaders.Accept.Clear();
-
-                var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
-				HttpResponseMessage response = await client.PostAsync("", jsonstring);
+				client.DefaultRequestHeaders.Accept.Clear();				
+				var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");				
+				HttpResponseMessage response = await client.PostAsync("" + id, jsonstring);
 
 				if (response.IsSuccessStatusCode) {
 					result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
@@ -128,7 +154,6 @@ namespace Web_API_Service.Controllers {
 				}
 			}
 		}
-
 
 		[HttpGet("elkl")]
 		public async Task<ActionResult<ElkLog>> Getelkl(string APIQuery) {
