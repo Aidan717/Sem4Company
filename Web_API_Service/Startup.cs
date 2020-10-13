@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Org.BouncyCastle.Bcpg.Sig;
 using Web_API_Service.Models;
 
 namespace Web_API_Service {
@@ -18,7 +19,7 @@ namespace Web_API_Service {
 		public void ConfigureServices(IServiceCollection services) {
 			services.AddControllers();
 			services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
-			services.AddTransient<IMailService, MailService>();
+			services.AddTransient<Service.IMailService, Service.MailService>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
