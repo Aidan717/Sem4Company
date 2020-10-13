@@ -117,9 +117,9 @@ namespace Web_API_Service.Controllers {
 			using (var client = new HttpClient()) {
 				var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
 
-				client.BaseAddress = new Uri("http://localhost:9200/" + ChosenDB + "/_doc/");
-				client.DefaultRequestHeaders.Accept.Clear();
-				HttpResponseMessage response = await client.PostAsync("", jsonstring);
+					client.BaseAddress = new Uri("http://localhost:9200/" + ChosenDB + "/_doc/");
+					client.DefaultRequestHeaders.Accept.Clear();
+					HttpResponseMessage response = await client.PostAsync("", jsonstring);
 
 				if (response.IsSuccessStatusCode) {
 					result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
@@ -173,7 +173,7 @@ namespace Web_API_Service.Controllers {
 		}
 
 		[HttpPut("{ChosenDB}/put/{id}")]
-		public async Task<ActionResult<ResponseStatus>> Put(string ChosenDB, string id,[FromBody] object parameter) {
+		public async Task<ActionResult<ResponseStatus>> Put(string ChosenDB, string id,[FromBody] Schools._Source parameter) {
 			using (var client = new HttpClient()) {
 
 				var result = new ResponseStatus();
