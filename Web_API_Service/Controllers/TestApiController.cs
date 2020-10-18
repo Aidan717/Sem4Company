@@ -90,20 +90,21 @@ namespace Web_API_Service.Controllers {
 		[HttpGet("schools/del/{id}")]
 		public async Task<ActionResult<ResponseStatus>> DelSchool(string id) {
 
-			using (var client = new HttpClient()) {
-                var result = new ResponseStatus();
-                client.BaseAddress = new Uri("http://localhost:9200/schools/_doc/");
-				client.DefaultRequestHeaders.Accept.Clear();
-				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-				HttpResponseMessage response = await client.DeleteAsync(id);
+				using (var client = new HttpClient()) {
+					var result = new ResponseStatus();
+					client.BaseAddress = new Uri("http://localhost:9200/schools/_doc/");
+					client.DefaultRequestHeaders.Accept.Clear();
+					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+					HttpResponseMessage response = await client.DeleteAsync(id);
 
-				if (response.IsSuccessStatusCode) {
-                    result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
-                    return result;
-				} else {
-					return result;
+					if (response.IsSuccessStatusCode) {
+						result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+						return result;
+					} else {
+						return result;
+					}
 				}
-			}
+			
 		}
 
 
@@ -171,12 +172,12 @@ namespace Web_API_Service.Controllers {
             }
 		}
 
-		[HttpPut("{ChosenDB}/put/{id}")]
-		public async Task<ActionResult<ResponseStatus>> Put(string ChosenDB, string id,[FromBody] Schools._Source parameter) {
+		[HttpPut("{chosenDB}/put/{id}")]
+		public async Task<ActionResult<ResponseStatus>> Put(string chosenDB, string id,[FromBody] Schools._Source parameter) {
 			using (var client = new HttpClient()) {
 
 				var result = new ResponseStatus();
-				client.BaseAddress = new Uri("http://localhost:9200/" + ChosenDB + "/_doc/");
+				client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
 				client.DefaultRequestHeaders.Accept.Clear();				
 				var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");				
 				HttpResponseMessage response = await client.PostAsync("" + id, jsonstring);
