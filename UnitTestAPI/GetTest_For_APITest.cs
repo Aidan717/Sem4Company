@@ -21,18 +21,18 @@ namespace GetTest_For_APITest {
 
 
         [TestMethod]
-        public async Task TestGet(){
+        public void TestGet(){
 
             //Arrange
-            string schoolsDB = "schools";
-            string pams = "_index=schools";
+            string chosenDB = "schools";
+            string query = "zip=9000";
+            int moreThen = 0;
 
-            schools = testApiCon.GetSchool(schoolsDB, pams).Result.Value;
-            
             //Act
+            schools = testApiCon.GetSchool(chosenDB, query).Result.Value;
 
             //Assert
-            //Assert.IsTrue(schools.hits.total < 0);
+            Assert.IsTrue(schools.hits.total.value > moreThen, "The Get didnt return anything that was Greater than (" + moreThen + ") in DB (" + chosenDB + ") when looking for (" + query + ")");
 
         }
     }
