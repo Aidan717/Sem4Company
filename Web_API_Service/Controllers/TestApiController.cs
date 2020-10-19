@@ -9,7 +9,8 @@ using Web_API_Service.Models;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text;
-using MailKit;
+using System.Diagnostics;
+using System.Security.Cryptography.X509Certificates;
 
 
 
@@ -17,12 +18,12 @@ using MailKit;
 
 namespace Web_API_Service.Controllers {
 
-	
+
 
 
 	[Route("[controller]")]
 	[ApiController]
-	public class TestApiController: ControllerBase {
+	public class TestApiController : ControllerBase {
 		// GET: api/<OpenWeatherMapsApiController>
 		[HttpGet]
 		public IEnumerable<string> Get() {
@@ -32,21 +33,21 @@ namespace Web_API_Service.Controllers {
 		// GET <OpenWeatherMapsApiController>/weather/APIQuery
 		[HttpGet("weather/{APIQuery}")]
 		public async Task<ActionResult<OpenWeatherMapsApi>> GetWeather(string APIQuery) {
-			
+
 			using (var client = new HttpClient()) {
 				var result = new OpenWeatherMapsApi();
 				string key = "e7f9dce3dd5e96bc3faf4f5ca8014fcb";
 				client.BaseAddress = new Uri("http://api.openweathermap.org/data/2.5/weather");
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage response = await client.GetAsync("?q=" + APIQuery + "&appid=" + key + "");
-                if (response.IsSuccessStatusCode) {
+				HttpResponseMessage response = await client.GetAsync("?q=" + APIQuery + "&appid=" + key + "");
+				if (response.IsSuccessStatusCode) {
 					result = JsonSerializer.Deserialize<OpenWeatherMapsApi>(await response.Content.ReadAsStringAsync());
 					return result;
-                } else {
-                    return result;
-                }
-            }
+				} else {
+					return result;
+				}
+			}
 		}
 
 		[HttpGet("wp/{APIQuery}")]
@@ -80,8 +81,8 @@ namespace Web_API_Service.Controllers {
 				HttpResponseMessage response = await client.GetAsync("?q=" + SearchParameter);
 
 				if (response.IsSuccessStatusCode) {
-                    result = JsonSerializer.Deserialize<Schools>(await response.Content.ReadAsStringAsync());
-                    return result;
+					result = JsonSerializer.Deserialize<Schools>(await response.Content.ReadAsStringAsync());
+					return result;
 				} else {
 					return result;
 				}
@@ -92,15 +93,15 @@ namespace Web_API_Service.Controllers {
 		public async Task<ActionResult<ResponseStatus>> DelSchool(string id) {
 
 			using (var client = new HttpClient()) {
-                var result = new ResponseStatus();
-                client.BaseAddress = new Uri("http://localhost:9200/schools/_doc/");
+				var result = new ResponseStatus();
+				client.BaseAddress = new Uri("http://localhost:9200/schools/_doc/");
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 				HttpResponseMessage response = await client.DeleteAsync(id);
 
 				if (response.IsSuccessStatusCode) {
-                    result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
-                    return result;
+					result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+					return result;
 				} else {
 					return result;
 				}
@@ -117,9 +118,9 @@ namespace Web_API_Service.Controllers {
 			using (var client = new HttpClient()) {
 				var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
 
-					client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
-					client.DefaultRequestHeaders.Accept.Clear();
-					HttpResponseMessage response = await client.PostAsync("", jsonstring);
+				client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
+				client.DefaultRequestHeaders.Accept.Clear();
+				HttpResponseMessage response = await client.PostAsync("", jsonstring);
 
 				if (response.IsSuccessStatusCode) {
 					result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
@@ -137,7 +138,7 @@ namespace Web_API_Service.Controllers {
 
 				var result = new ResponseStatus();
 
-				String[] avalibleCities = {"Aalborg", "Brønderslev", "Hjørring", "Skagen"};
+				String[] avalibleCities = { "Aalborg", "Brønderslev", "Hjørring", "Skagen" };
 				Boolean avalibleCityCheck = false;
 
 				foreach (String element in avalibleCities) {
@@ -146,7 +147,7 @@ namespace Web_API_Service.Controllers {
 					}
 				}
 
-                if (avalibleCityCheck == true) {
+				if (avalibleCityCheck == true) {
 					client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
 					client.DefaultRequestHeaders.Accept.Clear();
 
@@ -160,31 +161,55 @@ namespace Web_API_Service.Controllers {
 						return result;
 					}
 				} else {
-                    //Send email to be made
-                    ResponseStatus failedResponse = new ResponseStatus();
+					//Send email to be made
+					ResponseStatus failedResponse = new ResponseStatus();
 					failedResponse.result = "failed";
 					result = failedResponse;
-                    return result;
-                }
-            }
-		}
-
-		[HttpPut("{ChosenDB}/put/{id}")]
-		public async Task<ActionResult<ResponseStatus>> Put(string ChosenDB, string id,[FromBody] Schools._Source parameter) {
-			using (var client = new HttpClient()) {
-
-				var result = new ResponseStatus();
-				client.BaseAddress = new Uri("http://localhost:9200/" + ChosenDB + "/_doc/");
-				client.DefaultRequestHeaders.Accept.Clear();				
-				var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");				
-				HttpResponseMessage response = await client.PostAsync("" + id, jsonstring);
-
-				if (response.IsSuccessStatusCode) {
-					result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
-					return result;
-				} else {
 					return result;
 				}
+			}
+		}
+		// send uri as string, id and exception to mailrequest generator.
+		[HttpPut("{ChosenDB}/put/{id}")]
+
+		public async Task<ActionResult<ResponseStatus>> Put(string ChosenDB, string id, [FromBody] SchoolsFake._Source parameter ) {
+			var result = new ResponseStatus();
+			string baseaddress;
+			try {
+				using (var client = new HttpClient()) {
+
+				
+				client.BaseAddress = new Uri("http://localhost:9000/" + ChosenDB + "/_doc/");
+					baseaddress = client.BaseAddress.ToString();
+				client.DefaultRequestHeaders.Accept.Clear();
+					Debug.WriteLine("BaseAddress of client right hereeeeeeee: " + client.BaseAddress);
+				var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
+				HttpResponseMessage response = new HttpResponseMessage();
+				
+					//Hvorfor bruger vi PostAsync og ikke PutAsync? cant remember
+					response = await client.PostAsync("" + id, jsonstring);
+
+
+					if (response.IsSuccessStatusCode) {
+						result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+						return result;
+					} else {
+						//Find the right exception to use
+						HttpRequestException ex = new HttpRequestException("StatusCode: " + response.StatusCode);
+						Debug.WriteLine("This is the exception thrown: " + response);
+						Debug.WriteLine("This is the exception thrown: " + ex);
+						Debug.WriteLine("This is the exception thrown in string: " + ex.Message);
+
+						//Add exception to MailRequest and use Thundersnows SendMail Method
+						return result;
+					}
+				}
+			} catch (HttpRequestException ex) {
+				//Send ex til MailRequest og brug Thundersnows SendMail method
+				Debug.WriteLine("This is the exception thrown in string: " + ex);
+				//CreateMailRequest(ex, id, baseaddress)
+				return result = new ResponseStatus("failed to connect");
+				//throw new HttpRequestException("Couldn't Connect", ex);
 			}
 		}
 

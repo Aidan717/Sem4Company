@@ -36,5 +36,15 @@ namespace Web_API_Service.Controllers {
                 throw;
             }
         }
+
+        [HttpPost("warning")]
+        public async Task<IActionResult> SendWarningMail([FromForm] MailRequest warningRequest) {
+            try {
+                await mailService.SendWarningEmailAsync(warningRequest);
+                return Ok();
+            } catch (Exception ex) {
+                throw;
+            }
+        }
     }
 }
