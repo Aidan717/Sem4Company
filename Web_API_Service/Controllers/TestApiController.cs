@@ -26,8 +26,8 @@ namespace Web_API_Service.Controllers {
 	[Route("[controller]")]
 	[ApiController]
 	public class TestApiController : ControllerBase {
-		public IMailService mailService;
-		MailController mc = new MailController(mailService);
+		
+		
 		// GET: api/<OpenWeatherMapsApiController>
 		[HttpGet]
 		public IEnumerable<string> Get() {
@@ -166,7 +166,7 @@ namespace Web_API_Service.Controllers {
 					}
 				} else {
 					//Send email to be made
-					MailController mc = new MailController(mailService);
+					
 					ResponseStatus failedResponse = new ResponseStatus();
 
 					var jsonstring = new String(JsonSerializer.Serialize(parameter));
