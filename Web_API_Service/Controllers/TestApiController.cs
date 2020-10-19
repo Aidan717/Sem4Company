@@ -144,9 +144,6 @@ namespace Web_API_Service.Controllers {
 				foreach (String element in avalibleCities) {
 					if (parameter.city == element) {
 						avalibleCityCheck = true;
-						//contact halles mail
-						//return error
-						//fyld op response status
 					}
 				}
 
