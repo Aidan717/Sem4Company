@@ -11,6 +11,8 @@ using System.Text.Json.Serialization;
 using System.Text;
 using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
+using Web_API_Service.Controllers;
+using Web_API_Service.Service;
 
 
 
@@ -24,6 +26,8 @@ namespace Web_API_Service.Controllers {
 	[Route("[controller]")]
 	[ApiController]
 	public class TestApiController : ControllerBase {
+		public IMailService mailService;
+		MailController mc = new MailController(mailService);
 		// GET: api/<OpenWeatherMapsApiController>
 		[HttpGet]
 		public IEnumerable<string> Get() {
@@ -162,7 +166,12 @@ namespace Web_API_Service.Controllers {
 					}
 				} else {
 					//Send email to be made
+					MailController mc = new MailController(mailService);
 					ResponseStatus failedResponse = new ResponseStatus();
+
+					var jsonstring = new String(JsonSerializer.Serialize(parameter));
+					await mc.SendWarningMail("PostParametersNotMet", jsonstring, chosenDB, "Error");
+
 					failedResponse.result = "failed";
 					
 
