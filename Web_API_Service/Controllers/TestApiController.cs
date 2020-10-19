@@ -27,7 +27,14 @@ namespace Web_API_Service.Controllers {
 	[ApiController]
 	public class TestApiController : ControllerBase {
 		
+		public IMailService mailService;
 		
+		public TestApiController(IMailService mailService) {
+			this.mailService = mailService;
+        }
+		
+
+
 		// GET: api/<OpenWeatherMapsApiController>
 		[HttpGet]
 		public IEnumerable<string> Get() {
@@ -138,6 +145,9 @@ namespace Web_API_Service.Controllers {
 
 		[HttpPost("{chosenDB}/postwithfewcities")]
 		public async Task<ActionResult<ResponseStatus>> PostParametersNotMet(string chosenDB, [FromBody] Schools._Source parameter) {
+
+			
+
 			using (var client = new HttpClient()) {
 
 				var result = new ResponseStatus();
@@ -166,15 +176,13 @@ namespace Web_API_Service.Controllers {
 					}
 				} else {
 					//Send email to be made
-					
+					MailController mailController = new MailController(mailService);
 					ResponseStatus failedResponse = new ResponseStatus();
 
 					var jsonstring = new String(JsonSerializer.Serialize(parameter));
-					await mc.SendWarningMail("PostParametersNotMet", jsonstring, chosenDB, "Error");
+					await mailController.SendWarningMail("PostParametersNotMet", jsonstring, chosenDB, "Error");
 
 					failedResponse.result = "failed";
-					
-
 					result = failedResponse;
 					return result;
 				}
@@ -182,14 +190,15 @@ namespace Web_API_Service.Controllers {
 		}
 		// send uri as string, id and exception to mailrequest generator.
 		[HttpPut("{ChosenDB}/put/{id}")]
-		public async Task<ActionResult<ResponseStatus>> Put(string chosenDB, string id, [FromBody] SchoolsFake._Source parameter ) {
+
+		public async Task<ActionResult<ResponseStatus>> Put(string ChosenDB, string id, [FromBody] SchoolsFake._Source parameter ) {
 			var result = new ResponseStatus();
 			string baseaddress;
 			try {
 				using (var client = new HttpClient()) {
 
 				
-				client.BaseAddress = new Uri("http://localhost:9000/" + chosenDB + "/_doc/");
+				client.BaseAddress = new Uri("http://localhost:9000/" + ChosenDB + "/_doc/");
 					baseaddress = client.BaseAddress.ToString();
 				client.DefaultRequestHeaders.Accept.Clear();
 					Debug.WriteLine("BaseAddress of client right hereeeeeeee: " + client.BaseAddress);
