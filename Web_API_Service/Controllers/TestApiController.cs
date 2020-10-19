@@ -26,8 +26,6 @@ namespace Web_API_Service.Controllers {
 	[Route("[controller]")]
 	[ApiController]
 	public class TestApiController : ControllerBase {
-		public IMailService mailService;
-		MailController mc = new MailController(mailService);
 		// GET: api/<OpenWeatherMapsApiController>
 		[HttpGet]
 		public IEnumerable<string> Get() {
