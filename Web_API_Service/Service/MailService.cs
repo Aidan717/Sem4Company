@@ -62,6 +62,20 @@ namespace Web_API_Service.Service {
             await smtp.SendAsync(email);
             smtp.Disconnect(true);
         }
+
+        public async Task SendWarningEmailAsync(MailRequest warningRequest) {
+            var email = new MimeMessage();
+            email.Sender = MailboxAddress.Parse(_mailSettings.Mail);
+            email.To.Add(MailboxAddress.Parse(warningRequest.ToEmail));
+            email.Subject = warningRequest.Subject;
+            var builder = new BodyBuilder();
+            builder.HtmlBody = warningRequest.Body;
+            email.Body = builder.ToMessageBody();
+            using var smtp = new SmtpClient();
+            smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
+            smtp.Authenticate(_mailSettings.Mail, _mailSettings.Password);
+            await smtp.SendAsync(email);
+            smtp.Disconnect(true);
+        }
     }
  }
-
