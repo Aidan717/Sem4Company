@@ -9,6 +9,7 @@ using Web_API_Service.Models;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text;
+using MailKit;
 
 
 
@@ -142,9 +143,6 @@ namespace Web_API_Service.Controllers {
 				foreach (String element in avalibleCities) {
 					if (parameter.city == element) {
 						avalibleCityCheck = true;
-						//contact halles mail
-						//return error
-						//fyld op response status
 					}
 				}
 
