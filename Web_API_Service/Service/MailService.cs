@@ -12,6 +12,7 @@ using MailKit.Net.Smtp;
 namespace Web_API_Service.Service {
     public class MailService : IMailService {
         private readonly MailSettings _mailSettings;
+
         public MailService(IOptions<MailSettings> mailSettings) {
             _mailSettings = mailSettings.Value;
         }
@@ -63,21 +64,23 @@ namespace Web_API_Service.Service {
         //    smtp.Disconnect(true);
         //}
 
-        public async Task SendWarningEmailAsync(string Query, string Destination, string Error) {
+        public async Task SendWarningEmailAsync(string methodName, string Query, string Destination, string Error) {
             MailRequest warningRequest = new MailRequest();
             var email = new MimeMessage();
             var builder = new BodyBuilder();
 
-            warningRequest.Body += "This is the Query\n" + Query;
-            warningRequest.Body += "\nThis is the Destination\n" + Destination;
-            warningRequest.Body += "\nThis is the Errormessage\n" + Error;
+            warningRequest.Body += "Method:<br />" + methodName;
+            warningRequest.Body += "<br /><br />Query:<br />" + Query;
+            warningRequest.Body += "<br /><br />Destination:<br />" + Destination;
+            warningRequest.Body += "<br /><br />Errormessage:<br />" + Error;
 
             builder.HtmlBody = warningRequest.Body;
 
             email.Sender = MailboxAddress.Parse(_mailSettings.MailReciever);
             //email.To.Add(MailboxAddress.Parse(warningRequest.ToEmail));
             email.To.Add(MailboxAddress.Parse(_mailSettings.MailSender));
-            email.Subject = warningRequest.Subject;
+            //email.Subject = warningRequest.Subject;
+            email.Subject = "Error for HTTPRequest";
             email.Body = builder.ToMessageBody();
 
             using var smtp = new SmtpClient();

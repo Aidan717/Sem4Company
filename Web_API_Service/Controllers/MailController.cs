@@ -9,10 +9,10 @@ using System.Text.Json;
 
 namespace Web_API_Service.Controllers {
 
-    [Route("api/[controller]")]
-    [ApiController]
+    //[Route("api/[controller]")]
+    //[ApiController]
     public class MailController : ControllerBase {
-        private readonly Service.IMailService mailService;
+        public Service.IMailService mailService;
         public MailController(Service.IMailService mailService) {
             this.mailService = mailService;
         }
@@ -37,14 +37,10 @@ namespace Web_API_Service.Controllers {
         //    }
         //}
 
-        [HttpPost("warning")]
-        public async Task<IActionResult> SendWarningMail([FromForm] MailRequest warningRequest) {
-            string Query = "Query ting og sager";
-            string Destination = "Destinations ting og sager";
-            string Error = "Error ting og sager";
-
+        //[HttpPost("warning")]
+        public async Task<IActionResult> SendWarningMail(string methodName, string Query, string Destination, string Error) {
             try {
-                await mailService.SendWarningEmailAsync(Query, Destination, Error);
+                await mailService.SendWarningEmailAsync(methodName, Query, Destination, Error);
                 return Ok();
             } catch (Exception ex) {
                 throw;
