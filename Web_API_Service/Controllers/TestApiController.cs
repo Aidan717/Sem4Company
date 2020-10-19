@@ -26,6 +26,15 @@ namespace Web_API_Service.Controllers {
 	[Route("[controller]")]
 	[ApiController]
 	public class TestApiController : ControllerBase {
+		
+		public IMailService mailService;
+		
+		public TestApiController(IMailService mailService) {
+			this.mailService = mailService;
+        }
+		
+
+
 		// GET: api/<OpenWeatherMapsApiController>
 		[HttpGet]
 		public IEnumerable<string> Get() {
@@ -136,6 +145,9 @@ namespace Web_API_Service.Controllers {
 
 		[HttpPost("{chosenDB}/postwithfewcities")]
 		public async Task<ActionResult<ResponseStatus>> PostParametersNotMet(string chosenDB, [FromBody] Schools._Source parameter) {
+
+			
+
 			using (var client = new HttpClient()) {
 
 				var result = new ResponseStatus();
@@ -164,11 +176,11 @@ namespace Web_API_Service.Controllers {
 					}
 				} else {
 					//Send email to be made
-					MailController mc = new MailController(mailService);
+					MailController mailController = new MailController(mailService);
 					ResponseStatus failedResponse = new ResponseStatus();
 
 					var jsonstring = new String(JsonSerializer.Serialize(parameter));
-					await mc.SendWarningMail("PostParametersNotMet", jsonstring, chosenDB, "Error");
+					await mailController.SendWarningMail("PostParametersNotMet", jsonstring, chosenDB, "Error");
 
 					failedResponse.result = "failed";
 					result = failedResponse;

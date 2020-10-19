@@ -8,10 +8,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Web_API_Service.Models;
 using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Http;
 
 namespace Web_API_Service.Service {
     public class MailService : IMailService {
         private readonly MailSettings _mailSettings;
+
 
         public MailService(IOptions<MailSettings> mailSettings) {
             _mailSettings = mailSettings.Value;
@@ -65,6 +67,9 @@ namespace Web_API_Service.Service {
         //}
 
         public async Task SendWarningEmailAsync(string methodName, string Query, string Destination, string Error) {
+
+            
+
             MailRequest warningRequest = new MailRequest();
             var email = new MimeMessage();
             var builder = new BodyBuilder();
