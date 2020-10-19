@@ -174,15 +174,14 @@ namespace Web_API_Service.Controllers {
 		}
 		// send uri as string, id and exception to mailrequest generator.
 		[HttpPut("{ChosenDB}/put/{id}")]
-
-		public async Task<ActionResult<ResponseStatus>> Put(string ChosenDB, string id, [FromBody] SchoolsFake._Source parameter ) {
+		public async Task<ActionResult<ResponseStatus>> Put(string chosenDB, string id, [FromBody] SchoolsFake._Source parameter ) {
 			var result = new ResponseStatus();
 			string baseaddress;
 			try {
 				using (var client = new HttpClient()) {
 
 				
-				client.BaseAddress = new Uri("http://localhost:9000/" + ChosenDB + "/_doc/");
+				client.BaseAddress = new Uri("http://localhost:9000/" + chosenDB + "/_doc/");
 					baseaddress = client.BaseAddress.ToString();
 				client.DefaultRequestHeaders.Accept.Clear();
 					Debug.WriteLine("BaseAddress of client right hereeeeeeee: " + client.BaseAddress);
