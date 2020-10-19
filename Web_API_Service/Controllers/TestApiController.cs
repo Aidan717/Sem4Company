@@ -164,6 +164,8 @@ namespace Web_API_Service.Controllers {
 					//Send email to be made
 					ResponseStatus failedResponse = new ResponseStatus();
 					failedResponse.result = "failed";
+					
+
 					result = failedResponse;
 					return result;
 				}

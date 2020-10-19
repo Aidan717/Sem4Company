@@ -9,9 +9,9 @@ using System.Text.Json;
 
 namespace Web_API_Service.Controllers {
 
-    [Route("api/[controller]")]
-    [ApiController]
-    public class MailController : ControllerBase {
+    //[Route("api/[controller]")]
+    //[ApiController]
+    public class MailController : Controller {
         private readonly Service.IMailService mailService;
         public MailController(Service.IMailService mailService) {
             this.mailService = mailService;
@@ -37,7 +37,7 @@ namespace Web_API_Service.Controllers {
         //    }
         //}
 
-        [HttpPost("warning")]
+        //[HttpPost("warning")]
         public async Task<IActionResult> SendWarningMail([FromForm] MailRequest warningRequest) {
             string Query = "Query ting og sager";
             string Destination = "Destinations ting og sager";
