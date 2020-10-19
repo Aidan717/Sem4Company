@@ -14,6 +14,14 @@ namespace Web_API_Service.Models {
         public int _seq_no { get; set; }
         public int _primary_term { get; set; }
 
+        public ResponseStatus() {
+           
+        }
+
+        public ResponseStatus(string result) {
+            this.result = result;
+        }
+
         public class _Shards {
             public int total { get; set; }
             public int successful { get; set; }
