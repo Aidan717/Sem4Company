@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using Web_API_Service.Controllers;
 using Web_API_Service.Service;
+using Microsoft.Extensions.Options;
 
 
 
@@ -26,13 +27,8 @@ namespace Web_API_Service.Controllers {
 	[Route("[controller]")]
 	[ApiController]
 	public class TestApiController : ControllerBase {
-		
-		public IMailService mailService;
-		
-		public TestApiController(IMailService mailService) {
-			this.mailService = mailService;
-        }
-		
+
+
 
 
 		// GET: api/<OpenWeatherMapsApiController>
@@ -216,14 +212,14 @@ namespace Web_API_Service.Controllers {
 					} else {
 						//Find the right exception to use
 						HttpRequestException ex = new HttpRequestException("StatusCode: " + response.StatusCode);
-						
+
 
 						//Add exception to MailRequest and use Thundersnows SendMail Method
-						MailController mailController = new MailController(mailService);
+						MailService _mail = new MailService();
 						ResponseStatus failedResponse = new ResponseStatus();
 
 						var jsonstrings = new String(JsonSerializer.Serialize(parameter));
-						await mailController.SendWarningMail("UpdateIndexWithId", jsonstrings, baseaddress, ex.ToString());
+						await _mail.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseaddress, ex.ToString());
 
 						failedResponse.result = "Failed to connnect: " + response.StatusCode.ToString();
 						result = failedResponse;
@@ -232,11 +228,12 @@ namespace Web_API_Service.Controllers {
 					}
 				}
 			} catch (HttpRequestException ex) {
-				MailController mailController = new MailController(mailService);
+				
+				MailService _mail = new MailService();
 				ResponseStatus failedResponse = new ResponseStatus();
 
 				var jsonstrings = new String(JsonSerializer.Serialize(parameter));
-				await mailController.SendWarningMail("UpdateIndexWithId", jsonstrings, baseaddress, ex.ToString());
+				await _mail.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseaddress, ex.ToString());
 
 				failedResponse.result = "Failed to connect: No Response";
 				result = failedResponse;
