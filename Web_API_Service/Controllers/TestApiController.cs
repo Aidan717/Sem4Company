@@ -14,6 +14,7 @@ using System.Security.Cryptography.X509Certificates;
 using Web_API_Service.Controllers;
 using Web_API_Service.Service;
 using Microsoft.Extensions.Options;
+using System.Reflection;
 
 
 
@@ -168,7 +169,7 @@ namespace Web_API_Service.Controllers {
 						}
 					}
 
-					client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
+					client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_docs/");
 					baseaddress = client.BaseAddress.ToString();
 					client.DefaultRequestHeaders.Accept.Clear();
 
@@ -181,40 +182,25 @@ namespace Web_API_Service.Controllers {
 							result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
 							return result;
 						} else {
-							HttpRequestException ex = new HttpRequestException("StatusCode: " + response.StatusCode);
-
-							MailService mailS = new MailService();
-							ResponseStatus failedResponse = new ResponseStatus();
-
-							var jsonstrings = new String(JsonSerializer.Serialize(parameter));
-							await mailS.SendWarningEmailAsync("PostParametersNotMet", jsonstrings, baseaddress, ex.ToString());
-
-							failedResponse.result = "Failed to connnect: " + response.StatusCode.ToString();
-							result = failedResponse;
-							return result;
+							throw new HttpRequestException("statusCode: " + response.StatusCode);					
 						}
 
 					} else {
-						HttpRequestException ex = new HttpRequestException("StatusCode: " + response.StatusCode);
-
-						MailService mailS = new MailService();
-						ResponseStatus failedResponse = new ResponseStatus();
-
-						var jsonstrings = new String(JsonSerializer.Serialize(parameter));
-						await mailS.SendWarningEmailAsync("PostParametersNotMet", jsonstrings, baseaddress, ex.ToString());
-
-						failedResponse.result = "Failed to connnect: " + response.StatusCode.ToString();
-						result = failedResponse;
-						return result;
+						throw new HttpRequestException("the chosen city is not on the list");
 					}
 				}
 			} catch(HttpRequestException ex) {
+				MethodBase methName = MethodBase.GetCurrentMethod();
 				MailService mailS = new MailService();
-				var jsonstrings = new String(JsonSerializer.Serialize(parameter));
-				await mailS.SendWarningEmailAsync("PostParametersNotMet", jsonstrings, baseaddress, ex.ToString());
 
-				return result = new ResponseStatus("failed to connect");
-			}
+				var jsonstrings = new String(JsonSerializer.Serialize(parameter));
+				await mailS.SendWarningEmailAsync("PostParametersNotMet", jsonstrings, baseaddress, ex.Message);
+
+				return result = new ResponseStatus(ex.Message );
+
+
+
+			} 
 		}
 
 

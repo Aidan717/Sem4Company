@@ -11,9 +11,9 @@ namespace Web_API_Service.Controllers {
 
     //[Route("api/[controller]")]
     //[ApiController]
-    public class MailController : Controller {
+    public class MailController : ControllerBase {
         public Service.IMailService mailService;
-        public MailController(Service.IMailService mailService) {;
+        public MailController(Service.IMailService mailService) {
             this.mailService = mailService;
         }
 

@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Org.BouncyCastle.Bcpg.Sig;
 using Web_API_Service.Models;
+using Web_API_Service.Service;
 
 namespace Web_API_Service {
 	public class Startup {
