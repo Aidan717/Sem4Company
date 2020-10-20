@@ -12,12 +12,25 @@ using Microsoft.AspNetCore.Http;
 
 namespace Web_API_Service.Service {
     public class MailService : IMailService {
-        private readonly MailSettings _mailSettings;
 
+        MailSettings mSettings = new MailSettings() {
+            MailReciever = "gruppe6testmail@gmail.com",
+            MailSender = "gruppe6testmail@gmail.com",
+            DisplayName = "Test Email",
+            Password = "password424",
+            Host = "smtp.gmail.com",
+            Port = 587
+        };
 
-        public MailService(IOptions<MailSettings> mailSettings) {
-            _mailSettings = mailSettings.Value;
+        //private readonly MailSettings _mailSettings;
+
+        public MailService() {
+
         }
+
+        //public MailService(IOptions<MailSettings> mailSettings) {
+        //    _mailSettings = mailSettings.Value;
+        //}
 
         //public async Task SendEmailAsync(MailRequest mailRequest) {
         //    var email = new MimeMessage();
@@ -67,8 +80,8 @@ namespace Web_API_Service.Service {
         //}
 
         public async Task SendWarningEmailAsync(string methodName, string Query, string Destination, string Error) {
-
-            
+            IOptions<MailSettings> _mailSettings = Options.Create(mSettings);
+            MailSettings mailSettings = _mailSettings.Value;
 
             MailRequest warningRequest = new MailRequest();
             var email = new MimeMessage();
@@ -77,20 +90,20 @@ namespace Web_API_Service.Service {
             warningRequest.Body += "Method:<br />" + methodName;
             warningRequest.Body += "<br /><br />Query:<br />" + Query;
             warningRequest.Body += "<br /><br />Destination:<br />" + Destination;
-            warningRequest.Body += "<br /><br />Errormessage:<br />" + Error;
+            warningRequest.Body += "<br /><br />Error message:<br />" + Error;
 
             builder.HtmlBody = warningRequest.Body;
 
-            email.Sender = MailboxAddress.Parse(_mailSettings.MailReciever);
+            email.Sender = MailboxAddress.Parse(mailSettings.MailReciever);
             //email.To.Add(MailboxAddress.Parse(warningRequest.ToEmail));
-            email.To.Add(MailboxAddress.Parse(_mailSettings.MailSender));
+            email.To.Add(MailboxAddress.Parse(mailSettings.MailSender));
             //email.Subject = warningRequest.Subject;
             email.Subject = "Error for HTTPRequest";
             email.Body = builder.ToMessageBody();
 
             using var smtp = new SmtpClient();
-            smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
-            smtp.Authenticate(_mailSettings.MailReciever, _mailSettings.Password);
+            smtp.Connect(mailSettings.Host, mailSettings.Port, SecureSocketOptions.StartTls);
+            smtp.Authenticate(mailSettings.MailReciever, mailSettings.Password);
             await smtp.SendAsync(email);
             smtp.Disconnect(true);
         }

@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using Web_API_Service.Controllers;
 using Web_API_Service.Service;
+using Microsoft.Extensions.Options;
 
 
 
@@ -26,13 +27,8 @@ namespace Web_API_Service.Controllers {
 	[Route("[controller]")]
 	[ApiController]
 	public class TestApiController : ControllerBase {
-		
-		public IMailService mailService;
-		
-		public TestApiController(IMailService mailService) {
-			this.mailService = mailService;
-        }
-		
+
+
 
 
 		// GET: api/<OpenWeatherMapsApiController>
@@ -124,86 +120,121 @@ namespace Web_API_Service.Controllers {
 		[HttpPost("{chosenDB}/post")]
 		public async Task<ActionResult<ResponseStatus>> Post(string chosenDB, [FromBody] Schools._Source parameter) {
 			var result = new ResponseStatus();
+			string baseaddress = "";
+			HttpResponseMessage response = new HttpResponseMessage();
 
-			//if (parameter != null) {
-			using (var client = new HttpClient()) {
-				var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
+			try {
+				//if (parameter != null) {
+				using (var client = new HttpClient()) {
+					var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
 
-				client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
-				client.DefaultRequestHeaders.Accept.Clear();
-				HttpResponseMessage response = await client.PostAsync("", jsonstring);
+					client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
+					client.DefaultRequestHeaders.Accept.Clear();
+					response = await client.PostAsync("", jsonstring);
 
-				if (response.IsSuccessStatusCode) {
-					result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
-					return result;
-				} else {
-					// use mail service to report back
-					return result;
+					if (response.IsSuccessStatusCode) {
+						result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+						return result;
+					} else {
+						// use mail service to report back
+						return result;
+					}
 				}
+			} catch (HttpRequestException ex) {
+				MailService mailS = new MailService();
+				var jsonstrings = new String(JsonSerializer.Serialize(parameter));
+				await mailS.SendWarningEmailAsync("PostParametersNotMet", jsonstrings, baseaddress, ex.ToString());
+
+				return result = new ResponseStatus("failed to connect");
 			}
 		}
 
 		[HttpPost("{chosenDB}/postwithfewcities")]
 		public async Task<ActionResult<ResponseStatus>> PostParametersNotMet(string chosenDB, [FromBody] Schools._Source parameter) {
 
-			
+			var result = new ResponseStatus();
+			string baseaddress = "";
+			HttpResponseMessage response = new HttpResponseMessage();
 
-			using (var client = new HttpClient()) {
+			try {
+				using (var client = new HttpClient()) {
 
-				var result = new ResponseStatus();
+					String[] avalibleCities = { "Aalborg", "Brønderslev", "Hjørring", "Skagen" };
+					Boolean avalibleCityCheck = false;
 
-				String[] avalibleCities = { "Aalborg", "Brønderslev", "Hjørring", "Skagen" };
-				Boolean avalibleCityCheck = false;
-
-				foreach (String element in avalibleCities) {
-					if (parameter.city == element) {
-						avalibleCityCheck = true;
+					foreach (String element in avalibleCities) {
+						if (parameter.city == element) {
+							avalibleCityCheck = true;
+						}
 					}
-				}
 
-				if (avalibleCityCheck == true) {
 					client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
+					baseaddress = client.BaseAddress.ToString();
 					client.DefaultRequestHeaders.Accept.Clear();
 
-					var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
-					HttpResponseMessage response = await client.PostAsync("", jsonstring);
+					if (avalibleCityCheck == true) {
 
-					if (response.IsSuccessStatusCode) {
-						result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
-						return result;
+						var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
+						response = await client.PostAsync("", jsonstring);
+
+						if (response.IsSuccessStatusCode) {
+							result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+							return result;
+						} else {
+							HttpRequestException ex = new HttpRequestException("StatusCode: " + response.StatusCode);
+
+							MailService mailS = new MailService();
+							ResponseStatus failedResponse = new ResponseStatus();
+
+							var jsonstrings = new String(JsonSerializer.Serialize(parameter));
+							await mailS.SendWarningEmailAsync("PostParametersNotMet", jsonstrings, baseaddress, ex.ToString());
+
+							failedResponse.result = "Failed to connnect: " + response.StatusCode.ToString();
+							result = failedResponse;
+							return result;
+						}
+
 					} else {
+						HttpRequestException ex = new HttpRequestException("StatusCode: " + response.StatusCode);
+
+						MailService mailS = new MailService();
+						ResponseStatus failedResponse = new ResponseStatus();
+
+						var jsonstrings = new String(JsonSerializer.Serialize(parameter));
+						await mailS.SendWarningEmailAsync("PostParametersNotMet", jsonstrings, baseaddress, ex.ToString());
+
+						failedResponse.result = "Failed to connnect: " + response.StatusCode.ToString();
+						result = failedResponse;
 						return result;
 					}
-				} else {
-					//Send email to be made
-					MailController mailController = new MailController(mailService);
-					ResponseStatus failedResponse = new ResponseStatus();
-
-					var jsonstring = new String(JsonSerializer.Serialize(parameter));
-					await mailController.SendWarningMail("PostParametersNotMet", jsonstring, chosenDB, "Error");
-
-					failedResponse.result = "failed";
-					result = failedResponse;
-					return result;
 				}
+			} catch(HttpRequestException ex) {
+				MailService mailS = new MailService();
+				var jsonstrings = new String(JsonSerializer.Serialize(parameter));
+				await mailS.SendWarningEmailAsync("PostParametersNotMet", jsonstrings, baseaddress, ex.ToString());
+
+				return result = new ResponseStatus("failed to connect");
 			}
 		}
+
+
 		// send uri as string, id and exception to mailrequest generator.
 		[HttpPut("{ChosenDB}/put/{id}")]
 
 		public async Task<ActionResult<ResponseStatus>> Put(string ChosenDB, string id, [FromBody] SchoolsFake._Source parameter ) {
 			var result = new ResponseStatus();
-			string baseaddress;
+			string baseaddress = "";
+			HttpResponseMessage response = new HttpResponseMessage();
 			try {
 				using (var client = new HttpClient()) {
 
 				
-				client.BaseAddress = new Uri("http://localhost:9000/" + ChosenDB + "/_doc/");
-					baseaddress = client.BaseAddress.ToString();
+				client.BaseAddress = new Uri("http://localhost:9200/" + ChosenDB + "/_doc/");
+				baseaddress = client.BaseAddress.ToString();
 				client.DefaultRequestHeaders.Accept.Clear();
-					Debug.WriteLine("BaseAddress of client right hereeeeeeee: " + client.BaseAddress);
+				Debug.WriteLine("BaseAddress of client right hereeeeeeee: " + client.BaseAddress);
 				var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
-				HttpResponseMessage response = new HttpResponseMessage();
+				
 				
 					//Hvorfor bruger vi PostAsync og ikke PutAsync? cant remember
 					response = await client.PostAsync("" + id, jsonstring);
@@ -215,20 +246,32 @@ namespace Web_API_Service.Controllers {
 					} else {
 						//Find the right exception to use
 						HttpRequestException ex = new HttpRequestException("StatusCode: " + response.StatusCode);
-						Debug.WriteLine("This is the exception thrown: " + response);
-						Debug.WriteLine("This is the exception thrown: " + ex);
-						Debug.WriteLine("This is the exception thrown in string: " + ex.Message);
+
 
 						//Add exception to MailRequest and use Thundersnows SendMail Method
+						MailService _mail = new MailService();
+						ResponseStatus failedResponse = new ResponseStatus();
+
+						var jsonstrings = new String(JsonSerializer.Serialize(parameter));
+						await _mail.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseaddress, ex.ToString());
+
+						failedResponse.result = "Failed to connnect: " + response.StatusCode.ToString();
+						result = failedResponse;
 						return result;
+
 					}
 				}
 			} catch (HttpRequestException ex) {
-				//Send ex til MailRequest og brug Thundersnows SendMail method
-				Debug.WriteLine("This is the exception thrown in string: " + ex);
-				//CreateMailRequest(ex, id, baseaddress)
-				return result = new ResponseStatus("failed to connect");
-				//throw new HttpRequestException("Couldn't Connect", ex);
+				
+				MailService _mail = new MailService();
+				ResponseStatus failedResponse = new ResponseStatus();
+
+				var jsonstrings = new String(JsonSerializer.Serialize(parameter));
+				await _mail.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseaddress, ex.ToString());
+
+				failedResponse.result = "Failed to connect: No Response";
+				result = failedResponse;
+				return result;
 			}
 		}
 
