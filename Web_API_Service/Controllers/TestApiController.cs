@@ -164,20 +164,25 @@ namespace Web_API_Service.Controllers {
 						baseaddress = client.BaseAddress.ToString();
 						client.DefaultRequestHeaders.Accept.Clear();
 
-					if (avalibleCityCheck == true) {
 						var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
 						HttpResponseMessage response = await client.PostAsync("", jsonstring);
 
-						if (response.IsSuccessStatusCode) {
-							result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
-							return result;
-						} else {
-							HttpRequestException ex = new HttpRequestException("StatusCode: " + response.StatusCode);
-							return result;
-						}
-                    } else {
+					if (response.IsSuccessStatusCode && avalibleCityCheck == true) {
+						result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
 						return result;
-                    }
+					} else {
+						HttpRequestException ex = new HttpRequestException("StatusCode: " + response.StatusCode);
+
+						MailController mailController = new MailController(mailService);
+						ResponseStatus failedResponse = new ResponseStatus();
+
+						var jsonstrings = new String(JsonSerializer.Serialize(parameter));
+						await mailController.SendWarningMail("PostParametersNotMet", jsonstrings, baseaddress, ex.ToString());
+
+						failedResponse.result = "Failed to connnect: " + response.StatusCode.ToString();
+						result = failedResponse;
+						return result;
+					}
 				}
 			} catch(HttpRequestException ex) {
 				MailController mailController = new MailController(mailService);
