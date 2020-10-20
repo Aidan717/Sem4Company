@@ -148,6 +148,7 @@ namespace Web_API_Service.Controllers {
 
 			var result = new ResponseStatus();
 			string baseaddress = "";
+			HttpResponseMessage response = new HttpResponseMessage();
 
 			try {
 				using (var client = new HttpClient()) {
@@ -160,16 +161,32 @@ namespace Web_API_Service.Controllers {
 							avalibleCityCheck = true;
 						}
 					}
+
+                    if (avalibleCityCheck == true) {
 						client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
 						baseaddress = client.BaseAddress.ToString();
 						client.DefaultRequestHeaders.Accept.Clear();
 
 						var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
-						HttpResponseMessage response = await client.PostAsync("", jsonstring);
+						response = await client.PostAsync("", jsonstring);
 
-					if (response.IsSuccessStatusCode && avalibleCityCheck == true) {
-						result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
-						return result;
+						if (response.IsSuccessStatusCode) {
+							result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+							return result;
+						} else {
+							HttpRequestException ex = new HttpRequestException("StatusCode: " + response.StatusCode);
+
+							MailController mailController = new MailController(mailService);
+							ResponseStatus failedResponse = new ResponseStatus();
+
+							var jsonstrings = new String(JsonSerializer.Serialize(parameter));
+							await mailController.SendWarningMail("PostParametersNotMet", jsonstrings, baseaddress, ex.ToString());
+
+							failedResponse.result = "Failed to connnect: " + response.StatusCode.ToString();
+							result = failedResponse;
+							return result;
+						}
+
 					} else {
 						HttpRequestException ex = new HttpRequestException("StatusCode: " + response.StatusCode);
 
