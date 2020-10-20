@@ -120,22 +120,32 @@ namespace Web_API_Service.Controllers {
 		[HttpPost("{chosenDB}/post")]
 		public async Task<ActionResult<ResponseStatus>> Post(string chosenDB, [FromBody] Schools._Source parameter) {
 			var result = new ResponseStatus();
+			string baseaddress = "";
+			HttpResponseMessage response = new HttpResponseMessage();
 
-			//if (parameter != null) {
-			using (var client = new HttpClient()) {
-				var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
+			try {
+				//if (parameter != null) {
+				using (var client = new HttpClient()) {
+					var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
 
-				client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
-				client.DefaultRequestHeaders.Accept.Clear();
-				HttpResponseMessage response = await client.PostAsync("", jsonstring);
+					client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
+					client.DefaultRequestHeaders.Accept.Clear();
+					response = await client.PostAsync("", jsonstring);
 
-				if (response.IsSuccessStatusCode) {
-					result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
-					return result;
-				} else {
-					// use mail service to report back
-					return result;
+					if (response.IsSuccessStatusCode) {
+						result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+						return result;
+					} else {
+						// use mail service to report back
+						return result;
+					}
 				}
+			} catch (HttpRequestException ex) {
+				MailService mailS = new MailService();
+				var jsonstrings = new String(JsonSerializer.Serialize(parameter));
+				await mailS.SendWarningEmailAsync("PostParametersNotMet", jsonstrings, baseaddress, ex.ToString());
+
+				return result = new ResponseStatus("failed to connect");
 			}
 		}
 
