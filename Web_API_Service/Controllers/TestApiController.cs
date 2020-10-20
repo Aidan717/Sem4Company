@@ -173,11 +173,11 @@ namespace Web_API_Service.Controllers {
 						} else {
 							HttpRequestException ex = new HttpRequestException("StatusCode: " + response.StatusCode);
 
-							MailController mailController = new MailController(mailService);
+							MailService mailS = new MailService();
 							ResponseStatus failedResponse = new ResponseStatus();
 
 							var jsonstrings = new String(JsonSerializer.Serialize(parameter));
-							await mailController.SendWarningMail("PostParametersNotMet", jsonstrings, baseaddress, ex.ToString());
+							await mailS.SendWarningEmailAsync("PostParametersNotMet", jsonstrings, baseaddress, ex.ToString());
 
 							failedResponse.result = "Failed to connnect: " + response.StatusCode.ToString();
 							result = failedResponse;
@@ -187,11 +187,11 @@ namespace Web_API_Service.Controllers {
 					} else {
 						HttpRequestException ex = new HttpRequestException("StatusCode: " + response.StatusCode);
 
-						MailController mailController = new MailController(mailService);
+						MailService mailS = new MailService();
 						ResponseStatus failedResponse = new ResponseStatus();
 
 						var jsonstrings = new String(JsonSerializer.Serialize(parameter));
-						await mailController.SendWarningMail("PostParametersNotMet", jsonstrings, baseaddress, ex.ToString());
+						await mailS.SendWarningEmailAsync("PostParametersNotMet", jsonstrings, baseaddress, ex.ToString());
 
 						failedResponse.result = "Failed to connnect: " + response.StatusCode.ToString();
 						result = failedResponse;
@@ -199,9 +199,9 @@ namespace Web_API_Service.Controllers {
 					}
 				}
 			} catch(HttpRequestException ex) {
-				MailController mailController = new MailController(mailService);
-				var jsonstring = new String(JsonSerializer.Serialize(parameter));
-				await mailController.SendWarningMail("PostParametersNotMet", jsonstring, baseaddress, ex.ToString());
+				MailService mailS = new MailService();
+				var jsonstrings = new String(JsonSerializer.Serialize(parameter));
+				await mailS.SendWarningEmailAsync("PostParametersNotMet", jsonstrings, baseaddress, ex.ToString());
 
 				return result = new ResponseStatus("failed to connect");
 			}
