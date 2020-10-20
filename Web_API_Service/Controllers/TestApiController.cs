@@ -162,10 +162,11 @@ namespace Web_API_Service.Controllers {
 						}
 					}
 
-                    if (avalibleCityCheck == true) {
-						client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
-						baseaddress = client.BaseAddress.ToString();
-						client.DefaultRequestHeaders.Accept.Clear();
+					client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
+					baseaddress = client.BaseAddress.ToString();
+					client.DefaultRequestHeaders.Accept.Clear();
+
+					if (avalibleCityCheck == true) {
 
 						var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
 						response = await client.PostAsync("", jsonstring);
