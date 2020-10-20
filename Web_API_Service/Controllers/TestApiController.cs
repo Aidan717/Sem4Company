@@ -142,48 +142,72 @@ namespace Web_API_Service.Controllers {
 		[HttpPost("{chosenDB}/postwithfewcities")]
 		public async Task<ActionResult<ResponseStatus>> PostParametersNotMet(string chosenDB, [FromBody] Schools._Source parameter) {
 
-			
+			var result = new ResponseStatus();
+			string baseaddress = "";
+			HttpResponseMessage response = new HttpResponseMessage();
 
-			using (var client = new HttpClient()) {
+			try {
+				using (var client = new HttpClient()) {
 
-				var result = new ResponseStatus();
+					String[] avalibleCities = { "Aalborg", "Brønderslev", "Hjørring", "Skagen" };
+					Boolean avalibleCityCheck = false;
 
-				String[] avalibleCities = { "Aalborg", "Brønderslev", "Hjørring", "Skagen" };
-				Boolean avalibleCityCheck = false;
-
-				foreach (String element in avalibleCities) {
-					if (parameter.city == element) {
-						avalibleCityCheck = true;
+					foreach (String element in avalibleCities) {
+						if (parameter.city == element) {
+							avalibleCityCheck = true;
+						}
 					}
-				}
 
-				if (avalibleCityCheck == true) {
 					client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_doc/");
+					baseaddress = client.BaseAddress.ToString();
 					client.DefaultRequestHeaders.Accept.Clear();
 
-					var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
-					HttpResponseMessage response = await client.PostAsync("", jsonstring);
+					if (avalibleCityCheck == true) {
 
-					if (response.IsSuccessStatusCode) {
-						result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
-						return result;
+						var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
+						response = await client.PostAsync("", jsonstring);
+
+						if (response.IsSuccessStatusCode) {
+							result = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+							return result;
+						} else {
+							HttpRequestException ex = new HttpRequestException("StatusCode: " + response.StatusCode);
+
+							MailController mailController = new MailController(mailService);
+							ResponseStatus failedResponse = new ResponseStatus();
+
+							var jsonstrings = new String(JsonSerializer.Serialize(parameter));
+							await mailController.SendWarningMail("PostParametersNotMet", jsonstrings, baseaddress, ex.ToString());
+
+							failedResponse.result = "Failed to connnect: " + response.StatusCode.ToString();
+							result = failedResponse;
+							return result;
+						}
+
 					} else {
+						HttpRequestException ex = new HttpRequestException("StatusCode: " + response.StatusCode);
+
+						MailController mailController = new MailController(mailService);
+						ResponseStatus failedResponse = new ResponseStatus();
+
+						var jsonstrings = new String(JsonSerializer.Serialize(parameter));
+						await mailController.SendWarningMail("PostParametersNotMet", jsonstrings, baseaddress, ex.ToString());
+
+						failedResponse.result = "Failed to connnect: " + response.StatusCode.ToString();
+						result = failedResponse;
 						return result;
 					}
-				} else {
-					//Send email to be made
-					MailController mailController = new MailController(mailService);
-					ResponseStatus failedResponse = new ResponseStatus();
-
-					var jsonstring = new String(JsonSerializer.Serialize(parameter));
-					await mailController.SendWarningMail("PostParametersNotMet", jsonstring, chosenDB, "Error");
-
-					failedResponse.result = "failed";
-					result = failedResponse;
-					return result;
 				}
+			} catch(HttpRequestException ex) {
+				MailController mailController = new MailController(mailService);
+				var jsonstring = new String(JsonSerializer.Serialize(parameter));
+				await mailController.SendWarningMail("PostParametersNotMet", jsonstring, baseaddress, ex.ToString());
+
+				return result = new ResponseStatus("failed to connect");
 			}
 		}
+
+
 		// send uri as string, id and exception to mailrequest generator.
 		[HttpPut("{ChosenDB}/put/{id}")]
 
