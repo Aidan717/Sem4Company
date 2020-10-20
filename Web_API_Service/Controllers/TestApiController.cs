@@ -193,17 +193,18 @@ namespace Web_API_Service.Controllers {
 
 		public async Task<ActionResult<ResponseStatus>> Put(string ChosenDB, string id, [FromBody] SchoolsFake._Source parameter ) {
 			var result = new ResponseStatus();
-			string baseaddress;
+			string baseaddress = "";
+			HttpResponseMessage response = new HttpResponseMessage();
 			try {
 				using (var client = new HttpClient()) {
 
 				
-				client.BaseAddress = new Uri("http://localhost:9000/" + ChosenDB + "/_doc/");
-					baseaddress = client.BaseAddress.ToString();
+				client.BaseAddress = new Uri("http://localhost:9200/" + ChosenDB + "/_doc/");
+				baseaddress = client.BaseAddress.ToString();
 				client.DefaultRequestHeaders.Accept.Clear();
-					Debug.WriteLine("BaseAddress of client right hereeeeeeee: " + client.BaseAddress);
+				Debug.WriteLine("BaseAddress of client right hereeeeeeee: " + client.BaseAddress);
 				var jsonstring = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json");
-				HttpResponseMessage response = new HttpResponseMessage();
+				
 				
 					//Hvorfor bruger vi PostAsync og ikke PutAsync? cant remember
 					response = await client.PostAsync("" + id, jsonstring);
@@ -215,20 +216,31 @@ namespace Web_API_Service.Controllers {
 					} else {
 						//Find the right exception to use
 						HttpRequestException ex = new HttpRequestException("StatusCode: " + response.StatusCode);
-						Debug.WriteLine("This is the exception thrown: " + response);
-						Debug.WriteLine("This is the exception thrown: " + ex);
-						Debug.WriteLine("This is the exception thrown in string: " + ex.Message);
+						
 
 						//Add exception to MailRequest and use Thundersnows SendMail Method
+						MailController mailController = new MailController(mailService);
+						ResponseStatus failedResponse = new ResponseStatus();
+
+						var jsonstrings = new String(JsonSerializer.Serialize(parameter));
+						await mailController.SendWarningMail("UpdateIndexWithId", jsonstrings, baseaddress, ex.ToString());
+
+						failedResponse.result = "Failed to connnect: " + response.StatusCode.ToString();
+						result = failedResponse;
 						return result;
+
 					}
 				}
 			} catch (HttpRequestException ex) {
-				//Send ex til MailRequest og brug Thundersnows SendMail method
-				Debug.WriteLine("This is the exception thrown in string: " + ex);
-				//CreateMailRequest(ex, id, baseaddress)
-				return result = new ResponseStatus("failed to connect");
-				//throw new HttpRequestException("Couldn't Connect", ex);
+				MailController mailController = new MailController(mailService);
+				ResponseStatus failedResponse = new ResponseStatus();
+
+				var jsonstrings = new String(JsonSerializer.Serialize(parameter));
+				await mailController.SendWarningMail("UpdateIndexWithId", jsonstrings, baseaddress, ex.ToString());
+
+				failedResponse.result = "Failed to connect: No Response";
+				result = failedResponse;
+				return result;
 			}
 		}
 

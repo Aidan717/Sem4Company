@@ -77,7 +77,7 @@ namespace Web_API_Service.Service {
             warningRequest.Body += "Method:<br />" + methodName;
             warningRequest.Body += "<br /><br />Query:<br />" + Query;
             warningRequest.Body += "<br /><br />Destination:<br />" + Destination;
-            warningRequest.Body += "<br /><br />Errormessage:<br />" + Error;
+            warningRequest.Body += "<br /><br />Error message:<br />" + Error;
 
             builder.HtmlBody = warningRequest.Body;
 
