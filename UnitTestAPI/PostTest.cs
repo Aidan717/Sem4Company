@@ -35,7 +35,7 @@ namespace UnitTestAPI {
         public void TestPost() {
 
             //Arrange
-            ResponseStatus testResponse = new ResponseStatus();
+            ResponseStatus testResponse = new ResponseStatus(); 
 
             //Act
             var APIPostResult = testApiCon.Post("school", testSchool).Result.Value;
