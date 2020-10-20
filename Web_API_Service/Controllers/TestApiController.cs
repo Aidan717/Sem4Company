@@ -28,15 +28,15 @@ namespace Web_API_Service.Controllers {
 	public class TestApiController : ControllerBase {
 		
 		public IMailService mailService;
-		
-		public TestApiController(IMailService mailService) {
-			this.mailService = mailService;
+
+        public TestApiController(IMailService mailService) {
+            this.mailService = mailService;
         }
-		
 
 
-		// GET: api/<OpenWeatherMapsApiController>
-		[HttpGet]
+
+        // GET: api/<OpenWeatherMapsApiController>
+        [HttpGet]
 		public IEnumerable<string> Get() {
 			return new string[] { "value1", "value2" };
 		}
