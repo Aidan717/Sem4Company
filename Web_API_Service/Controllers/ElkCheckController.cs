@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Web_API_Service.Controllers {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class ValuesController : ControllerBase {
+	public class ElkCheckController : ControllerBase {
 		// GET: api/<ValuesController>
 		[HttpGet]
 		public IEnumerable<string> Get() {
