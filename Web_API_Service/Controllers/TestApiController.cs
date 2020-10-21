@@ -143,9 +143,9 @@ namespace Web_API_Service.Controllers {
 					}
 				}
 			} catch (HttpRequestException ex) {
-				MailService mailS = new MailService();
+				MailService warningMail = new MailService();
 				var jsonstrings = new String(JsonSerializer.Serialize(parameter));
-                await mailS.SendWarningEmailAsync("PostParametersNotMet", jsonstrings, baseaddress, ex.Message);
+                await warningMail.SendWarningEmailAsync("Post", jsonstrings, baseaddress, ex.Message);
 
                 return result = new ResponseStatus("failed to connect" + ex.Message);
 			}
@@ -190,10 +190,10 @@ namespace Web_API_Service.Controllers {
 					}
 				}
 			} catch(HttpRequestException ex) {
-				MailService mailS = new MailService();
+				MailService warningMail = new MailService();
 
 				var jsonstrings = new String(JsonSerializer.Serialize(parameter));
-				await mailS.SendWarningEmailAsync("PostParametersNotMet", jsonstrings, baseaddress, ex.Message);
+				await warningMail.SendWarningEmailAsync("PostParametersNotMet", jsonstrings, baseaddress, ex.Message);
 
 				return result = new ResponseStatus(ex.Message);
 			}
@@ -227,10 +227,10 @@ namespace Web_API_Service.Controllers {
 				}
 			} catch (HttpRequestException ex) {
 				
-				MailService _mail = new MailService();
+				MailService warningMail = new MailService();
 				
 				var jsonstrings = new String(JsonSerializer.Serialize(parameter));
-				await _mail.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseaddress, ex.Message);
+				await warningMail.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseaddress, ex.Message);
 
 				return result = new ResponseStatus(ex.Message);
 			}
