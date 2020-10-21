@@ -197,16 +197,12 @@ namespace Web_API_Service.Controllers {
 				await mailS.SendWarningEmailAsync("PostParametersNotMet", jsonstrings, baseaddress, ex.Message);
 
 				return result = new ResponseStatus(ex.Message );
-
-
-
 			} 
 		}
 
 
 		// send uri as string, id and exception to mailrequest generator.
 		[HttpPut("{ChosenDB}/put/{id}")]
-
 		public async Task<ActionResult<ResponseStatus>> Put(string ChosenDB, string id, [FromBody] SchoolsFake._Source parameter ) {
 			var result = new ResponseStatus();
 			string baseaddress = "";
