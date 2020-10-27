@@ -57,8 +57,7 @@ namespace Web_API_Service.Controllers {
 		public void PostNewDataEntry([FromBody] string value) {
 		}
 
-		//post to dbRecord of all prier post/request types that have been done
-		[HttpPost]
+		//post to dbRecord of all prier post/request types that have been done		
 		public void PostToRequestDB([FromBody] string value) {
 		}
 
