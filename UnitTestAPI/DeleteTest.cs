@@ -9,7 +9,7 @@ namespace UnitTestAPI {
     [TestClass]
     class DeleteTest {
         TestApiController testApiCon;
-        SchoolsFake._Source schools;
+        Schools._Source schools;
 
         [TestInitialize]
 

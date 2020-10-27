@@ -203,7 +203,7 @@ namespace Web_API_Service.Controllers {
 		// send uri as string, id and exception to mailrequest generator.
 		[HttpPut("{ChosenDB}/put/{id}")]
 
-		public async Task<ActionResult<ResponseStatus>> Put(string ChosenDB, string id, [FromBody] SchoolsFake._Source parameter ) {
+		public async Task<ActionResult<ResponseStatus>> Put(string ChosenDB, string id, [FromBody] DBschema parameter ) {
 			var result = new ResponseStatus();
 			string baseaddress = "";
 			HttpResponseMessage response = new HttpResponseMessage();
