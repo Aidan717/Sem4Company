@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Web_API_Service.Models {
-    public class DBSchema {
+    public class DBSchemaCopy {
 
             public string _id { get; set; }
             public string _index { get; set; }
@@ -412,8 +412,6 @@ namespace Web_API_Service.Models {
             public string exceptionkeyword { get; set; }
             public string exceptionlineNumber { get; set; }
             public string exceptionlinePosition { get; set; }
-            public string exceptionmessage { get; set; }
-            public string exceptionmessagekeyword { get; set; }
             public string exceptionobjectName { get; set; }
             public string exceptionobjectNamekeyword { get; set; }
             public string exceptionparamName { get; set; }
@@ -475,14 +473,10 @@ namespace Web_API_Service.Models {
             public string namespacekeyword { get; set; }
             public string orderCompletedDate { get; set; }
             public string orderCompletedDatekeyword { get; set; }
-            public string orderID { get; set; }
-            public string orderIDkeyword { get; set; }
             public string orderId { get; set; }
             public string orderIdkeyword { get; set; }
             public string orderRef { get; set; }
             public string orderRefkeyword { get; set; }
-            public string orderid { get; set; }
-            public string orderidkeyword { get; set; }
             public string output { get; set; }
             public string outputkeyword { get; set; }
             public string parameters { get; set; }
@@ -576,7 +570,5 @@ namespace Web_API_Service.Models {
             public string userIdkeyword { get; set; }
             public string userName { get; set; }
             public string userNamekeyword { get; set; }
-            public string username { get; set; }
-            public string usernamekeyword { get; set; }
     }
 }
