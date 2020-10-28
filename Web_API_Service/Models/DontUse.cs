@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Web_API_Service.Models {
 	public class DontUse {
-
+		//this file should be deleted later on it just used for modeling 
 
 		public class Rootobject {
 			public int took { get; set; }
