@@ -1,16 +1,18 @@
-﻿using System;
+﻿using Org.BouncyCastle.Asn1.Cms;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Web_API_Service.Models {
-    public class DBSchema {
+    public class DBSchemaCopy {
 
 
             public int took { get; set; }
             public bool timed_out { get; set; }
             public _Shards _shards { get; set; }
             public Hits hits { get; set; }
+            public _Source _source { get; set; }
         
 
         public class _Shards {
@@ -442,8 +444,6 @@ namespace Web_API_Service.Models {
             public string exceptionkeyword { get; set; }
             public string exceptionlineNumber { get; set; }
             public string exceptionlinePosition { get; set; }
-            public string exceptionmessage { get; set; }
-            public string exceptionmessagekeyword { get; set; }
             public string exceptionobjectName { get; set; }
             public string exceptionobjectNamekeyword { get; set; }
             public string exceptionparamName { get; set; }
@@ -505,14 +505,10 @@ namespace Web_API_Service.Models {
             public string namespacekeyword { get; set; }
             public string orderCompletedDate { get; set; }
             public string orderCompletedDatekeyword { get; set; }
-            public string orderID { get; set; }
-            public string orderIDkeyword { get; set; }
             public string orderId { get; set; }
             public string orderIdkeyword { get; set; }
             public string orderRef { get; set; }
             public string orderRefkeyword { get; set; }
-            public string orderid { get; set; }
-            public string orderidkeyword { get; set; }
             public string output { get; set; }
             public string outputkeyword { get; set; }
             public string parameters { get; set; }
@@ -588,6 +584,7 @@ namespace Web_API_Service.Models {
             public string successCount { get; set; }
             public string tags { get; set; }
             public string tagskeyword { get; set; }
+            //public string timestamp { get; set; }
             public DateTime timestamp { get; set; }
             public string totalCount { get; set; }
             public string transactionNumber { get; set; }
@@ -606,8 +603,6 @@ namespace Web_API_Service.Models {
             public string userIdkeyword { get; set; }
             public string userName { get; set; }
             public string userNamekeyword { get; set; }
-            public string username { get; set; }
-            public string usernamekeyword { get; set; }
         }
     }
 }

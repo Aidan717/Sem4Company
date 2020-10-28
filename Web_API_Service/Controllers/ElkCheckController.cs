@@ -103,8 +103,8 @@ namespace Web_API_Service.Controllers {
 
 
 		// POST api/<ValuesController>
-		[HttpPost]
-		public void PostNewDataEntry([FromBody] string value) {
+		[HttpPost("poster")]
+		public void PostNewDataEntry([FromBody] DBSchema parametor) {
 		}
 
 		//post to dbRecord of all prier post/request types that have been done		
