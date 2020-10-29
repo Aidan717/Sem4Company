@@ -16,6 +16,10 @@ using Web_API_Service.Service;
 using Microsoft.Extensions.Options;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualBasic;
+using Newtonsoft.Json.Converters;
+using Web_API_Service.Utility;
+
 
 
 
@@ -248,7 +252,10 @@ namespace Web_API_Service.Controllers {
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 				HttpResponseMessage response = await client.GetAsync("");
 
+				
+
 				if (response.IsSuccessStatusCode) {
+
 					result = JsonSerializer.Deserialize<ElkLog>(await response.Content.ReadAsStringAsync());
 					return result;
 				} else {
@@ -256,6 +263,38 @@ namespace Web_API_Service.Controllers {
 				}
 			}
 		}
+
+
+		[HttpGet("dbschema/{chosenDB}/{SearchParameter}")]
+		public async Task<ActionResult<DBSchemaCopy>> GetDbSchema(string chosenDB, string SearchParameter) {
+
+			using (var client = new HttpClient()) {
+				var result = new DBSchemaCopy();
+				var datetimeconverter = new DateTimeConverter();
+				client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_search");
+				client.DefaultRequestHeaders.Accept.Clear();
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+				HttpResponseMessage response = await client.GetAsync("?q=" + SearchParameter);
+
+				if (response.IsSuccessStatusCode) {
+
+					var options = new JsonSerializerOptions {
+						Converters = { new DateTimeConverter() }
+					};
+
+					result = JsonSerializer.Deserialize<DBSchemaCopy>(await response.Content.ReadAsStringAsync(), options);
+
+					//send to method for checking exceptions with datetime
+					//if 3 or more within 5 minutes, send email with exception name
+					//else, return result.
+
+					return result;
+				} else {
+					return result;
+				}
+			}
+		}
+
 
 
 		//DOES NOT WORK
