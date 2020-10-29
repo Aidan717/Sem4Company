@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using MailKit;
 using Microsoft.AspNetCore.Mvc;
 using Web_API_Service.Models;
+using Web_API_Service.Utility;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -27,8 +28,8 @@ namespace Web_API_Service.Controllers {
 		// GET api/<ValuesController>/5
 		//name need to change to what it does this is just temps
 		[HttpGet("project/{error}")]
-		public async Task<ActionResult<DBSchema>> checkForError(string error) {
-			var result = new DBSchema();
+		public async Task<ActionResult<DBSchemaCopy>> checkForError(string error) {
+			var result = new DBSchemaCopy();
 			HttpResponseMessage response = new HttpResponseMessage();
 
 			try {
@@ -37,15 +38,16 @@ namespace Web_API_Service.Controllers {
 					client.BaseAddress = new Uri("http://localhost:9200/" + "project" + "/_search");
 					client.DefaultRequestHeaders.Accept.Clear();
 					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-					response = await client.GetAsync("?q=_exists_:" + error /*"activities.exceptions.errors.message"*/);
+					response = await client.GetAsync("?q=" + error /*"activities.exceptions.errors.message"*/);
 
 					if (response.IsSuccessStatusCode) {
 
 						var option = new JsonSerializerOptions {
-							PropertyNameCaseInsensitive = true
-                        };
+							PropertyNameCaseInsensitive = false,
+							Converters = { new DateTimeConverter() }
+						};
 
-						result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync(), option);
+						result = JsonSerializer.Deserialize<DBSchemaCopy>(await response.Content.ReadAsStringAsync(), option);
 						return result;
 					} else {
 						throw new HttpRequestException("statusCode: " + response.StatusCode);

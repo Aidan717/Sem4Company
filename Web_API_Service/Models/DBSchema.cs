@@ -465,8 +465,8 @@ namespace Web_API_Service.Models {
             public string exceptionwatsonBuckets { get; set; }
             public string exceptionwatsonBucketsskippedcount { get; set; }
             public string exceptionzone { get; set; }
-            public string exceptionMessage { get; set; }
-            public string exceptionMessagekeyword { get; set; }
+            //public string exceptionMessage { get; set; }
+            //public string exceptionMessagekeyword { get; set; }
             public string exceptionStackTrace { get; set; }
             public string exceptionStackTracekeyword { get; set; }
             public string exceptionType { get; set; }
