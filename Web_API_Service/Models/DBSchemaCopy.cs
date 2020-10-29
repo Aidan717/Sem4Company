@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace Web_API_Service.Models {
     public class DBSchemaCopy {
@@ -465,6 +466,7 @@ namespace Web_API_Service.Models {
             public string exceptionwatsonBuckets { get; set; }
             public string exceptionwatsonBucketsskippedcount { get; set; }
             public string exceptionzone { get; set; }
+            [JsonPropertyName("exception.message")]
             public string exceptionMessage { get; set; }
             public string exceptionMessagekeyword { get; set; }
             public string exceptionStackTrace { get; set; }

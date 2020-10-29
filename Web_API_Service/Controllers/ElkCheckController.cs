@@ -27,8 +27,8 @@ namespace Web_API_Service.Controllers {
 		// GET api/<ValuesController>/5
 		//name need to change to what it does this is just temps
 		[HttpGet("project/{error}")]
-		public async Task<ActionResult<DBSchema>> checkForError(string error) {
-			var result = new DBSchema();
+		public async Task<ActionResult<DBSchemaCopy>> checkForError(string error) {
+			var result = new DBSchemaCopy();
 			HttpResponseMessage response = new HttpResponseMessage();
 
 			try {
@@ -42,10 +42,10 @@ namespace Web_API_Service.Controllers {
 					if (response.IsSuccessStatusCode) {
 
 						var option = new JsonSerializerOptions {
-							PropertyNameCaseInsensitive = true
+							//PropertyNameCaseInsensitive = false
                         };
 
-						result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync(), option);
+						result = JsonSerializer.Deserialize<DBSchemaCopy>(await response.Content.ReadAsStringAsync(), option);
 						return result;
 					} else {
 						throw new HttpRequestException("statusCode: " + response.StatusCode);
