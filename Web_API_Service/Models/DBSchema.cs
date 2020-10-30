@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace Web_API_Service.Models {
     public class DBSchema {
@@ -442,6 +444,8 @@ namespace Web_API_Service.Models {
             public string exceptionkeyword { get; set; }
             public string exceptionlineNumber { get; set; }
             public string exceptionlinePosition { get; set; }
+            
+            [JsonPropertyName("exception.message")]
             public string exceptionmessage { get; set; }
             public string exceptionmessagekeyword { get; set; }
             public string exceptionobjectName { get; set; }
