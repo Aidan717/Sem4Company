@@ -308,7 +308,7 @@ namespace Web_API_Service.Controllers {
 
 
 					//sortér result via timer
-					while (i < result.hits.hits.Length) {
+					while (i < result.hits.hits.Length && hour < 24) {
 						Debug.WriteLine("the count of result: " + result.hits.hits.Length);
 						Debug.WriteLine("i outer while start is now: " + i);
 						//tids limit som kan addes til
