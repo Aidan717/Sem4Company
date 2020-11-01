@@ -921,7 +921,6 @@ namespace Web_API_Service.Models {
             public string userName { get; set; }
             public string username { get; set; }
 
-
         }
     }
 }
