@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using MailKit;
 using Microsoft.AspNetCore.Mvc;
 using Web_API_Service.Models;
+using Web_API_Service.Utility;
+using Web_API_Service.Service;
+using Org.BouncyCastle.Math.EC.Rfc7748;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -113,10 +116,79 @@ namespace Web_API_Service.Controllers {
 
 
 
+		[HttpGet("db/{chosenDB}/{SearchParameter}")]
+		public async Task<ActionResult<DBSchemaCopy>> GetError(string chosenDB, string SearchParameter) {
+
+			string baseaddress = "";
+			var result = new DBSchemaCopy();
+
+			try {
+				using (var client = new HttpClient()) {
 
 
+					client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_search");
+					baseaddress = client.BaseAddress.ToString();
+					client.DefaultRequestHeaders.Accept.Clear();
+					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+					HttpResponseMessage response = await client.GetAsync("?q=" + SearchParameter);
 
+					if (response.IsSuccessStatusCode) {
+						result = JsonSerializer.Deserialize<DBSchemaCopy>(await response.Content.ReadAsStringAsync());
+						return result;
+					} else {
+						throw new HttpRequestException("StatusCode: " + response.StatusCode);
+					}
+				}
 
+			} catch (Exception ex) {
+
+				int i = -1;
+				i = result.hits.hits.Count();
+				result.hits.hits[i]._source.exception = ex.ToString();
+
+                await PostNewError(result);
+
+                MailService warningMail = new MailService();
+
+				var jsonstrings = new String(JsonSerializer.Serialize(SearchParameter));
+				await warningMail.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseaddress, ex.Message);
+
+				return result;
+			}
+		}
+
+		//Skal kun kaldes igennem en anden GET metode. Er dette nødvendigt at have noget inde i HttpPost med?
+		[HttpPost("")]
+		public async Task<ActionResult<ResponseStatus>> PostNewError(DBSchemaCopy result) {
+			string baseaddress = "";
+			HttpResponseMessage response = new HttpResponseMessage();
+			var resSta = new ResponseStatus();
+
+			try {
+
+				using (var client = new HttpClient()) {
+					var jsonstring = new StringContent(JsonSerializer.Serialize(result), Encoding.UTF8, "application/json");
+
+					client.BaseAddress = new Uri("http://localhost:9200/errordb/_doc/");
+					baseaddress = client.BaseAddress.ToString();
+					client.DefaultRequestHeaders.Accept.Clear();
+					response = await client.PostAsync("", jsonstring);
+
+					if (response.IsSuccessStatusCode) {
+						resSta = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+						return resSta;
+					} else {
+						throw new HttpRequestException("statusCode: " + response.StatusCode);
+					}
+				}
+			} catch (HttpRequestException ex) {
+				MailService warningMail = new MailService();
+				var jsonstrings = new String(JsonSerializer.Serialize(result));
+				await warningMail.SendWarningEmailAsync("Post", jsonstrings, baseaddress, ex.Message);
+
+				return resSta = new ResponseStatus("failed to connect" + ex.Message);
+			}
+		}
 
 
 
