@@ -65,6 +65,7 @@ namespace Web_API_Service.Models {
             public string activitiesexceptionsdatahelpLinkProdVerkeyword { get; set; }
             public string activitiesexceptionserrorsclass { get; set; }
             public string activitiesexceptionserrorslineNumber { get; set; }
+            [JsonPropertyName("activities.exceptions.errors.message")]
             public string activitiesexceptionserrorsmessage { get; set; }
             public string activitiesexceptionserrorsmessagekeyword { get; set; }
             public string activitiesexceptionserrorsnumber { get; set; }
@@ -98,15 +99,18 @@ namespace Web_API_Service.Models {
             public string activitiesexceptionsinnerExceptiondatahelpLinkProdVerkeyword { get; set; }
             public string activitiesexceptionsinnerExceptionerrorsclass { get; set; }
             public string activitiesexceptionsinnerExceptionerrorslineNumber { get; set; }
+            [JsonPropertyName("activities.exceptions.innerException.errors.message")]
             public string activitiesexceptionsinnerExceptionerrorsmessage { get; set; }
             public string activitiesexceptionsinnerExceptionerrorsmessagekeyword { get; set; }
             public string activitiesexceptionsinnerExceptionerrorsnumber { get; set; }
             public string activitiesexceptionsinnerExceptionerrorsprocedure { get; set; }
             public string activitiesexceptionsinnerExceptionerrorsprocedurekeyword { get; set; }
+            [JsonPropertyName("activities.exceptions.innerException.errors.server")]
             public string activitiesexceptionsinnerExceptionerrorsserver { get; set; }
             public string activitiesexceptionsinnerExceptionerrorsserverkeyword { get; set; }
             public string activitiesexceptionsinnerExceptionerrorssource { get; set; }
             public string activitiesexceptionsinnerExceptionerrorssourcekeyword { get; set; }
+            [JsonPropertyName("activities.exceptions.innerException.errors.state")]
             public string activitiesexceptionsinnerExceptionerrorsstate { get; set; }
             public string activitiesexceptionsinnerExceptionexceptionMethod { get; set; }
             public string activitiesexceptionsinnerExceptionexceptionMethodkeyword { get; set; }
