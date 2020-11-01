@@ -1,18 +1,19 @@
-﻿using System;
+﻿using Org.BouncyCastle.Asn1.Cms;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Web_API_Service.Models {
-    public class DBSchema {
+    public class DBSchemaCopy {
 
 
             public int took { get; set; }
             public bool timed_out { get; set; }
             public _Shards _shards { get; set; }
             public Hits hits { get; set; }
+            public _Source _source { get; set; }
         
 
         public class _Shards {
@@ -42,885 +43,572 @@ namespace Web_API_Service.Models {
         }
 
         public class _Source {
+
             public string action { get; set; }
-            public string activities { get; set; }
-
-            [JsonPropertyName("activities.exceptions.className")]
+            public string actionkeyword { get; set; }
+            public string activitiesskippedcount { get; set; }
             public string activitiesexceptionsclassName { get; set; }
-
-            [JsonPropertyName("activities.exceptions.clientConnectionId")]
+            public string activitiesexceptionsclassNamekeyword { get; set; }
             public string activitiesexceptionsclientConnectionId { get; set; }
-
-            [JsonPropertyName("activities.exceptions.data.helpLink.BaseHelpUrl")]
+            public string activitiesexceptionsclientConnectionIdkeyword { get; set; }
             public string activitiesexceptionsdatahelpLinkBaseHelpUrl { get; set; }
-
-            [JsonPropertyName("activities.exceptions.data.helpLink.EvtID")]
+            public string activitiesexceptionsdatahelpLinkBaseHelpUrlkeyword { get; set; }
             public string activitiesexceptionsdatahelpLinkEvtID { get; set; }
-
-            [JsonPropertyName("activities.exceptions.data.helpLink.EvtSrc")]
+            public string activitiesexceptionsdatahelpLinkEvtIDkeyword { get; set; }
             public string activitiesexceptionsdatahelpLinkEvtSrc { get; set; }
-
-            [JsonPropertyName("activities.exceptions.data.helpLink.LinkId")]
+            public string activitiesexceptionsdatahelpLinkEvtSrckeyword { get; set; }
             public string activitiesexceptionsdatahelpLinkLinkId { get; set; }
-
-            [JsonPropertyName("activities.exceptions.data.helpLink.ProdName")]
+            public string activitiesexceptionsdatahelpLinkLinkIdkeyword { get; set; }
             public string activitiesexceptionsdatahelpLinkProdName { get; set; }
-
-            [JsonPropertyName("activities.exceptions.data.helpLink.ProdVer")]
+            public string activitiesexceptionsdatahelpLinkProdNamekeyword { get; set; }
             public string activitiesexceptionsdatahelpLinkProdVer { get; set; }
-
-            [JsonPropertyName("activities.exceptions.errors.class")]
+            public string activitiesexceptionsdatahelpLinkProdVerkeyword { get; set; }
             public string activitiesexceptionserrorsclass { get; set; }
-
-            [JsonPropertyName("activities.exceptions.errors.lineNumber")]
             public string activitiesexceptionserrorslineNumber { get; set; }
-
             [JsonPropertyName("activities.exceptions.errors.message")]
             public string activitiesexceptionserrorsmessage { get; set; }
-
-            [JsonPropertyName("activities.exceptions.errors.number")]
+            public string activitiesexceptionserrorsmessagekeyword { get; set; }
             public string activitiesexceptionserrorsnumber { get; set; }
-
-            [JsonPropertyName("activities.exceptions.errors.procedure")]
             public string activitiesexceptionserrorsprocedure { get; set; }
-
-            [JsonPropertyName("activities.exceptions.errors.server")]
+            public string activitiesexceptionserrorsprocedurekeyword { get; set; }
             public string activitiesexceptionserrorsserver { get; set; }
-
-            [JsonPropertyName("activities.exceptions.errors.source")]
+            public string activitiesexceptionserrorsserverkeyword { get; set; }
             public string activitiesexceptionserrorssource { get; set; }
-
-            [JsonPropertyName("activities.exceptions.errors.state")]
+            public string activitiesexceptionserrorssourcekeyword { get; set; }
             public string activitiesexceptionserrorsstate { get; set; }
-
-            [JsonPropertyName("activities.exceptions.exceptionMethod")]
             public string activitiesexceptionsexceptionMethod { get; set; }
-
-            [JsonPropertyName("activities.exceptions.fileNotFound_FileName")]
+            public string activitiesexceptionsexceptionMethodkeyword { get; set; }
             public string activitiesexceptionsfileNotFound_FileName { get; set; }
-
-            [JsonPropertyName("activities.exceptions.hResult")]
+            public string activitiesexceptionsfileNotFound_FileNamekeyword { get; set; }
             public string activitiesexceptionshResult { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.className")]
             public string activitiesexceptionsinnerExceptionclassName { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.clientConnectionId")]
+            public string activitiesexceptionsinnerExceptionclassNamekeyword { get; set; }
             public string activitiesexceptionsinnerExceptionclientConnectionId { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.data.helpLink.BaseHelpUrl")]
+            public string activitiesexceptionsinnerExceptionclientConnectionIdkeyword { get; set; }
             public string activitiesexceptionsinnerExceptiondatahelpLinkBaseHelpUrl { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.data.helpLink.EvtID")]
+            public string activitiesexceptionsinnerExceptiondatahelpLinkBaseHelpUrlkeyword { get; set; }
             public string activitiesexceptionsinnerExceptiondatahelpLinkEvtID { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.data.helpLink.EvtSrc")]
+            public string activitiesexceptionsinnerExceptiondatahelpLinkEvtIDkeyword { get; set; }
             public string activitiesexceptionsinnerExceptiondatahelpLinkEvtSrc { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.data.helpLink.LinkId")]
+            public string activitiesexceptionsinnerExceptiondatahelpLinkEvtSrckeyword { get; set; }
             public string activitiesexceptionsinnerExceptiondatahelpLinkLinkId { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.data.helpLink.ProdName")]
+            public string activitiesexceptionsinnerExceptiondatahelpLinkLinkIdkeyword { get; set; }
             public string activitiesexceptionsinnerExceptiondatahelpLinkProdName { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.data.helpLink.ProdVer")]
+            public string activitiesexceptionsinnerExceptiondatahelpLinkProdNamekeyword { get; set; }
             public string activitiesexceptionsinnerExceptiondatahelpLinkProdVer { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.errors.class")]
+            public string activitiesexceptionsinnerExceptiondatahelpLinkProdVerkeyword { get; set; }
             public string activitiesexceptionsinnerExceptionerrorsclass { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.errors.lineNumber")]
             public string activitiesexceptionsinnerExceptionerrorslineNumber { get; set; }
-
             [JsonPropertyName("activities.exceptions.innerException.errors.message")]
             public string activitiesexceptionsinnerExceptionerrorsmessage { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.errors.number")]
+            public string activitiesexceptionsinnerExceptionerrorsmessagekeyword { get; set; }
             public string activitiesexceptionsinnerExceptionerrorsnumber { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.errors.procedure")]
             public string activitiesexceptionsinnerExceptionerrorsprocedure { get; set; }
-
+            public string activitiesexceptionsinnerExceptionerrorsprocedurekeyword { get; set; }
             [JsonPropertyName("activities.exceptions.innerException.errors.server")]
             public string activitiesexceptionsinnerExceptionerrorsserver { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.errors.source")]
+            public string activitiesexceptionsinnerExceptionerrorsserverkeyword { get; set; }
             public string activitiesexceptionsinnerExceptionerrorssource { get; set; }
-
+            public string activitiesexceptionsinnerExceptionerrorssourcekeyword { get; set; }
             [JsonPropertyName("activities.exceptions.innerException.errors.state")]
             public string activitiesexceptionsinnerExceptionerrorsstate { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.exceptionMethod")]
             public string activitiesexceptionsinnerExceptionexceptionMethod { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.hResult")]
+            public string activitiesexceptionsinnerExceptionexceptionMethodkeyword { get; set; }
             public string activitiesexceptionsinnerExceptionhResult { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.className")]
             public string activitiesexceptionsinnerExceptioninnerExceptionclassName { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.clientConnectionId")]
+            public string activitiesexceptionsinnerExceptioninnerExceptionclassNamekeyword { get; set; }
             public string activitiesexceptionsinnerExceptioninnerExceptionclientConnectionId { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.data.helpLink.BaseHelpUrl")]
+            public string activitiesexceptionsinnerExceptioninnerExceptionclientConnectionIdkeyword { get; set; }
             public string activitiesexceptionsinnerExceptioninnerExceptiondatahelpLinkBaseHelpUrl { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.data.helpLink.EvtID")]
+            public string activitiesexceptionsinnerExceptioninnerExceptiondatahelpLinkBaseHelpUrlkeyword { get; set; }
             public string activitiesexceptionsinnerExceptioninnerExceptiondatahelpLinkEvtID { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.data.helpLink.EvtSrc")]
+            public string activitiesexceptionsinnerExceptioninnerExceptiondatahelpLinkEvtIDkeyword { get; set; }
             public string activitiesexceptionsinnerExceptioninnerExceptiondatahelpLinkEvtSrc { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.data.helpLink.LinkId")]
+            public string activitiesexceptionsinnerExceptioninnerExceptiondatahelpLinkEvtSrckeyword { get; set; }
             public string activitiesexceptionsinnerExceptioninnerExceptiondatahelpLinkLinkId { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.data.helpLink.ProdName")]
+            public string activitiesexceptionsinnerExceptioninnerExceptiondatahelpLinkLinkIdkeyword { get; set; }
             public string activitiesexceptionsinnerExceptioninnerExceptiondatahelpLinkProdName { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.data.helpLink.ProdVer")]
+            public string activitiesexceptionsinnerExceptioninnerExceptiondatahelpLinkProdNamekeyword { get; set; }
             public string activitiesexceptionsinnerExceptioninnerExceptiondatahelpLinkProdVer { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.errors.class")]
+            public string activitiesexceptionsinnerExceptioninnerExceptiondatahelpLinkProdVerkeyword { get; set; }
             public string activitiesexceptionsinnerExceptioninnerExceptionerrorsclass { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.errors.lineNumber")]
             public string activitiesexceptionsinnerExceptioninnerExceptionerrorslineNumber { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.errors.message")]
             public string activitiesexceptionsinnerExceptioninnerExceptionerrorsmessage { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.errors.number")]
+            public string activitiesexceptionsinnerExceptioninnerExceptionerrorsmessagekeyword { get; set; }
             public string activitiesexceptionsinnerExceptioninnerExceptionerrorsnumber { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.errors.procedure")]
             public string activitiesexceptionsinnerExceptioninnerExceptionerrorsprocedure { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.errors.server")]
+            public string activitiesexceptionsinnerExceptioninnerExceptionerrorsprocedurekeyword { get; set; }
             public string activitiesexceptionsinnerExceptioninnerExceptionerrorsserver { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.errors.source")]
+            public string activitiesexceptionsinnerExceptioninnerExceptionerrorsserverkeyword { get; set; }
             public string activitiesexceptionsinnerExceptioninnerExceptionerrorssource { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.errors.state")]
+            public string activitiesexceptionsinnerExceptioninnerExceptionerrorssourcekeyword { get; set; }
             public string activitiesexceptionsinnerExceptioninnerExceptionerrorsstate { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.exceptionMethod")]
             public string activitiesexceptionsinnerExceptioninnerExceptionexceptionMethod { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.hResult")]
+            public string activitiesexceptionsinnerExceptioninnerExceptionexceptionMethodkeyword { get; set; }
             public string activitiesexceptionsinnerExceptioninnerExceptionhResult { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.innerException.className")]
             public string activitiesexceptionsinnerExceptioninnerExceptioninnerExceptionclassName { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.innerException.hResult")]
+            public string activitiesexceptionsinnerExceptioninnerExceptioninnerExceptionclassNamekeyword { get; set; }
             public string activitiesexceptionsinnerExceptioninnerExceptioninnerExceptionhResult { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.innerException.message")]
             public string activitiesexceptionsinnerExceptioninnerExceptioninnerExceptionmessage { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.innerException.nativeErrorCode")]
+            public string activitiesexceptionsinnerExceptioninnerExceptioninnerExceptionmessagekeyword { get; set; }
             public string activitiesexceptionsinnerExceptioninnerExceptioninnerExceptionnativeErrorCode { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.innerException.remoteStackIndex")]
             public string activitiesexceptionsinnerExceptioninnerExceptioninnerExceptionremoteStackIndex { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.message")]
             public string activitiesexceptionsinnerExceptioninnerExceptionmessage { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.nativeErrorCode")]
+            public string activitiesexceptionsinnerExceptioninnerExceptionmessagekeyword { get; set; }
             public string activitiesexceptionsinnerExceptioninnerExceptionnativeErrorCode { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.remoteStackIndex")]
             public string activitiesexceptionsinnerExceptioninnerExceptionremoteStackIndex { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.source")]
             public string activitiesexceptionsinnerExceptioninnerExceptionsource { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.innerException.stackTraceString")]
+            public string activitiesexceptionsinnerExceptioninnerExceptionsourcekeyword { get; set; }
             public string activitiesexceptionsinnerExceptioninnerExceptionstackTraceString { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.message")]
+            public string activitiesexceptionsinnerExceptioninnerExceptionstackTraceStringkeyword { get; set; }
             public string activitiesexceptionsinnerExceptionmessage { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.nativeErrorCode")]
+            public string activitiesexceptionsinnerExceptionmessagekeyword { get; set; }
             public string activitiesexceptionsinnerExceptionnativeErrorCode { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.remoteStackIndex")]
             public string activitiesexceptionsinnerExceptionremoteStackIndex { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.source")]
             public string activitiesexceptionsinnerExceptionsource { get; set; }
-
-            [JsonPropertyName("activities.exceptions.innerException.stackTraceString")]
+            public string activitiesexceptionsinnerExceptionsourcekeyword { get; set; }
             public string activitiesexceptionsinnerExceptionstackTraceString { get; set; }
-
-            [JsonPropertyName("activities.exceptions.message")]
+            public string activitiesexceptionsinnerExceptionstackTraceStringkeyword { get; set; }
             public string activitiesexceptionsmessage { get; set; }
-
-            [JsonPropertyName("activities.exceptions.remoteStackIndex")]
+            public string activitiesexceptionsmessagekeyword { get; set; }
             public string activitiesexceptionsremoteStackIndex { get; set; }
-
-            [JsonPropertyName("activities.exceptions.source")]
             public string activitiesexceptionssource { get; set; }
-
-            [JsonPropertyName("activities.exceptions.stackTraceString")]
+            public string activitiesexceptionssourcekeyword { get; set; }
             public string activitiesexceptionsstackTraceString { get; set; }
-
-            [JsonPropertyName("activities.executionTime")]
+            public string activitiesexceptionsstackTraceStringkeyword { get; set; }
             public string activitiesexecutionTime { get; set; }
-
-            [JsonPropertyName("activities.readableName")]
             public string activitiesreadableName { get; set; }
-
-            [JsonPropertyName("activities.type")]
+            public string activitiesreadableNamekeyword { get; set; }
             public string activitiestype { get; set; }
-
-            [JsonPropertyName("activities.warnings")]
+            public string activitiestypekeyword { get; set; }
             public string activitieswarnings { get; set; }
+            public string activitieswarningskeyword { get; set; }
             public string activityId { get; set; }
             public string activityType { get; set; }
-
-            [JsonPropertyName("arguments.cart.identification.customerNumber")]
+            public string activityTypekeyword { get; set; }
             public string argumentscartidentificationcustomerNumber { get; set; }
-
-            [JsonPropertyName("arguments.cart.orderId")]
+            public string argumentscartidentificationcustomerNumberkeyword { get; set; }
             public string argumentscartorderId { get; set; }
-
-            [JsonPropertyName("arguments.order.orderId")]
+            public string argumentscartorderIdkeyword { get; set; }
             public string argumentsorderorderId { get; set; }
             public string caller { get; set; }
+            public string callerkeyword { get; set; }
             public string cartId { get; set; }
+            public string cartIdkeyword { get; set; }
             public string _class { get; set; }
+            public string classkeyword { get; set; }
             public string command { get; set; }
+            public string commandkeyword { get; set; }
             public string commandType { get; set; }
+            public string commandTypekeyword { get; set; }
             public string controller { get; set; }
+            public string controllerkeyword { get; set; }
             public string cropNumber { get; set; }
+            public string cropNumberkeyword { get; set; }
             public string customer { get; set; }
+            public string customerkeyword { get; set; }
             public string customerNumber { get; set; }
+            public string customerNumberkeyword { get; set; }
             public string duration { get; set; }
             public string emails { get; set; }
+            public string emailskeyword { get; set; }
             public string entryCount { get; set; }
             public string exception { get; set; }
-
-            [JsonPropertyName("exception._httpCode")]
             public string exception_httpCode { get; set; }
-
-            [JsonPropertyName("exception.action")]
             public string exceptionaction { get; set; }
-
-            [JsonPropertyName("exception.args")]
+            public string exceptionactionkeyword { get; set; }
             public string exceptionargs { get; set; }
-
-            [JsonPropertyName("exception.className")]
+            public string exceptionargskeyword { get; set; }
             public string exceptionclassName { get; set; }
-
-            [JsonPropertyName("exception.clientConnectionId")]
+            public string exceptionclassNamekeyword { get; set; }
             public string exceptionclientConnectionId { get; set; }
-
-            [JsonPropertyName("exception.data.helpLink.BaseHelpUrl")]
+            public string exceptionclientConnectionIdkeyword { get; set; }
             public string exceptiondatahelpLinkBaseHelpUrl { get; set; }
-
-            [JsonPropertyName("exception.data.helpLink.EvtID")]
+            public string exceptiondatahelpLinkBaseHelpUrlkeyword { get; set; }
             public string exceptiondatahelpLinkEvtID { get; set; }
-
-            [JsonPropertyName("exception.data.helpLink.EvtSrc")]
+            public string exceptiondatahelpLinkEvtIDkeyword { get; set; }
             public string exceptiondatahelpLinkEvtSrc { get; set; }
-
-            [JsonPropertyName("exception.data.helpLink.LinkId")]
+            public string exceptiondatahelpLinkEvtSrckeyword { get; set; }
             public string exceptiondatahelpLinkLinkId { get; set; }
-
-            [JsonPropertyName("exception.data.helpLink.ProdName")]
+            public string exceptiondatahelpLinkLinkIdkeyword { get; set; }
             public string exceptiondatahelpLinkProdName { get; set; }
-
-            [JsonPropertyName("exception.data.helpLink.ProdVer")]
+            public string exceptiondatahelpLinkProdNamekeyword { get; set; }
             public string exceptiondatahelpLinkProdVer { get; set; }
-
-            [JsonPropertyName("exception.detail.message")]
+            public string exceptiondatahelpLinkProdVerkeyword { get; set; }
             public string exceptiondetailmessage { get; set; }
-
-            [JsonPropertyName("exception.detail.stackTrace")]
+            public string exceptiondetailmessagekeyword { get; set; }
             public string exceptiondetailstackTrace { get; set; }
-
-            [JsonPropertyName("exception.detail.type")]
+            public string exceptiondetailstackTracekeyword { get; set; }
             public string exceptiondetailtype { get; set; }
-
-            [JsonPropertyName("exception.errors.class")]
+            public string exceptiondetailtypekeyword { get; set; }
             public string exceptionerrorsclass { get; set; }
-
-            [JsonPropertyName("exception.errors.errorCode")]
             public string exceptionerrorserrorCode { get; set; }
-
-            [JsonPropertyName("exception.errors.helpLink")]
             public string exceptionerrorshelpLink { get; set; }
-
-            [JsonPropertyName("exception.errors.lineNumber")]
+            public string exceptionerrorshelpLinkkeyword { get; set; }
             public string exceptionerrorslineNumber { get; set; }
-
-            [JsonPropertyName("exception.errors.message")]
             public string exceptionerrorsmessage { get; set; }
-
-            [JsonPropertyName("exception.errors.number")]
+            public string exceptionerrorsmessagekeyword { get; set; }
             public string exceptionerrorsnumber { get; set; }
-
-            [JsonPropertyName("exception.errors.procedure")]
             public string exceptionerrorsprocedure { get; set; }
-
-            [JsonPropertyName("exception.errors.server")]
+            public string exceptionerrorsprocedurekeyword { get; set; }
             public string exceptionerrorsserver { get; set; }
-
-            [JsonPropertyName("exception.errors.source")]
+            public string exceptionerrorsserverkeyword { get; set; }
             public string exceptionerrorssource { get; set; }
-
-            [JsonPropertyName("exception.errors.state")]
+            public string exceptionerrorssourcekeyword { get; set; }
             public string exceptionerrorsstate { get; set; }
-
-            [JsonPropertyName("exception.exceptionMethod")]
             public string exceptionexceptionMethod { get; set; }
-
-            [JsonPropertyName("exception.failedRecipient")]
+            public string exceptionexceptionMethodkeyword { get; set; }
             public string exceptionfailedRecipient { get; set; }
-
-            [JsonPropertyName("exception.hResult")]
+            public string exceptionfailedRecipientkeyword { get; set; }
             public string exceptionhResult { get; set; }
-
-            [JsonPropertyName("exception.helpURL")]
             public string exceptionhelpURL { get; set; }
-
-            [JsonPropertyName("exception.innerException._httpCode")]
+            public string exceptionhelpURLkeyword { get; set; }
             public string exceptioninnerException_httpCode { get; set; }
-
-            [JsonPropertyName("exception.innerException.className")]
             public string exceptioninnerExceptionclassName { get; set; }
-
-            [JsonPropertyName("exception.innerException.clientConnectionId")]
+            public string exceptioninnerExceptionclassNamekeyword { get; set; }
             public string exceptioninnerExceptionclientConnectionId { get; set; }
-
-            [JsonPropertyName("exception.innerException.data.helpLink.BaseHelpUrl")]
+            public string exceptioninnerExceptionclientConnectionIdkeyword { get; set; }
             public string exceptioninnerExceptiondatahelpLinkBaseHelpUrl { get; set; }
-
-            [JsonPropertyName("exception.innerException.data.helpLink.EvtID")]
+            public string exceptioninnerExceptiondatahelpLinkBaseHelpUrlkeyword { get; set; }
             public string exceptioninnerExceptiondatahelpLinkEvtID { get; set; }
-
-            [JsonPropertyName("exception.innerException.data.helpLink.EvtSrc")]
+            public string exceptioninnerExceptiondatahelpLinkEvtIDkeyword { get; set; }
             public string exceptioninnerExceptiondatahelpLinkEvtSrc { get; set; }
-
-            [JsonPropertyName("exception.innerException.data.helpLink.LinkId")]
+            public string exceptioninnerExceptiondatahelpLinkEvtSrckeyword { get; set; }
             public string exceptioninnerExceptiondatahelpLinkLinkId { get; set; }
-
-            [JsonPropertyName("exception.innerException.data.helpLink.ProdName")]
+            public string exceptioninnerExceptiondatahelpLinkLinkIdkeyword { get; set; }
             public string exceptioninnerExceptiondatahelpLinkProdName { get; set; }
-
-            [JsonPropertyName("exception.innerException.data.helpLink.ProdVer")]
+            public string exceptioninnerExceptiondatahelpLinkProdNamekeyword { get; set; }
             public string exceptioninnerExceptiondatahelpLinkProdVer { get; set; }
-
-            [JsonPropertyName("exception.innerException.errors.class")]
+            public string exceptioninnerExceptiondatahelpLinkProdVerkeyword { get; set; }
             public string exceptioninnerExceptionerrorsclass { get; set; }
-
-            [JsonPropertyName("exception.innerException.errors.lineNumber")]
             public string exceptioninnerExceptionerrorslineNumber { get; set; }
-
-            [JsonPropertyName("exception.innerException.errors.message")]
             public string exceptioninnerExceptionerrorsmessage { get; set; }
-
-            [JsonPropertyName("exception.innerException.errors.number")]
+            public string exceptioninnerExceptionerrorsmessagekeyword { get; set; }
             public string exceptioninnerExceptionerrorsnumber { get; set; }
-
-            [JsonPropertyName("exception.innerException.errors.procedure")]
             public string exceptioninnerExceptionerrorsprocedure { get; set; }
-
-            [JsonPropertyName("exception.innerException.errors.server")]
+            public string exceptioninnerExceptionerrorsprocedurekeyword { get; set; }
             public string exceptioninnerExceptionerrorsserver { get; set; }
-
-            [JsonPropertyName("exception.innerException.errors.source")]
+            public string exceptioninnerExceptionerrorsserverkeyword { get; set; }
             public string exceptioninnerExceptionerrorssource { get; set; }
-
-            [JsonPropertyName("exception.innerException.errors.state")]
+            public string exceptioninnerExceptionerrorssourcekeyword { get; set; }
             public string exceptioninnerExceptionerrorsstate { get; set; }
-
-            [JsonPropertyName("exception.innerException.exceptionMethod")]
             public string exceptioninnerExceptionexceptionMethod { get; set; }
-
-            [JsonPropertyName("exception.innerException.hResult")]
+            public string exceptioninnerExceptionexceptionMethodkeyword { get; set; }
             public string exceptioninnerExceptionhResult { get; set; }
-
-            [JsonPropertyName("exception.innerException.helpURL")]
             public string exceptioninnerExceptionhelpURL { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException._httpCode")]
+            public string exceptioninnerExceptionhelpURLkeyword { get; set; }
             public string exceptioninnerExceptioninnerException_httpCode { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.className")]
             public string exceptioninnerExceptioninnerExceptionclassName { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.clientConnectionId")]
+            public string exceptioninnerExceptioninnerExceptionclassNamekeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptionclientConnectionId { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.data.helpLink.BaseHelpUrl")]
+            public string exceptioninnerExceptioninnerExceptionclientConnectionIdkeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptiondatahelpLinkBaseHelpUrl { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.data.helpLink.EvtID")]
+            public string exceptioninnerExceptioninnerExceptiondatahelpLinkBaseHelpUrlkeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptiondatahelpLinkEvtID { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.data.helpLink.EvtSrc")]
+            public string exceptioninnerExceptioninnerExceptiondatahelpLinkEvtIDkeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptiondatahelpLinkEvtSrc { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.data.helpLink.LinkId")]
+            public string exceptioninnerExceptioninnerExceptiondatahelpLinkEvtSrckeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptiondatahelpLinkLinkId { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.data.helpLink.ProdName")]
+            public string exceptioninnerExceptioninnerExceptiondatahelpLinkLinkIdkeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptiondatahelpLinkProdName { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.errors.class")]
+            public string exceptioninnerExceptioninnerExceptiondatahelpLinkProdNamekeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptionerrorsclass { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.errors.lineNumber")]
             public string exceptioninnerExceptioninnerExceptionerrorslineNumber { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.errors.message")]
             public string exceptioninnerExceptioninnerExceptionerrorsmessage { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.errors.number")]
+            public string exceptioninnerExceptioninnerExceptionerrorsmessagekeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptionerrorsnumber { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.errors.procedure")]
             public string exceptioninnerExceptioninnerExceptionerrorsprocedure { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.errors.server")]
+            public string exceptioninnerExceptioninnerExceptionerrorsprocedurekeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptionerrorsserver { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.errors.source")]
+            public string exceptioninnerExceptioninnerExceptionerrorsserverkeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptionerrorssource { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.errors.state")]
+            public string exceptioninnerExceptioninnerExceptionerrorssourcekeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptionerrorsstate { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.exceptionMethod")]
             public string exceptioninnerExceptioninnerExceptionexceptionMethod { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.hResult")]
+            public string exceptioninnerExceptioninnerExceptionexceptionMethodkeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptionhResult { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.className")]
             public string exceptioninnerExceptioninnerExceptioninnerExceptionclassName { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.clientConnectionId")]
+            public string exceptioninnerExceptioninnerExceptioninnerExceptionclassNamekeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptioninnerExceptionclientConnectionId { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.data.helpLink.BaseHelpUrl")]
+            public string exceptioninnerExceptioninnerExceptioninnerExceptionclientConnectionIdkeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptioninnerExceptiondatahelpLinkBaseHelpUrl { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.data.helpLink.EvtID")]
+            public string exceptioninnerExceptioninnerExceptioninnerExceptiondatahelpLinkBaseHelpUrlkeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptioninnerExceptiondatahelpLinkEvtID { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.data.helpLink.EvtSrc")]
+            public string exceptioninnerExceptioninnerExceptioninnerExceptiondatahelpLinkEvtIDkeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptioninnerExceptiondatahelpLinkEvtSrc { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.data.helpLink.LinkId")]
+            public string exceptioninnerExceptioninnerExceptioninnerExceptiondatahelpLinkEvtSrckeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptioninnerExceptiondatahelpLinkLinkId { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.data.helpLink.ProdName")]
+            public string exceptioninnerExceptioninnerExceptioninnerExceptiondatahelpLinkLinkIdkeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptioninnerExceptiondatahelpLinkProdName { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.data.helpLink.ProdVer")]
+            public string exceptioninnerExceptioninnerExceptioninnerExceptiondatahelpLinkProdNamekeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptioninnerExceptiondatahelpLinkProdVer { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.errors.class")]
+            public string exceptioninnerExceptioninnerExceptioninnerExceptiondatahelpLinkProdVerkeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptioninnerExceptionerrorsclass { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.errors.lineNumber")]
             public string exceptioninnerExceptioninnerExceptioninnerExceptionerrorslineNumber { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.errors.message")]
             public string exceptioninnerExceptioninnerExceptioninnerExceptionerrorsmessage { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.errors.number")]
+            public string exceptioninnerExceptioninnerExceptioninnerExceptionerrorsmessagekeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptioninnerExceptionerrorsnumber { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.errors.procedure")]
             public string exceptioninnerExceptioninnerExceptioninnerExceptionerrorsprocedure { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.errors.server")]
+            public string exceptioninnerExceptioninnerExceptioninnerExceptionerrorsprocedurekeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptioninnerExceptionerrorsserver { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.errors.source")]
+            public string exceptioninnerExceptioninnerExceptioninnerExceptionerrorsserverkeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptioninnerExceptionerrorssource { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.errors.state")]
+            public string exceptioninnerExceptioninnerExceptioninnerExceptionerrorssourcekeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptioninnerExceptionerrorsstate { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.exceptionMethod")]
             public string exceptioninnerExceptioninnerExceptioninnerExceptionexceptionMethod { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.hResult")]
+            public string exceptioninnerExceptioninnerExceptioninnerExceptionexceptionMethodkeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptioninnerExceptionhResult { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.innerException.className")]
             public string exceptioninnerExceptioninnerExceptioninnerExceptioninnerExceptionclassName { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.innerException.hResult")]
+            public string exceptioninnerExceptioninnerExceptioninnerExceptioninnerExceptionclassNamekeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptioninnerExceptioninnerExceptionhResult { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.innerException.message")]
             public string exceptioninnerExceptioninnerExceptioninnerExceptioninnerExceptionmessage { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.innerException.nativeErrorCode")]
+            public string exceptioninnerExceptioninnerExceptioninnerExceptioninnerExceptionmessagekeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptioninnerExceptioninnerExceptionnativeErrorCode { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.innerException.remoteStackIndex")]
             public string exceptioninnerExceptioninnerExceptioninnerExceptioninnerExceptionremoteStackIndex { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.message")]
             public string exceptioninnerExceptioninnerExceptioninnerExceptionmessage { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.nativeErrorCode")]
+            public string exceptioninnerExceptioninnerExceptioninnerExceptionmessagekeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptioninnerExceptionnativeErrorCode { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.remoteStackIndex")]
             public string exceptioninnerExceptioninnerExceptioninnerExceptionremoteStackIndex { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.source")]
             public string exceptioninnerExceptioninnerExceptioninnerExceptionsource { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.innerException.stackTraceString")]
+            public string exceptioninnerExceptioninnerExceptioninnerExceptionsourcekeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptioninnerExceptionstackTraceString { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.message")]
+            public string exceptioninnerExceptioninnerExceptioninnerExceptionstackTraceStringkeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptionmessage { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.nativeErrorCode")]
+            public string exceptioninnerExceptioninnerExceptionmessagekeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptionnativeErrorCode { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.remoteStackIndex")]
             public string exceptioninnerExceptioninnerExceptionremoteStackIndex { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.source")]
             public string exceptioninnerExceptioninnerExceptionsource { get; set; }
-
-            [JsonPropertyName("exception.innerException.innerException.stackTraceString")]
+            public string exceptioninnerExceptioninnerExceptionsourcekeyword { get; set; }
             public string exceptioninnerExceptioninnerExceptionstackTraceString { get; set; }
-
-            [JsonPropertyName("exception.innerException.message")]
+            public string exceptioninnerExceptioninnerExceptionstackTraceStringkeyword { get; set; }
             public string exceptioninnerExceptionmessage { get; set; }
-
-            [JsonPropertyName("exception.innerException.nativeErrorCode")]
+            public string exceptioninnerExceptionmessagekeyword { get; set; }
             public string exceptioninnerExceptionnativeErrorCode { get; set; }
-
-            [JsonPropertyName("exception.innerException.remoteStackIndex")]
             public string exceptioninnerExceptionremoteStackIndex { get; set; }
-
-            [JsonPropertyName("exception.innerException.source")]
             public string exceptioninnerExceptionsource { get; set; }
-
-            [JsonPropertyName("exception.innerException.stackTraceString")]
+            public string exceptioninnerExceptionsourcekeyword { get; set; }
             public string exceptioninnerExceptionstackTraceString { get; set; }
-
-            [JsonPropertyName("exception.innerException.watsonBuckets")]
+            public string exceptioninnerExceptionstackTraceStringkeyword { get; set; }
             public string exceptioninnerExceptionwatsonBuckets { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.className")]
+            public string exceptioninnerExceptionwatsonBucketsskippedcount { get; set; }
             public string exceptioninnerExceptionsclassName { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.exceptionMethod")]
+            public string exceptioninnerExceptionsclassNamekeyword { get; set; }
             public string exceptioninnerExceptionsexceptionMethod { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.hResult")]
+            public string exceptioninnerExceptionsexceptionMethodkeyword { get; set; }
             public string exceptioninnerExceptionshResult { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.className")]
             public string exceptioninnerExceptionsinnerExceptionclassName { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.clientConnectionId")]
+            public string exceptioninnerExceptionsinnerExceptionclassNamekeyword { get; set; }
             public string exceptioninnerExceptionsinnerExceptionclientConnectionId { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.data.helpLink.BaseHelpUrl")]
+            public string exceptioninnerExceptionsinnerExceptionclientConnectionIdkeyword { get; set; }
             public string exceptioninnerExceptionsinnerExceptiondatahelpLinkBaseHelpUrl { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.data.helpLink.EvtID")]
+            public string exceptioninnerExceptionsinnerExceptiondatahelpLinkBaseHelpUrlkeyword { get; set; }
             public string exceptioninnerExceptionsinnerExceptiondatahelpLinkEvtID { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.data.helpLink.EvtSrc")]
+            public string exceptioninnerExceptionsinnerExceptiondatahelpLinkEvtIDkeyword { get; set; }
             public string exceptioninnerExceptionsinnerExceptiondatahelpLinkEvtSrc { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.data.helpLink.LinkId")]
+            public string exceptioninnerExceptionsinnerExceptiondatahelpLinkEvtSrckeyword { get; set; }
             public string exceptioninnerExceptionsinnerExceptiondatahelpLinkLinkId { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.data.helpLink.ProdName")]
+            public string exceptioninnerExceptionsinnerExceptiondatahelpLinkLinkIdkeyword { get; set; }
             public string exceptioninnerExceptionsinnerExceptiondatahelpLinkProdName { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.errors.class")]
+            public string exceptioninnerExceptionsinnerExceptiondatahelpLinkProdNamekeyword { get; set; }
             public string exceptioninnerExceptionsinnerExceptionerrorsclass { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.errors.lineNumber")]
             public string exceptioninnerExceptionsinnerExceptionerrorslineNumber { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.errors.message")]
             public string exceptioninnerExceptionsinnerExceptionerrorsmessage { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.errors.number")]
+            public string exceptioninnerExceptionsinnerExceptionerrorsmessagekeyword { get; set; }
             public string exceptioninnerExceptionsinnerExceptionerrorsnumber { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.errors.procedure")]
             public string exceptioninnerExceptionsinnerExceptionerrorsprocedure { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.errors.server")]
+            public string exceptioninnerExceptionsinnerExceptionerrorsprocedurekeyword { get; set; }
             public string exceptioninnerExceptionsinnerExceptionerrorsserver { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.errors.source")]
+            public string exceptioninnerExceptionsinnerExceptionerrorsserverkeyword { get; set; }
             public string exceptioninnerExceptionsinnerExceptionerrorssource { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.errors.state")]
+            public string exceptioninnerExceptionsinnerExceptionerrorssourcekeyword { get; set; }
             public string exceptioninnerExceptionsinnerExceptionerrorsstate { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.exceptionMethod")]
             public string exceptioninnerExceptionsinnerExceptionexceptionMethod { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.hResult")]
+            public string exceptioninnerExceptionsinnerExceptionexceptionMethodkeyword { get; set; }
             public string exceptioninnerExceptionsinnerExceptionhResult { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.innerException.className")]
             public string exceptioninnerExceptionsinnerExceptioninnerExceptionclassName { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.innerException.hResult")]
+            public string exceptioninnerExceptionsinnerExceptioninnerExceptionclassNamekeyword { get; set; }
             public string exceptioninnerExceptionsinnerExceptioninnerExceptionhResult { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.innerException.message")]
             public string exceptioninnerExceptionsinnerExceptioninnerExceptionmessage { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.innerException.nativeErrorCode")]
+            public string exceptioninnerExceptionsinnerExceptioninnerExceptionmessagekeyword { get; set; }
             public string exceptioninnerExceptionsinnerExceptioninnerExceptionnativeErrorCode { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.innerException.remoteStackIndex")]
             public string exceptioninnerExceptionsinnerExceptioninnerExceptionremoteStackIndex { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.message")]
             public string exceptioninnerExceptionsinnerExceptionmessage { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.remoteStackIndex")]
+            public string exceptioninnerExceptionsinnerExceptionmessagekeyword { get; set; }
             public string exceptioninnerExceptionsinnerExceptionremoteStackIndex { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.source")]
             public string exceptioninnerExceptionsinnerExceptionsource { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.innerException.stackTraceString")]
+            public string exceptioninnerExceptionsinnerExceptionsourcekeyword { get; set; }
             public string exceptioninnerExceptionsinnerExceptionstackTraceString { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.message")]
+            public string exceptioninnerExceptionsinnerExceptionstackTraceStringkeyword { get; set; }
             public string exceptioninnerExceptionsmessage { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.remoteStackIndex")]
+            public string exceptioninnerExceptionsmessagekeyword { get; set; }
             public string exceptioninnerExceptionsremoteStackIndex { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.source")]
             public string exceptioninnerExceptionssource { get; set; }
-
-            [JsonPropertyName("exception.innerExceptions.stackTraceString")]
+            public string exceptioninnerExceptionssourcekeyword { get; set; }
             public string exceptioninnerExceptionsstackTraceString { get; set; }
-
-            [JsonPropertyName("exception.lineNumber")]
+            public string exceptioninnerExceptionsstackTraceStringkeyword { get; set; }
+            public string exceptionkeyword { get; set; }
             public string exceptionlineNumber { get; set; }
-
-            [JsonPropertyName("exception.linePosition")]
             public string exceptionlinePosition { get; set; }
-
-            [JsonPropertyName("exception.message")]
-            public string exceptionmessage { get; set; }
-
-            [JsonPropertyName("exception.objectName")]
             public string exceptionobjectName { get; set; }
-
-            [JsonPropertyName("exception.paramName")]
+            public string exceptionobjectNamekeyword { get; set; }
             public string exceptionparamName { get; set; }
-
-            [JsonPropertyName("exception.remoteStackIndex")]
+            public string exceptionparamNamekeyword { get; set; }
             public string exceptionremoteStackIndex { get; set; }
-
-            [JsonPropertyName("exception.remoteStackTraceString")]
             public string exceptionremoteStackTraceString { get; set; }
-
-            [JsonPropertyName("exception.res")]
+            public string exceptionremoteStackTraceStringkeyword { get; set; }
             public string exceptionres { get; set; }
-
-            [JsonPropertyName("exception.source")]
+            public string exceptionreskeyword { get; set; }
             public string exceptionsource { get; set; }
-
-            [JsonPropertyName("exception.sourceUri")]
+            public string exceptionsourcekeyword { get; set; }
             public string exceptionsourceUri { get; set; }
-
-            [JsonPropertyName("exception.stackTraceString")]
+            public string exceptionsourceUrikeyword { get; set; }
             public string exceptionstackTraceString { get; set; }
-
-            [JsonPropertyName("exception.status")]
+            public string exceptionstackTraceStringkeyword { get; set; }
             public string exceptionstatus { get; set; }
-
-            [JsonPropertyName("exception.version")]
             public string exceptionversion { get; set; }
-
-            [JsonPropertyName("exception.watsonBuckets")]
+            public string exceptionversionkeyword { get; set; }
             public string exceptionwatsonBuckets { get; set; }
-
-            [JsonPropertyName("exception.zone")]
+            public string exceptionwatsonBucketsskippedcount { get; set; }
             public string exceptionzone { get; set; }
-
+            [JsonPropertyName("exception.message")]
             public string exceptionMessage { get; set; }
+            public string exceptionMessagekeyword { get; set; }
             public string exceptionStackTrace { get; set; }
+            public string exceptionStackTracekeyword { get; set; }
             public string exceptionType { get; set; }
+            public string exceptionTypekeyword { get; set; }
             public string executionTime { get; set; }
             public string executionTimeMs { get; set; }
             public string expired { get; set; }
             public string expiredCount { get; set; }
             public string failedCount { get; set; }
             public string file { get; set; }
+            public string filekeyword { get; set; }
             public string fileCount { get; set; }
             public string growerId { get; set; }
+            public string growerIdkeyword { get; set; }
             public string host { get; set; }
+            public string hostkeyword { get; set; }
             public string implementation { get; set; }
+            public string implementationkeyword { get; set; }
             public string importedCount { get; set; }
             public string importedFile { get; set; }
+            public string importedFilekeyword { get; set; }
             public string _interface { get; set; }
+            public string interfacekeyword { get; set; }
             public string internalId { get; set; }
             public string level { get; set; }
+            public string levelkeyword { get; set; }
             public string logger { get; set; }
+            public string loggerkeyword { get; set; }
             public string message { get; set; }
+            public string messagekeyword { get; set; }
             public string method { get; set; }
+            public string methodkeyword { get; set; }
             public string name { get; set; }
+            public string namekeyword { get; set; }
             public string _namespace { get; set; }
+            public string namespacekeyword { get; set; }
             public string orderCompletedDate { get; set; }
-            public string orderID { get; set; }
+            public string orderCompletedDatekeyword { get; set; }
             public string orderId { get; set; }
+            public string orderIdkeyword { get; set; }
             public string orderRef { get; set; }
-            public string orderid { get; set; }
+            public string orderRefkeyword { get; set; }
             public string output { get; set; }
+            public string outputkeyword { get; set; }
             public string parameters { get; set; }
             public string pending { get; set; }
             public string pendingCount { get; set; }
             public string performanceHit { get; set; }
             public string productNumber { get; set; }
+            public string productNumberkeyword { get; set; }
             public string reason { get; set; }
+            public string reasonkeyword { get; set; }
             public string recipient { get; set; }
+            public string recipientkeyword { get; set; }
             public string requestId { get; set; }
+            public string requestIdkeyword { get; set; }
             public string result { get; set; }
+            public string resultkeyword { get; set; }
             public string rows { get; set; }
-
-            [JsonPropertyName("shops.sHOP1.expired")]
             public string shopssHOP1expired { get; set; }
-
-            [JsonPropertyName("shops.sHOP1.newest")]
             public string shopssHOP1newest { get; set; }
-
-            [JsonPropertyName("shops.sHOP1.oldest")]
+            public string shopssHOP1newestkeyword { get; set; }
             public string shopssHOP1oldest { get; set; }
-
-            [JsonPropertyName("shops.sHOP1.pending")]
+            public string shopssHOP1oldestkeyword { get; set; }
             public string shopssHOP1pending { get; set; }
-
-            [JsonPropertyName("shops.sHOP2.expired")]
             public string shopssHOP2expired { get; set; }
-
-            [JsonPropertyName("shops.sHOP2.pending")]
             public string shopssHOP2pending { get; set; }
-
-            [JsonPropertyName("shops.sHOP3.expired")]
             public string shopssHOP3expired { get; set; }
-
-            [JsonPropertyName("shops.sHOP3.newest")]
             public string shopssHOP3newest { get; set; }
-
-            [JsonPropertyName("shops.sHOP3.oldest")]
+            public string shopssHOP3newestkeyword { get; set; }
             public string shopssHOP3oldest { get; set; }
-
-            [JsonPropertyName("shops.sHOP3.pending")]
+            public string shopssHOP3oldestkeyword { get; set; }
             public string shopssHOP3pending { get; set; }
-
-            [JsonPropertyName("shops.sHOP4.expired")]
             public string shopssHOP4expired { get; set; }
-
-            [JsonPropertyName("shops.sHOP4.newest")]
             public string shopssHOP4newest { get; set; }
-
-            [JsonPropertyName("shops.sHOP4.oldest")]
+            public string shopssHOP4newestkeyword { get; set; }
             public string shopssHOP4oldest { get; set; }
-
-            [JsonPropertyName("shops.sHOP4.pending")]
+            public string shopssHOP4oldestkeyword { get; set; }
             public string shopssHOP4pending { get; set; }
-
-            [JsonPropertyName("shops.sHOP5.expired")]
             public string shopssHOP5expired { get; set; }
-
-            [JsonPropertyName("shops.sHOP5.newest")]
             public string shopssHOP5newest { get; set; }
-
-            [JsonPropertyName("shops.sHOP5.oldest")]
+            public string shopssHOP5newestkeyword { get; set; }
             public string shopssHOP5oldest { get; set; }
-
-            [JsonPropertyName("shops.sHOP5.pending")]
+            public string shopssHOP5oldestkeyword { get; set; }
             public string shopssHOP5pending { get; set; }
-
-            [JsonPropertyName("shops.sHOP6.expired")]
             public string shopssHOP6expired { get; set; }
-
-            [JsonPropertyName("shops.sHOP6.newest")]
             public string shopssHOP6newest { get; set; }
-
-            [JsonPropertyName("shops.sHOP6.oldest")]
+            public string shopssHOP6newestkeyword { get; set; }
             public string shopssHOP6oldest { get; set; }
-
-            [JsonPropertyName("shops.sHOP6.pending")]
+            public string shopssHOP6oldestkeyword { get; set; }
             public string shopssHOP6pending { get; set; }
-
-            [JsonPropertyName("shops.sHOP7.expired")]
             public string shopssHOP7expired { get; set; }
-
-            [JsonPropertyName("shops.sHOP7.newest")]
             public string shopssHOP7newest { get; set; }
-
-            [JsonPropertyName("shops.sHOP7.oldest")]
+            public string shopssHOP7newestkeyword { get; set; }
             public string shopssHOP7oldest { get; set; }
-
-            [JsonPropertyName("shops.sHOP7.pending")]
+            public string shopssHOP7oldestkeyword { get; set; }
             public string shopssHOP7pending { get; set; }
-
-            [JsonPropertyName("shops.sHOP8.expired")]
             public string shopssHOP8expired { get; set; }
-
-            [JsonPropertyName("shops.sHOP8.newest")]
             public string shopssHOP8newest { get; set; }
-
-            [JsonPropertyName("shops.sHOP8.oldest")]
+            public string shopssHOP8newestkeyword { get; set; }
             public string shopssHOP8oldest { get; set; }
-
-            [JsonPropertyName("shops.sHOP8.pending")]
+            public string shopssHOP8oldestkeyword { get; set; }
             public string shopssHOP8pending { get; set; }
-
-            [JsonPropertyName("shops.sHOP9.expired")]
             public string shopssHOP9expired { get; set; }
-
-            [JsonPropertyName("shops.sHOP9.newest")]
             public string shopssHOP9newest { get; set; }
-
-            [JsonPropertyName("shops.sHOP9.oldest")]
+            public string shopssHOP9newestkeyword { get; set; }
             public string shopssHOP9oldest { get; set; }
-
-            [JsonPropertyName("shops.sHOP9.pending")]
+            public string shopssHOP9oldestkeyword { get; set; }
             public string shopssHOP9pending { get; set; }
-
             public string solution { get; set; }
+            public string solutionkeyword { get; set; }
             public string status { get; set; }
+            public string statuskeyword { get; set; }
             public string statusCode { get; set; }
             public string successCount { get; set; }
             public string tags { get; set; }
-            public string timestamp { get; set; }
+            public string tagskeyword { get; set; }
+            //public string timestamp { get; set; }
+            public DateTime timestamp { get; set; }
             public string totalCount { get; set; }
             public string transactionNumber { get; set; }
+            public string transactionNumberkeyword { get; set; }
             public string trigger { get; set; }
+            public string triggerkeyword { get; set; }
             public string type { get; set; }
+            public string typekeyword { get; set; }
             public string url { get; set; }
+            public string urlkeyword { get; set; }
             public string urlFull { get; set; }
+            public string urlFullkeyword { get; set; }
             public string urlInternal { get; set; }
+            public string urlInternalkeyword { get; set; }
             public string userId { get; set; }
+            public string userIdkeyword { get; set; }
             public string userName { get; set; }
-            public string username { get; set; }
-
+            public string userNamekeyword { get; set; }
         }
     }
 }

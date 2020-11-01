@@ -11,13 +11,13 @@ namespace UnitTestAPI {
    [TestClass]
     class PutTest {
         TestApiController testApiCon;
-        SchoolsFake._Source schools;
+        Schools._Source schools;
 
         [TestInitialize]
 
         public void setUpGetTest() {
             testApiCon = new TestApiController();
-            schools = new SchoolsFake._Source();
+            schools = new Schools._Source();
             schools.name = "putSchool";
             schools.description = "put test";
             schools.street = "put street";
