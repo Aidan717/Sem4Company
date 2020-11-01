@@ -38,12 +38,22 @@ namespace Web_API_Service.Controllers {
 					client.BaseAddress = new Uri("http://localhost:9200/" + "project" + "/_search");
 					client.DefaultRequestHeaders.Accept.Clear();
 					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-					response = await client.GetAsync("?q=" + error /*"activities.exceptions.errors.message"*/);
 
-					if (response.IsSuccessStatusCode) {
+                    if (error.Equals("getAll")) {
+						response = await client.GetAsync("?q=_exists_:\"*exception*\"&size=5&sort=timestamp:asc");
+
+						//Limit delen:
+						//&size=5&sort=timestamp:asc
+
+						//limit på 24 timer + add count (total)
+						//dernæste limit på antal
+					} else {
+						response = await client.GetAsync("?q=_exists_:\"*" + error + "*\"&size=5&sort=timestamp:asc");
+					}
+
+                    if (response.IsSuccessStatusCode) {
 
 						var option = new JsonSerializerOptions {
-							PropertyNameCaseInsensitive = false,
 							Converters = { new DateTimeConverter() }
 						};
 

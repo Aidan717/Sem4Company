@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace Web_API_Service.Models {
     public class DBSchema {
@@ -442,6 +444,8 @@ namespace Web_API_Service.Models {
             public string exceptionkeyword { get; set; }
             public string exceptionlineNumber { get; set; }
             public string exceptionlinePosition { get; set; }
+            
+            [JsonPropertyName("exception.message")]
             public string exceptionmessage { get; set; }
             public string exceptionmessagekeyword { get; set; }
             public string exceptionobjectName { get; set; }
@@ -465,8 +469,8 @@ namespace Web_API_Service.Models {
             public string exceptionwatsonBuckets { get; set; }
             public string exceptionwatsonBucketsskippedcount { get; set; }
             public string exceptionzone { get; set; }
-            //public string exceptionMessage { get; set; }
-            //public string exceptionMessagekeyword { get; set; }
+            public string exceptionMessage { get; set; }
+            public string exceptionMessagekeyword { get; set; }
             public string exceptionStackTrace { get; set; }
             public string exceptionStackTracekeyword { get; set; }
             public string exceptionType { get; set; }
