@@ -230,6 +230,8 @@ namespace Web_API_Service.Controllers {
 					}
 				}
 			} catch (HttpRequestException ex) {
+				DBSchemaCopy ds = new DBSchemaCopy();
+				
 				
 				MailService warningMail = new MailService();
 				
@@ -268,7 +270,7 @@ namespace Web_API_Service.Controllers {
 
 			using (var client = new HttpClient()) {
 				var result = new DBSchemaCopy();
-				var datetimeconverter = new DateTimeConverter();
+				//var datetimeconverter = new DateTimeConverter();
 				client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_search");
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -282,6 +284,11 @@ namespace Web_API_Service.Controllers {
 
 					result = JsonSerializer.Deserialize<DBSchemaCopy>(await response.Content.ReadAsStringAsync(), options);
 
+					DateTime limit = 
+
+					foreach (DBSchemaCopy._Source s in result.hits.hits) {
+						s.timestamp.
+					}
 					//send to method for checking exceptions with datetime
 					//if 3 or more within 5 minutes, send email with exception name
 					//else, return result.
