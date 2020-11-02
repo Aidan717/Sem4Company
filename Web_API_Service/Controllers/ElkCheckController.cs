@@ -45,7 +45,7 @@ namespace Web_API_Service.Controllers {
 					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                     if (error.Equals("getAll")) {
-						response = await client.GetAsync("?q=_exists_:\"*exception*\"&q=timestamp:["+ yesterday.ToString() + "+TO+"+ currentTimeInMs.ToString() + "]&size=5&sort=timestamp:asc&track_scores=true");
+						response = await client.GetAsync("?q=_exists_:\"*exception*\"&q=timestamp:["+ yesterday.ToString() + "+TO+"+ currentTimeInMs.ToString() + "]&size=5&sort=timestamp:desc&track_scores=true");
 
 						//Limit delen:
 						//&size=5&sort=timestamp:asc
@@ -53,7 +53,7 @@ namespace Web_API_Service.Controllers {
 						//limit på 24 timer + add count (total)
 						//dernæste limit på antal
 					} else {
-						response = await client.GetAsync("?q=_exists_:\"*" + error + "*\"&q=timestamp:[" + yesterday.ToString() + "+TO+" + currentTimeInMs.ToString() + "]&size=5&sort=timestamp:asc&track_scores=true");
+						response = await client.GetAsync("?q=_exists_:\"*" + error + "*\"&q=timestamp:[" + yesterday.ToString() + "+TO+" + currentTimeInMs.ToString() + "]&size=5&sort=timestamp:desc&track_scores=true");
 					}
 
                     if (response.IsSuccessStatusCode) {
