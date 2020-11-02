@@ -271,62 +271,62 @@ namespace Web_API_Service.Controllers {
 		}
 
 
-		[HttpGet("dbschema/{chosenDB}/{SearchParameter}")]
-		public async Task<ActionResult<DBSchemaCopy>> GetDbSchema(string chosenDB, string SearchParameter) 
-			{
+		//[HttpGet("dbschema/{chosenDB}/{SearchParameter}")]
+		//public async Task<ActionResult<DBSchemaCopy>> GetDbSchema(string chosenDB, string SearchParameter) 
+		//	{
 			
-			//nyeste tid er størst
-			DateTime time1 = DateTime.Now;
-			DateTime time2 = DateTime.Now.AddHours(-1);
-			if (time1 > time2) {
-				Debug.WriteLine("Time1 er størst");
-            }
-			else {
-				Debug.WriteLine("time2 er størst");
-            }
+		//	//nyeste tid er størst
+		//	DateTime time1 = DateTime.Now;
+		//	DateTime time2 = DateTime.Now.AddHours(-1);
+		//	if (time1 > time2) {
+		//		Debug.WriteLine("Time1 er størst");
+  //          }
+		//	else {
+		//		Debug.WriteLine("time2 er størst");
+  //          }
 
-			using (var client = new HttpClient()) {
-				var result = new DBSchemaCopy();
-				//var datetimeconverter = new DateTimeConverter();
-				client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_search");
-				client.DefaultRequestHeaders.Accept.Clear();
-				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-				HttpResponseMessage response = await client.GetAsync("?q=_exists_:\"*exception*\"&sort=timestamp:desc&track_scores=true");
+		//	using (var client = new HttpClient()) {
+		//		var result = new DBSchemaCopy();
+		//		//var datetimeconverter = new DateTimeConverter();
+		//		client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_search");
+		//		client.DefaultRequestHeaders.Accept.Clear();
+		//		client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+		//		HttpResponseMessage response = await client.GetAsync("?q=_exists_:\"*exception*\"&sort=timestamp:desc&track_scores=true");
 
-				if (response.IsSuccessStatusCode) {
+		//		if (response.IsSuccessStatusCode) {
 
-					var options = new JsonSerializerOptions {
-						Converters = { new DateTimeConverter() }
-					};
+		//			var options = new JsonSerializerOptions {
+		//				Converters = { new DateTimeConverter() }
+		//			};
 
-					result = JsonSerializer.Deserialize<DBSchemaCopy>(await response.Content.ReadAsStringAsync(), options);
+		//			result = JsonSerializer.Deserialize<DBSchemaCopy>(await response.Content.ReadAsStringAsync(), options);
 
-					int index = 0;
-					int hour = 1;
-					int[] count = new int[50];
-					int i = 0;
+		//			int index = 0;
+		//			int hour = 1;
+		//			int[] count = new int[50];
+		//			int i = 0;
 
 
-					//sortér result via timer
-					while (i < result.hits.hits.Length && hour < 24) {
-						Debug.WriteLine("the count of result: " + result.hits.hits.Length);
-						Debug.WriteLine("i outer while start is now: " + i);
-						//tids limit som kan addes til
-						DateTime timelimit = DateTime.Now.AddHours(-hour);
+		//			//sortér result via timer
+		//			while (i < result.hits.hits.Length && hour < 24) {
+		//				Debug.WriteLine("the count of result: " + result.hits.hits.Length);
+		//				Debug.WriteLine("i outer while start is now: " + i);
+		//				//tids limit som kan addes til
+		//				DateTime timelimit = DateTime.Now.AddHours(-hour);
 
-						while (i < result.hits.hits.Length && result.hits.hits[i]._source.timestamp > timelimit) {
-							count[index] += 1;
-							i++;
-							Debug.WriteLine("i inner while is now: " + i);
-						}
-						Debug.WriteLine("i outer while end is now: " + i);
-						index++;
-						hour++;
-					}
-					Debug.WriteLine("[2 3[");
-					foreach (int error in count) { 
-						Debug.WriteLine(error.ToString());
-					}
+		//				while (i < result.hits.hits.Length && result.hits.hits[i]._source.timestamp > timelimit) {
+		//					count[index] += 1;
+		//					i++;
+		//					Debug.WriteLine("i inner while is now: " + i);
+		//				}
+		//				Debug.WriteLine("i outer while end is now: " + i);
+		//				index++;
+		//				hour++;
+		//			}
+		//			Debug.WriteLine("[2 3[");
+		//			foreach (int error in count) { 
+		//				Debug.WriteLine(error.ToString());
+		//			}
 
 
 
@@ -350,12 +350,12 @@ namespace Web_API_Service.Controllers {
                     //if 3 or more within 5 minutes, send email with exception name
                     //else, return result.
 
-                    return result;
-				} else {
-					return result;
-				}
-			}
-		}
+  //                  return result;
+		//		} else {
+		//			return result;
+		//		}
+		//	}
+		//}
 
 
 
