@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text.Json.Serialization;
-using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Web_API_Service.Models {
     public class DBSchemaCopy {
@@ -591,8 +591,7 @@ namespace Web_API_Service.Models {
             public string successCount { get; set; }
             public string tags { get; set; }
             public string tagskeyword { get; set; }
-			//public string timestamp { get; set; }
-            //[DataType(DataType.Date)]
+            //public string timestamp { get; set; }
             public string timestamp { get; set; }
             public string totalCount { get; set; }
             public string transactionNumber { get; set; }
@@ -612,6 +611,5 @@ namespace Web_API_Service.Models {
             public string userName { get; set; }
             public string userNamekeyword { get; set; }
         }
-       
     }
 }
