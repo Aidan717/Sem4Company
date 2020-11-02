@@ -34,6 +34,9 @@ namespace Web_API_Service.Controllers {
 			var result = new DBSchemaCopy();
 			HttpResponseMessage response = new HttpResponseMessage();
 
+			long currentTimeInMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+			long yesterday = DateTimeOffset.UtcNow.AddHours(-24).ToUnixTimeMilliseconds();
+
 			try {
 				using (var client = new HttpClient()) {
 
@@ -42,7 +45,7 @@ namespace Web_API_Service.Controllers {
 					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                     if (error.Equals("getAll")) {
-						response = await client.GetAsync("?q=_exists_:\"*exception*\"&size=5&sort=timestamp:asc");
+						response = await client.GetAsync("?q=_exists_:\"*exception*\"&q=timestamp:["+ yesterday.ToString() + "+TO+"+ currentTimeInMs.ToString() + "]&size=5&sort=timestamp:asc&track_scores=true");
 
 						//Limit delen:
 						//&size=5&sort=timestamp:asc
@@ -50,7 +53,7 @@ namespace Web_API_Service.Controllers {
 						//limit på 24 timer + add count (total)
 						//dernæste limit på antal
 					} else {
-						response = await client.GetAsync("?q=_exists_:\"*" + error + "*\"&size=5&sort=timestamp:asc");
+						response = await client.GetAsync("?q=_exists_:\"*" + error + "*\"&q=timestamp:[" + yesterday.ToString() + "+TO+" + currentTimeInMs.ToString() + "]&size=5&sort=timestamp:asc&track_scores=true");
 					}
 
                     if (response.IsSuccessStatusCode) {

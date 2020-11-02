@@ -909,7 +909,7 @@ namespace Web_API_Service.Models {
             public string statusCode { get; set; }
             public string successCount { get; set; }
             public string tags { get; set; }
-            public string timestamp { get; set; }
+            public DateTime timestamp { get; set; }
             public string totalCount { get; set; }
             public string transactionNumber { get; set; }
             public string trigger { get; set; }
