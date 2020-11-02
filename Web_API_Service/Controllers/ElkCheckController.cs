@@ -101,23 +101,32 @@ namespace Web_API_Service.Controllers {
 			return "value";
 		}
 
-		//look up history of a index and see if something does not fit in
-		[HttpGet("{error}")]
-		public string LookUphistory() {
-			return "value";
+		//look at status for index when a person call something
+		[HttpGet("db/{index}")]
+		public async Task<ActionResult<IndexStat>> GetIndexStatus() {
+
+			using (var client = new HttpClient()) {
+				var result = new IndexStat();
+				client.BaseAddress = new Uri("http://localhost:9200/");
+				client.DefaultRequestHeaders.Accept.Clear();
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+				if ()
+					
+
+			}
 		}
 
 
+		//http://localhost:9200/_cat/indices?h=index laver en en liste af alle indexes
+		//http://localhost:9200/_cluster/health?level=indices henter alle indexes med en oversigt heriblandt status.
 
 
 
 
 
-
-
-
-		// POST api/<ValuesController>
-		[HttpPost("poster")]
+	// POST api/<ValuesController>
+	[HttpPost("poster")]
 		public void PostNewDataEntry([FromBody] DBSchema parametor) {
 		}
 

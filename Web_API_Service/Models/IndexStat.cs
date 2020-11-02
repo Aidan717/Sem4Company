@@ -11,6 +11,6 @@ namespace Web_API_Service.Models {
         public string id { get; set; }
         public string status { get; set; }
         public string index { get; set; }
-
+     
     }
 }
