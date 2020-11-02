@@ -56,7 +56,8 @@ namespace Web_API_Service.Controllers {
                     if (response.IsSuccessStatusCode) {
 
 						var option = new JsonSerializerOptions {
-							Converters = { new DateTimeConverter() }
+							Converters = { new DateTimeConverter() }						
+							
 						};
 
 						result = JsonSerializer.Deserialize<DBSchemaCopy>(await response.Content.ReadAsStringAsync(), option);
@@ -157,7 +158,7 @@ namespace Web_API_Service.Controllers {
 				i = result.hits.hits.Count();
 				result.hits.hits[i]._source.exception = ex.ToString();
 
-                await PostNewError(result);
+               // await PostNewError(result);
 
                 MailService warningMail = new MailService();
 
@@ -169,8 +170,8 @@ namespace Web_API_Service.Controllers {
 		}
 
 		//Skal kun kaldes igennem en anden GET metode. Er dette nødvendigt at have noget inde i HttpPost med?
-		[HttpPost("")]
-		public async Task<ActionResult<ResponseStatus>> PostNewError(DBSchemaCopy result) {
+		[HttpPost("app")]
+		public async Task<ActionResult<ResponseStatus>> PostNewError([FromBody] DBSchema._Source result) {
 			string baseaddress = "";
 			HttpResponseMessage response = new HttpResponseMessage();
 			var resSta = new ResponseStatus();
@@ -178,7 +179,11 @@ namespace Web_API_Service.Controllers {
 			try {
 
 				using (var client = new HttpClient()) {
-					var jsonstring = new StringContent(JsonSerializer.Serialize(result), Encoding.UTF8, "application/json");
+					var option = new JsonSerializerOptions {
+						IgnoreNullValues = true
+
+					};
+					var jsonstring = new StringContent(JsonSerializer.Serialize(result, option), Encoding.UTF8, "application/json");
 
 					client.BaseAddress = new Uri("http://localhost:9200/errordb/_doc/");
 					baseaddress = client.BaseAddress.ToString();
@@ -186,6 +191,7 @@ namespace Web_API_Service.Controllers {
 					response = await client.PostAsync("", jsonstring);
 
 					if (response.IsSuccessStatusCode) {
+						
 						resSta = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
 						return resSta;
 					} else {
@@ -195,9 +201,9 @@ namespace Web_API_Service.Controllers {
 			} catch (HttpRequestException ex) {
 				MailService warningMail = new MailService();
 				var jsonstrings = new String(JsonSerializer.Serialize(result));
-				await warningMail.SendWarningEmailAsync("Post", jsonstrings, baseaddress, ex.Message);
+				//await warningMail.SendWarningEmailAsync("Post", jsonstrings, baseaddress, ex.Message);
 
-				return resSta = new ResponseStatus("failed to connect" + ex.Message);
+				return resSta = new ResponseStatus("failed to connect" + ex.Message + result.timestamp.ToString());
 			}
 		}
 
