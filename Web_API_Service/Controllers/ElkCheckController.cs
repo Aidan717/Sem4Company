@@ -105,19 +105,33 @@ namespace Web_API_Service.Controllers {
 		}
 
 		//look at status for index when a person call something
-		[HttpGet("db/{index}")]
-		public async Task<ActionResult<IndexStat>> GetIndexStatus() {
+		[HttpGet("hey")]
+		public async Task<ActionResult<IndexStat>> GetIndexStatus(string index) {
+			var result = new IndexStat();
+			HttpResponseMessage response = new HttpResponseMessage();
 
-			using (var client = new HttpClient()) {
-				var result = new IndexStat();
-				client.BaseAddress = new Uri("http://localhost:9200/");
-				client.DefaultRequestHeaders.Accept.Clear();
-				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+			try {
+				using (var client = new HttpClient()) {
 
-				if ()
-					
+					client.BaseAddress = new Uri("http://localhost:9200/" + "_cluster/health/");
+					client.DefaultRequestHeaders.Accept.Clear();
+					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-			}
+					response = await client.GetAsync("schools");
+
+					if (response.IsSuccessStatusCode) {
+
+						result = JsonSerializer.Deserialize<IndexStat>(await response.Content.ReadAsStringAsync());
+						return result;
+					} else {
+						throw new HttpRequestException("statusCode: " + response.StatusCode);
+					}
+				}
+			}catch(HttpRequestException ex) {
+
+			return result;
+            }
+
 		}
 
 
