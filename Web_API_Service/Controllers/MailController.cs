@@ -12,10 +12,11 @@ namespace Web_API_Service.Controllers {
     //[Route("api/[controller]")]
     //[ApiController]
     public class MailController : ControllerBase {
-        public Service.IMailService mailService;
+        public readonly Service.IMailService mailService;
         public MailController(Service.IMailService mailService) {
             this.mailService = mailService;
         }
+        
 
         //[HttpPost("send")]
         //public async Task<IActionResult> SendMail([FromForm] MailRequest request) {

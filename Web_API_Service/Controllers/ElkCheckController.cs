@@ -20,6 +20,15 @@ namespace Web_API_Service.Controllers {
 	[Route("api/[controller]")]
 	[ApiController]
 	public class ElkCheckController : ControllerBase {
+
+		public readonly IMailService mailService;
+		public ElkCheckController(IMailService mailService) {
+			this.mailService = mailService;
+		}
+
+
+
+
 		// GET: api/<ValuesController>
 		[HttpGet]
 		public IEnumerable<string> Get() {
@@ -143,8 +152,8 @@ namespace Web_API_Service.Controllers {
 
 
 
-	// POST api/<ValuesController>
-	[HttpPost("poster")]
+		// POST api/<ValuesController>
+		[HttpPost("poster")]
 		public void PostNewDataEntry([FromBody] DBSchema parametor) {
 		}
 
@@ -195,18 +204,19 @@ namespace Web_API_Service.Controllers {
             }
         }
 
-        //Skal kun kaldes igennem en anden GET metode. Er dette nødvendigt at have noget inde i HttpPost med?
+		//Skal kun kaldes igennem en anden GET metode. Er dette nødvendigt at have noget inde i HttpPost med?
 		public async Task<ActionResult<ResponseStatus>> PostNewError([FromBody] DBSchema._Source result) {
 			string baseaddress = "";
 			HttpResponseMessage response = new HttpResponseMessage();
 			var resSta = new ResponseStatus();
+			
 
 			try {
 
-				using (var client = new HttpClient()) {
+				using (var client = new HttpClient()) {					
 					var jsonstring = new StringContent(JsonSerializer.Serialize(result), Encoding.UTF8, "application/json");
 
-					client.BaseAddress = new Uri("http://localhost:9200/errordb/_docoro/");
+					client.BaseAddress = new Uri("http://localhost:9200/errordb/_doc/");
 					baseaddress = client.BaseAddress.ToString();
 					client.DefaultRequestHeaders.Accept.Clear();
 					response = await client.PostAsync("", jsonstring);
@@ -226,7 +236,7 @@ namespace Web_API_Service.Controllers {
 				MailService warningMail = new MailService();
 				var option = new JsonSerializerOptions {
 					IgnoreNullValues = true
-			};
+				};
 				var jsonstrings = new String(JsonSerializer.Serialize(result, option));
 
 				await warningMail.SendWarningEmailAsync("Post", jsonstrings, baseaddress, ex.Message);
