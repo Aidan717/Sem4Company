@@ -274,7 +274,7 @@ namespace Web_API_Service.Controllers {
 
 
 		[HttpGet("dbschema/getall")]
-		public async Task<ActionResult<DBSchema>> GetDbSchema(string chosenDB, string SearchParameter) 
+		public async Task<ActionResult<DBSchema>> GetDbSchema() 
 			{
 
 			using (var client = new HttpClient()) {
@@ -302,7 +302,7 @@ namespace Web_API_Service.Controllers {
 						//tids limit som kan addes til
 						DateTime timelimit = DateTime.Now.AddHours(-hour);
 						errortime.Add(timelimit, 0);
-						while (i < result.hits.hits.Length && result.hits.hits[i]._source.timestamp > timelimit) {
+						while (i < result.hits.hits.Length && DateTime.Parse(result.hits.hits[i]._source.timestamp) > timelimit) {
 							errortime[timelimit] += 1;
 							i++;
 						}
