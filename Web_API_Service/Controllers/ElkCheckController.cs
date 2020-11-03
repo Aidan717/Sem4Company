@@ -13,6 +13,8 @@ using Web_API_Service.Utility;
 using Web_API_Service.Service;
 using Org.BouncyCastle.Math.EC.Rfc7748;
 using System.Diagnostics;
+using static Web_API_Service.Models.DBSchema;
+using System.Reflection;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -24,6 +26,62 @@ namespace Web_API_Service.Controllers {
 		[HttpGet]
 		public IEnumerable<string> Get() {
 			return new string[] { "value1", "value2" };
+		}
+
+
+		//Robins metode
+		[HttpGet("dbschema/getall")]
+		public async Task<ActionResult<string>> GetDbSchema() {
+
+			using (var client = new HttpClient()) {
+				var result = new DBSchema();
+				client.BaseAddress = new Uri("http://localhost:9200/dbschema/_search");
+				client.DefaultRequestHeaders.Accept.Clear();
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+				HttpResponseMessage response = await client.GetAsync("?q=_exists_:\"*exception*\"&sort=timestamp:desc&track_scores=true");
+
+				if (response.IsSuccessStatusCode) {
+
+                    var options = new JsonSerializerOptions {
+                        Converters = { new DateTimeConverter() }
+                    };
+
+
+                    result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync(), options);
+					int index = 0;
+					int hour = 1;
+					var errortime = new Dictionary<DateTime, int>();
+					int i = 0;
+				
+
+					//sortér result via timer
+					while (i < result.hits.hits.Length && hour < 730) {
+						//tids limit som kan addes til
+						DateTime timelimit = DateTime.Now.AddHours(-hour);
+						errortime.Add(timelimit, 0);
+						while (i < result.hits.hits.Length && DateTime.Parse(result.hits.hits[i]._source.timestamp) > timelimit) {
+							errortime[timelimit] += 1;
+							i++;
+						}
+						index++;
+						hour++;
+					}
+					Debug.WriteLine("[2 3[");
+					foreach (var error in errortime) {
+						if (error.Value != 0) {
+							Debug.WriteLine(error.ToString());
+						}
+					}
+					var option = new JsonSerializerOptions {
+						IgnoreNullValues = true
+					};
+
+					var jsonstrings = new String(JsonSerializer.Serialize(result, option));
+					return jsonstrings;
+				} else {
+					return result.ToString();
+				}
+			}
 		}
 
 
@@ -192,7 +250,7 @@ namespace Web_API_Service.Controllers {
 				using (var client = new HttpClient()) {
 					var jsonstring = new StringContent(JsonSerializer.Serialize(result), Encoding.UTF8, "application/json");
 
-					client.BaseAddress = new Uri("http://localhost:9200/errordb/_docoro/");
+					client.BaseAddress = new Uri("http://localhost:9200/errordb/_doc/");
 					baseaddress = client.BaseAddress.ToString();
 					client.DefaultRequestHeaders.Accept.Clear();
 					response = await client.PostAsync("", jsonstring);
@@ -202,7 +260,7 @@ namespace Web_API_Service.Controllers {
 						var option = new JsonSerializerOptions {
 							Converters = { new DateTimeConverter() }
 						};
-						resSta = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+						resSta = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync(), option);
 						return resSta;
 					} else {
 						throw new HttpRequestException("statusCode: " + response.StatusCode);
@@ -221,8 +279,55 @@ namespace Web_API_Service.Controllers {
 			}
 		}
 
+		[HttpPost("{chosenDB}/CheckIfError")]
+		public async Task<ActionResult<ResponseStatus>> PostCheckIfError([FromBody] DBSchema result) {
+			
+			string baseaddress = "";
+			HttpResponseMessage response = new HttpResponseMessage();
+			var respSta = new ResponseStatus();
 
+			try {
 
+				using (var client = new HttpClient()) {
+					var jsonstring = new StringContent(JsonSerializer.Serialize(result), Encoding.UTF8, "application/json");
+
+					client.BaseAddress = new Uri("http://localhost:9200/dbschema/_doc/");
+					baseaddress = client.BaseAddress.ToString();
+					client.DefaultRequestHeaders.Accept.Clear();
+					response = await client.PostAsync("", jsonstring);
+
+					
+					var errorAdd = new DBSchema();
+
+					Debug.WriteLine(result.ToString());
+
+					foreach (Hit s in result.hits.hits) {
+						foreach (PropertyInfo pi in s._source.GetType().GetProperties()) {
+							string value = (string)pi.GetValue(s._source);
+							if (pi.Name.Contains("exception") && !string.IsNullOrEmpty(value)) {
+								Debug.WriteLine(s);
+							}
+						}
+					}
+
+					if (response.IsSuccessStatusCode) {
+
+						var option = new JsonSerializerOptions {
+							Converters = { new DateTimeConverter() }
+						};
+						respSta = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync(), option);
+						return respSta;
+					} else {
+						throw new HttpRequestException("statusCode: " + response.StatusCode);
+					}
+				}
+			} catch (HttpRequestException ex) {
+
+				await PostNewError(result.hits.hits[0]._source);
+
+				return respSta;
+			}
+		}
 
 
 
@@ -250,3 +355,4 @@ namespace Web_API_Service.Controllers {
 		}
 	}
 }
+
