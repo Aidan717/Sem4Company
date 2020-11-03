@@ -31,8 +31,8 @@ namespace Web_API_Service.Controllers {
 		// GET api/<ValuesController>/5
 		//name need to change to what it does this is just temps
 		[HttpGet("project/{error}")]
-		public async Task<ActionResult<DBSchemaCopy>> checkForError(string error) {
-			var result = new DBSchemaCopy();
+		public async Task<ActionResult<DBSchema>> checkForError(string error) {
+			var result = new DBSchema();
 			HttpResponseMessage response = new HttpResponseMessage();
 
 			long currentTimeInMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -48,22 +48,26 @@ namespace Web_API_Service.Controllers {
                     if (error.Equals("getAll")) {
 						response = await client.GetAsync("?q=_exists_:\"*exception*\"&q=timestamp:["+ yesterday.ToString() + "+TO+"+ currentTimeInMs.ToString() + "]&size=5&sort=timestamp:desc&track_scores=true");
 
-						//Limit delen:
-						//&size=5&sort=timestamp:asc
-
-						//limit på 24 timer + add count (total)
-						//dernæste limit på antal
 					} else {
 						response = await client.GetAsync("?q=_exists_:\"*" + error + "*\"&q=timestamp:[" + yesterday.ToString() + "+TO+" + currentTimeInMs.ToString() + "]&size=5&sort=timestamp:desc&track_scores=true");
 					}
+					
+					//Forklaring af strengen der står i getAsync:
+					//"?q=" er starten af vores query som fortæller "_search" fra baseAddress hvad den skal lede efter
+					//"_exists_" beder "client" om at retunere de objecter som indeholder det søgte streng
+					//"\"*exception*\"" eller "error" er det vi søger efter
+					//"&q=timestamp:["+ yesterday.ToString() + "+TO+"+ currentTimeInMs.ToString() + "]" er hvor vi beder om kun at få objecter fra et bestemt tidsrum
+					//"&size" er hvor mange objecter vi får ud
+					//"&sort=timestamp:" sortere vores objecter så vi enten får de ælste først eller de nyeste først
+					//"&track_scores=true" er for at forhindre fejl når vi køre metoden
 
-                    if (response.IsSuccessStatusCode) {
+					if (response.IsSuccessStatusCode) {
 
 						var option = new JsonSerializerOptions {
 							Converters = { new DateTimeConverter() }
 						};
 
-						result = JsonSerializer.Deserialize<DBSchemaCopy>(await response.Content.ReadAsStringAsync(), option);
+						result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync(), option);
 						return result;
 					} else {
 						throw new HttpRequestException("statusCode: " + response.StatusCode);
@@ -71,26 +75,8 @@ namespace Web_API_Service.Controllers {
 				}
 			} catch (HttpRequestException ex) {
 
-				//return result = new ResponseStatus("failed to connect" + ex.Message);
 				return result;
 			}
-
-			//Noter til mig selv:
-			//kigge hele databasen gennem for alle exception
-			//lav noget univercielt
-			//er der noget der hedder noget med exception
-			//indeholder den noget
-			//prøv at match exception med modellen
-			//from body er en match
-			//Tjekke hele listen i gennem
-			//Der er 3 der har en error returner dem
-			//Skal have en deafult check og en specifik
-			//Limit fejl til 24 timer eller de sidste 50 fejl
-			//Connect til kibana som vi gør i testAPI
-			//get alle error føst
-			//dernæst lav limit
-			//udvid langsomt
-			
 		}
 
 		//look up something specific with in the last hour that have given an exception or something
