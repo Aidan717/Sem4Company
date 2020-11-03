@@ -12,6 +12,7 @@ using Web_API_Service.Models;
 using Web_API_Service.Utility;
 using Web_API_Service.Service;
 using Org.BouncyCastle.Math.EC.Rfc7748;
+using System.Diagnostics;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -34,6 +35,9 @@ namespace Web_API_Service.Controllers {
 			var result = new DBSchemaCopy();
 			HttpResponseMessage response = new HttpResponseMessage();
 
+			long currentTimeInMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+			long yesterday = DateTimeOffset.UtcNow.AddHours(-24).ToUnixTimeMilliseconds();
+
 			try {
 				using (var client = new HttpClient()) {
 
@@ -42,7 +46,7 @@ namespace Web_API_Service.Controllers {
 					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                     if (error.Equals("getAll")) {
-						response = await client.GetAsync("?q=_exists_:\"*exception*\"&size=5&sort=timestamp:asc");
+						response = await client.GetAsync("?q=_exists_:\"*exception*\"&q=timestamp:["+ yesterday.ToString() + "+TO+"+ currentTimeInMs.ToString() + "]&size=5&sort=timestamp:desc&track_scores=true");
 
 						//Limit delen:
 						//&size=5&sort=timestamp:asc
@@ -50,7 +54,7 @@ namespace Web_API_Service.Controllers {
 						//limit på 24 timer + add count (total)
 						//dernæste limit på antal
 					} else {
-						response = await client.GetAsync("?q=_exists_:\"*" + error + "*\"&size=5&sort=timestamp:asc");
+						response = await client.GetAsync("?q=_exists_:\"*" + error + "*\"&q=timestamp:[" + yesterday.ToString() + "+TO+" + currentTimeInMs.ToString() + "]&size=5&sort=timestamp:desc&track_scores=true");
 					}
 
                     if (response.IsSuccessStatusCode) {
@@ -101,23 +105,46 @@ namespace Web_API_Service.Controllers {
 			return "value";
 		}
 
-		//look up history of a index and see if something does not fit in
-		[HttpGet("{error}")]
-		public string LookUphistory() {
-			return "value";
+		//look at status for index when a person call something
+		[HttpGet("hey")]
+		public async Task<ActionResult<IndexStat>> GetIndexStatus(string index) {
+			var result = new IndexStat();
+			HttpResponseMessage response = new HttpResponseMessage();
+
+			try {
+				using (var client = new HttpClient()) {
+
+					client.BaseAddress = new Uri("http://localhost:9200/" + "_cluster/health/");
+					client.DefaultRequestHeaders.Accept.Clear();
+					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+					response = await client.GetAsync("schools");
+
+					if (response.IsSuccessStatusCode) {
+
+						result = JsonSerializer.Deserialize<IndexStat>(await response.Content.ReadAsStringAsync());
+						return result;
+					} else {
+						throw new HttpRequestException("statusCode: " + response.StatusCode);
+					}
+				}
+			}catch(HttpRequestException ex) {
+
+			return result;
+            }
+
 		}
 
 
+		//http://localhost:9200/_cat/indices?h=index laver en en liste af alle indexes
+		//http://localhost:9200/_cluster/health?level=indices henter alle indexes med en oversigt heriblandt status.
 
 
 
 
 
-
-
-
-		// POST api/<ValuesController>
-		[HttpPost("poster")]
+	// POST api/<ValuesController>
+	[HttpPost("poster")]
 		public void PostNewDataEntry([FromBody] DBSchema parametor) {
 		}
 
@@ -127,50 +154,49 @@ namespace Web_API_Service.Controllers {
 
 
 
-		[HttpGet("db/{chosenDB}/{SearchParameter}")]
-		public async Task<ActionResult<DBSchemaCopy>> GetError(string chosenDB, string SearchParameter) {
+        [HttpGet("db/{chosenDB}/{SearchParameter}")]
+        public async Task<ActionResult<DBSchemaCopy>> GetError(string chosenDB, string SearchParameter) {
 
-			string baseaddress = "";
-			var result = new DBSchemaCopy();
+            string baseaddress = "";
+            var result = new DBSchemaCopy();
 
-			try {
-				using (var client = new HttpClient()) {
+            try {
+                using (var client = new HttpClient()) {
 
 
-					client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_search");
-					baseaddress = client.BaseAddress.ToString();
-					client.DefaultRequestHeaders.Accept.Clear();
-					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-					HttpResponseMessage response = await client.GetAsync("?q=" + SearchParameter);
+                    client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_search");
+                    baseaddress = client.BaseAddress.ToString();
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    HttpResponseMessage response = await client.GetAsync("?q=" + SearchParameter);
 
-					if (response.IsSuccessStatusCode) {
-						result = JsonSerializer.Deserialize<DBSchemaCopy>(await response.Content.ReadAsStringAsync());
-						return result;
-					} else {
-						throw new HttpRequestException("StatusCode: " + response.StatusCode);
-					}
-				}
+                    if (response.IsSuccessStatusCode) {
+                        result = JsonSerializer.Deserialize<DBSchemaCopy>(await response.Content.ReadAsStringAsync());
+                        return result;
+                    } else {
+                        throw new HttpRequestException("StatusCode: " + response.StatusCode);
+                    }
+                }
 
-			} catch (Exception ex) {
+            } catch (Exception ex) {
 
-				int i = -1;
-				i = result.hits.hits.Count();
-				result.hits.hits[i]._source.exception = ex.ToString();
+                int i = -1;
+                i = result.hits.hits.Count();
+                result.hits.hits[i]._source.exception = ex.ToString();
 
-                await PostNewError(result);
+                //await PostNewError(result._source);
 
                 MailService warningMail = new MailService();
 
-				var jsonstrings = new String(JsonSerializer.Serialize(SearchParameter));
-				await warningMail.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseaddress, ex.Message);
+                var jsonstrings = new String(JsonSerializer.Serialize(SearchParameter));
+                await warningMail.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseaddress, ex.Message);
 
-				return result;
-			}
-		}
+                return result;
+            }
+        }
 
-		//Skal kun kaldes igennem en anden GET metode. Er dette nødvendigt at have noget inde i HttpPost med?
-		[HttpPost("")]
-		public async Task<ActionResult<ResponseStatus>> PostNewError(DBSchemaCopy result) {
+        //Skal kun kaldes igennem en anden GET metode. Er dette nødvendigt at have noget inde i HttpPost med?
+		public async Task<ActionResult<ResponseStatus>> PostNewError([FromBody] DBSchema._Source result) {
 			string baseaddress = "";
 			HttpResponseMessage response = new HttpResponseMessage();
 			var resSta = new ResponseStatus();
@@ -180,12 +206,16 @@ namespace Web_API_Service.Controllers {
 				using (var client = new HttpClient()) {
 					var jsonstring = new StringContent(JsonSerializer.Serialize(result), Encoding.UTF8, "application/json");
 
-					client.BaseAddress = new Uri("http://localhost:9200/errordb/_doc/");
+					client.BaseAddress = new Uri("http://localhost:9200/errordb/_docoro/");
 					baseaddress = client.BaseAddress.ToString();
 					client.DefaultRequestHeaders.Accept.Clear();
 					response = await client.PostAsync("", jsonstring);
 
 					if (response.IsSuccessStatusCode) {
+
+						var option = new JsonSerializerOptions {
+							Converters = { new DateTimeConverter() }
+						};
 						resSta = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
 						return resSta;
 					} else {
@@ -194,10 +224,14 @@ namespace Web_API_Service.Controllers {
 				}
 			} catch (HttpRequestException ex) {
 				MailService warningMail = new MailService();
-				var jsonstrings = new String(JsonSerializer.Serialize(result));
+				var option = new JsonSerializerOptions {
+					IgnoreNullValues = true
+			};
+				var jsonstrings = new String(JsonSerializer.Serialize(result, option));
+
 				await warningMail.SendWarningEmailAsync("Post", jsonstrings, baseaddress, ex.Message);
 
-				return resSta = new ResponseStatus("failed to connect" + ex.Message);
+				return resSta = new ResponseStatus("failed to connect " + ex.Message);
 			}
 		}
 

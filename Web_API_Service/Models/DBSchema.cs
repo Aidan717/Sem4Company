@@ -618,6 +618,9 @@ namespace Web_API_Service.Models {
             [JsonPropertyName("exception.innerException.watsonBuckets")]
             public string exceptioninnerExceptionwatsonBuckets { get; set; }
 
+            [JsonPropertyName("exception.innerException.watsonBuckets-skipped-count")]
+            public string exceptioninnerExceptionwatsonBucketsskippedcount { get; set; }
+
             [JsonPropertyName("exception.innerExceptions.className")]
             public string exceptioninnerExceptionsclassName { get; set; }
 
@@ -759,6 +762,9 @@ namespace Web_API_Service.Models {
             [JsonPropertyName("exception.watsonBuckets")]
             public string exceptionwatsonBuckets { get; set; }
 
+            [JsonPropertyName("exception.watsonBuckets-skipped-count")]
+            public string exceptionwatsonBucketsskippedcount { get; set; }
+
             [JsonPropertyName("exception.zone")]
             public string exceptionzone { get; set; }
 
@@ -786,10 +792,11 @@ namespace Web_API_Service.Models {
             public string name { get; set; }
             public string _namespace { get; set; }
             public string orderCompletedDate { get; set; }
-            public string orderID { get; set; }
+           // public string orderID { get; set; }
+            [JsonPropertyName("orderId")]
             public string orderId { get; set; }
             public string orderRef { get; set; }
-            public string orderid { get; set; }
+           // public string orderid { get; set; }
             public string output { get; set; }
             public string parameters { get; set; }
             public string pending { get; set; }
@@ -909,7 +916,7 @@ namespace Web_API_Service.Models {
             public string statusCode { get; set; }
             public string successCount { get; set; }
             public string tags { get; set; }
-            public DateTime timestamp { get; set; }
+            public string timestamp { get; set; }
             public string totalCount { get; set; }
             public string transactionNumber { get; set; }
             public string trigger { get; set; }
@@ -919,7 +926,7 @@ namespace Web_API_Service.Models {
             public string urlInternal { get; set; }
             public string userId { get; set; }
             public string userName { get; set; }
-            public string username { get; set; }
+            //public string username { get; set; }
 
         }
     }
