@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations;
 
 namespace Web_API_Service.Models {
     public class DBSchemaCopy {

@@ -23,6 +23,8 @@ using Microsoft.EntityFrameworkCore.Update;
 using Org.BouncyCastle.Asn1.Cms;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Org.BouncyCastle.Crypto.Engines;
+using System.Collections;
+using Microsoft.AspNetCore.DataProtection;
 
 
 
@@ -271,24 +273,13 @@ namespace Web_API_Service.Controllers {
 		}
 
 
-		[HttpGet("dbschema/{chosenDB}/{SearchParameter}")]
-		public async Task<ActionResult<DBSchemaCopy>> GetDbSchema(string chosenDB, string SearchParameter) 
+		[HttpGet("dbschema/getall")]
+		public async Task<ActionResult<DBSchema>> GetDbSchema(string chosenDB, string SearchParameter) 
 			{
-			
-			//nyeste tid er størst
-			DateTime time1 = DateTime.Now;
-			DateTime time2 = DateTime.Now.AddHours(-1);
-			if (time1 > time2) {
-				Debug.WriteLine("Time1 er størst");
-            }
-			else {
-				Debug.WriteLine("time2 er størst");
-            }
 
 			using (var client = new HttpClient()) {
-				var result = new DBSchemaCopy();
-				//var datetimeconverter = new DateTimeConverter();
-				client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_search");
+				var result = new DBSchema();
+				client.BaseAddress = new Uri("http://localhost:9200/dbschema/_search");
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 				HttpResponseMessage response = await client.GetAsync("?q=_exists_:\"*exception*\"&sort=timestamp:desc&track_scores=true");
@@ -299,56 +290,32 @@ namespace Web_API_Service.Controllers {
 						Converters = { new DateTimeConverter() }
 					};
 
-					result = JsonSerializer.Deserialize<DBSchemaCopy>(await response.Content.ReadAsStringAsync(), options);
-
+					result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync(), options);
 					int index = 0;
 					int hour = 1;
-					int[] count = new int[50];
+					var errortime = new Dictionary<DateTime, int>();
 					int i = 0;
 
 
 					//sortér result via timer
-					while (i < result.hits.hits.Length && hour < 24) {
-						Debug.WriteLine("the count of result: " + result.hits.hits.Length);
-						Debug.WriteLine("i outer while start is now: " + i);
+					while (i < result.hits.hits.Length && hour < 730) {
 						//tids limit som kan addes til
 						DateTime timelimit = DateTime.Now.AddHours(-hour);
-
+						errortime.Add(timelimit, 0);
 						while (i < result.hits.hits.Length && result.hits.hits[i]._source.timestamp > timelimit) {
-							count[index] += 1;
+							errortime[timelimit] += 1;
 							i++;
-							Debug.WriteLine("i inner while is now: " + i);
 						}
-						Debug.WriteLine("i outer while end is now: " + i);
 						index++;
 						hour++;
 					}
 					Debug.WriteLine("[2 3[");
-					foreach (int error in count) { 
+					foreach (var error in errortime) { 
+						if(error.Value != 0) { 
 						Debug.WriteLine(error.ToString());
 					}
+					}
 
-
-
-                    //for (int i = 0; i < result.hits.hits.Count(); i++) {
-                    //	DateTime test = result.hits.hits[i]._source.timestamp;
-                    //	for (int ii = 0; ii < result.hits.hits.Count(); ii++) {
-                    //		var diff = test.Subtract(result.hits.hits[ii]._source.timestamp).TotalSeconds;
-
-                    //		if (Math.Abs(diff) < 300) {
-                    //			int iii = 0;
-                    //			holding.hits.hits[iii] = result.hits.hits[ii];
-                    //			iii++;
-                    //                       }
-                    //                   }
-                    //               }
-
-                    //foreach (DBSchemaCopy._Source s in result.hits.hits) {
-                    //	s.timestamp
-                    //}
-                    //send to method for checking exceptions with datetime
-                    //if 3 or more within 5 minutes, send email with exception name
-                    //else, return result.
 
                     return result;
 				} else {
