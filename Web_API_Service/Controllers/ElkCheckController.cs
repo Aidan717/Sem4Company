@@ -264,7 +264,7 @@ namespace Web_API_Service.Controllers {
 				using (var client = new HttpClient()) {
 					var jsonstring = new StringContent(JsonSerializer.Serialize(result), Encoding.UTF8, "application/json");
 
-					client.BaseAddress = new Uri("http://localhost:9200/errordb/_docoro/");
+					client.BaseAddress = new Uri("http://localhost:9200/errordb/_doc/");
 					baseaddress = client.BaseAddress.ToString();
 					client.DefaultRequestHeaders.Accept.Clear();
 					response = await client.PostAsync("", jsonstring);
@@ -293,8 +293,41 @@ namespace Web_API_Service.Controllers {
 			}
 		}
 
+		[HttpPost("{chosenDB}/CheckIfError")]
+		public async Task<ActionResult<ResponseStatus>> PostCheckIfError([FromBody] DBSchema._Source result) {
+			
+			string baseaddress = "";
+			HttpResponseMessage response = new HttpResponseMessage();
+			var respSta = new ResponseStatus();
 
+			try {
 
+				using (var client = new HttpClient()) {
+					var jsonstring = new StringContent(JsonSerializer.Serialize(result), Encoding.UTF8, "application/json");
+
+					client.BaseAddress = new Uri("http://localhost:9200/dbschema/_doc/");
+					baseaddress = client.BaseAddress.ToString();
+					client.DefaultRequestHeaders.Accept.Clear();
+					response = await client.PostAsync("", jsonstring);
+
+					if (response.IsSuccessStatusCode) {
+
+						var option = new JsonSerializerOptions {
+							Converters = { new DateTimeConverter() }
+						};
+						respSta = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+						return respSta;
+					} else {
+						throw new HttpRequestException("statusCode: " + response.StatusCode);
+					}
+				}
+			} catch (HttpRequestException ex) {
+
+				await PostNewError(result);
+
+				return respSta;
+			}
+		}
 
 
 
@@ -322,3 +355,4 @@ namespace Web_API_Service.Controllers {
 		}
 	}
 }
+
