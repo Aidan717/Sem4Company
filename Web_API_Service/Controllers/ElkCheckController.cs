@@ -27,8 +27,6 @@ namespace Web_API_Service.Controllers {
 		}
 
 
-
-
 		// GET: api/<ValuesController>
 		[HttpGet]
 		public IEnumerable<string> Get() {
@@ -247,10 +245,10 @@ namespace Web_API_Service.Controllers {
 
                 //await PostNewError(result._source);
 
-                MailService warningMail = new MailService();
+                
 
                 var jsonstrings = new String(JsonSerializer.Serialize(SearchParameter));
-                await warningMail.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseaddress, ex.Message);
+                await mailService.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseaddress, ex.Message);
 
                 return result;
             }
@@ -285,13 +283,12 @@ namespace Web_API_Service.Controllers {
 					}
 				}
 			} catch (HttpRequestException ex) {
-				MailService warningMail = new MailService();
 				var option = new JsonSerializerOptions {
 					IgnoreNullValues = true
 				};
 				var jsonstrings = new String(JsonSerializer.Serialize(result, option));
 
-				await warningMail.SendWarningEmailAsync("Post", jsonstrings, baseaddress, ex.Message);
+				await mailService.SendWarningEmailAsync("Post", jsonstrings, baseaddress, ex.Message);
 
 				return resSta = new ResponseStatus("failed to connect " + ex.Message);
 			}
@@ -357,6 +354,70 @@ namespace Web_API_Service.Controllers {
 		[HttpDelete("{id}")]
 		public void Delete(int id) {
 		}
+
+
+
+
+
+		//[HttpPost("ad")]
+		//public async Task getser(int id) {
+		//	var newjsons = new DBInfoGenerater();
+		//	await AbuseThis(newjsons);
+		//}
+
+		
+		[HttpGet("FillDB/{amount}")]
+		public async Task<ActionResult<ResponseStatus>> AbuseThisGenerater(int amount) {
+
+			string baseaddress = "";
+			HttpResponseMessage response = new HttpResponseMessage();
+			var respSta = new ResponseStatus();
+			IDBInfoGenerater newjsons = new DBInfoGenerater();
+			int i = 0;
+			
+			try {
+
+				using (var client = new HttpClient()) {
+					var options = new JsonSerializerOptions {
+						IgnoreNullValues = true
+					};
+					
+
+					client.BaseAddress = new Uri("http://localhost:9200/dbschema/_doc/");
+					baseaddress = client.BaseAddress.ToString();
+					client.DefaultRequestHeaders.Accept.Clear();
+					while (i < amount) {
+
+						var jsn = newjsons.getNewData();
+
+						var jsonstring = new StringContent(JsonSerializer.Serialize(jsn, options), Encoding.UTF8, "application/json");
+						response = await client.PostAsync("", jsonstring);
+						
+						i++;
+						//just to see how far we are with generating 
+						Debug.WriteLine("added: " + i);
+					}
+					Debug.WriteLine("Done");
+
+					if (response.IsSuccessStatusCode) {
+						var option = new JsonSerializerOptions {
+							Converters = { new DateTimeConverter() }
+						};
+						respSta = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+						return respSta;
+					} else {
+						throw new HttpRequestException("statusCode: " + response.StatusCode);
+					}
+				}
+			} catch (HttpRequestException ex) {
+				//await mailService.SendWarningEmailAsync("Post", amount.ToString(), baseaddress, ex.Message);
+				return respSta;
+			}
+		}
+
+
+
+
 	}
 }
 
