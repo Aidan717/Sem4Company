@@ -27,6 +27,58 @@ namespace Web_API_Service.Controllers {
 		}
 
 
+		//Robins metode
+		[HttpGet("dbschema/getall")]
+		public async Task<ActionResult<DBSchema>> GetDbSchema() {
+
+			using (var client = new HttpClient()) {
+				var result = new DBSchema();
+				client.BaseAddress = new Uri("http://localhost:9200/dbschema/_search");
+				client.DefaultRequestHeaders.Accept.Clear();
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+				HttpResponseMessage response = await client.GetAsync("?q=_exists_:\"*exception*\"&sort=timestamp:desc&track_scores=true");
+
+				if (response.IsSuccessStatusCode) {
+
+					var options = new JsonSerializerOptions {
+						Converters = { new DateTimeConverter() }
+					};
+
+					result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync(), options);
+					int index = 0;
+					int hour = 1;
+					var errortime = new Dictionary<DateTime, int>();
+					int i = 0;
+
+
+					//sortér result via timer
+					while (i < result.hits.hits.Length && hour < 730) {
+						//tids limit som kan addes til
+						DateTime timelimit = DateTime.Now.AddHours(-hour);
+						errortime.Add(timelimit, 0);
+						while (i < result.hits.hits.Length && DateTime.Parse(result.hits.hits[i]._source.timestamp) > timelimit) {
+							errortime[timelimit] += 1;
+							i++;
+						}
+						index++;
+						hour++;
+					}
+					Debug.WriteLine("[2 3[");
+					foreach (var error in errortime) {
+						if (error.Value != 0) {
+							Debug.WriteLine(error.ToString());
+						}
+					}
+
+
+					return result;
+				} else {
+					return result;
+				}
+			}
+		}
+
+
 
 		// GET api/<ValuesController>/5
 		//name need to change to what it does this is just temps
