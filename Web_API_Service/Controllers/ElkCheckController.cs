@@ -13,6 +13,8 @@ using Web_API_Service.Utility;
 using Web_API_Service.Service;
 using Org.BouncyCastle.Math.EC.Rfc7748;
 using System.Diagnostics;
+using static Web_API_Service.Models.DBSchema;
+using System.Reflection;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -29,7 +31,7 @@ namespace Web_API_Service.Controllers {
 
 		//Robins metode
 		[HttpGet("dbschema/getall")]
-		public async Task<ActionResult<DBSchema>> GetDbSchema() {
+		public async Task<ActionResult<string>> GetDbSchema() {
 
 			using (var client = new HttpClient()) {
 				var result = new DBSchema();
@@ -40,16 +42,17 @@ namespace Web_API_Service.Controllers {
 
 				if (response.IsSuccessStatusCode) {
 
-					var options = new JsonSerializerOptions {
-						Converters = { new DateTimeConverter() }
-					};
+                    var options = new JsonSerializerOptions {
+                        Converters = { new DateTimeConverter() }
+                    };
 
-					result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync(), options);
+
+                    result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync(), options);
 					int index = 0;
 					int hour = 1;
 					var errortime = new Dictionary<DateTime, int>();
 					int i = 0;
-
+				
 
 					//sortér result via timer
 					while (i < result.hits.hits.Length && hour < 730) {
@@ -69,11 +72,14 @@ namespace Web_API_Service.Controllers {
 							Debug.WriteLine(error.ToString());
 						}
 					}
+					var option = new JsonSerializerOptions {
+						IgnoreNullValues = true
+					};
 
-
-					return result;
+					var jsonstrings = new String(JsonSerializer.Serialize(result, option));
+					return jsonstrings;
 				} else {
-					return result;
+					return result.ToString();
 				}
 			}
 		}
