@@ -106,31 +106,47 @@ namespace Web_API_Service.Controllers {
 		}
 
 		//look at status for index when a person call something
-		[HttpGet("hey")]
-		public async Task<ActionResult<IndexStat>> GetIndexStatus(string index) {
-			var result = new IndexStat();
+		[HttpGet("hey/{index}")]
+		public async Task<ActionResult<object>> GetIndexStatus(string index) {
+			var result = new clusterHealth("Fail report");
 			HttpResponseMessage response = new HttpResponseMessage();
 
 			try {
 				using (var client = new HttpClient()) {
 
-					client.BaseAddress = new Uri("http://localhost:9200/" + "_cluster/health/");
+					client.BaseAddress = new Uri("http://localhost:9200");
 					client.DefaultRequestHeaders.Accept.Clear();
 					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-					response = await client.GetAsync("schools");
+                    if (index.Equals("getIndex")){
+						response = await client.GetAsync("/_cluster/health");
 
+					} else {
+						response = await client.GetAsync("schools/_stats");
+
+					}
 					if (response.IsSuccessStatusCode) {
 
-						result = JsonSerializer.Deserialize<IndexStat>(await response.Content.ReadAsStringAsync());
+						if (index.Equals("as")) {
+							result = JsonSerializer.Deserialize<clusterHealth>(await response.Content.ReadAsStringAsync());
+
+                    } else {
+							var results = new IndexStats();
+							results = JsonSerializer.Deserialize<IndexStats>(await response.Content.ReadAsStringAsync());
+							return result;
+						}
+						if (result.status == ("red"))
+							return result.status;
+
 						return result;
+
 					} else {
 						throw new HttpRequestException("statusCode: " + response.StatusCode);
 					}
 				}
 			}catch(HttpRequestException ex) {
+				return result;
 
-			return result;
             }
 
 		}
@@ -138,8 +154,6 @@ namespace Web_API_Service.Controllers {
 
 		//http://localhost:9200/_cat/indices?h=index laver en en liste af alle indexes
 		//http://localhost:9200/_cluster/health?level=indices henter alle indexes med en oversigt heriblandt status.
-
-
 
 
 
