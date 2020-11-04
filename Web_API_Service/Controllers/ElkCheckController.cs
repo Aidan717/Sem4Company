@@ -288,8 +288,13 @@ namespace Web_API_Service.Controllers {
 
 			try {
 
-				using (var client = new HttpClient()) {					
-					var jsonstring = new StringContent(JsonSerializer.Serialize(result), Encoding.UTF8, "application/json");
+				using (var client = new HttpClient()) {
+
+					var options = new JsonSerializerOptions {
+						IgnoreNullValues = true
+					};
+
+					var jsonstring = new StringContent(JsonSerializer.Serialize(result, options), Encoding.UTF8, "application/json");
 
 					client.BaseAddress = new Uri("http://localhost:9200/errordb/_doc/");
 					baseaddress = client.BaseAddress.ToString();
@@ -371,8 +376,8 @@ namespace Web_API_Service.Controllers {
 		}
 
 
-		//[HttpPost("CheckIfErrorSingle")]
-		public async Task<ActionResult<ResponseStatus>> PostCheckIfErrorSingleObject( DBSchema._Source result) {
+		[HttpPost("CheckIfErrorSingle")]
+		public async Task<ActionResult<ResponseStatus>> PostCheckIfErrorSingleObject([FromBody] DBSchema._Source result) {
 
 			string baseaddress = "";
 			HttpResponseMessage response = new HttpResponseMessage();
@@ -381,12 +386,19 @@ namespace Web_API_Service.Controllers {
 			try {
 
 				using (var client = new HttpClient()) {
-					var jsonstring = new StringContent(JsonSerializer.Serialize(result), Encoding.UTF8, "application/json");
+
+					var options = new JsonSerializerOptions {
+						IgnoreNullValues = true
+					};
+
+					var jsonstring = new StringContent(JsonSerializer.Serialize(result, options), Encoding.UTF8, "application/json");
 
 					client.BaseAddress = new Uri("http://localhost:9200/dbschema/_doc/");
 					baseaddress = client.BaseAddress.ToString();
 					client.DefaultRequestHeaders.Accept.Clear();
 					response = await client.PostAsync("", jsonstring);
+
+
 
 					int i = 0;
 					while (i < result.GetType().GetProperties().Count()) {
@@ -478,9 +490,11 @@ namespace Web_API_Service.Controllers {
 
 						var jsn = newjsons.getNewData();
 
-						var jsonstring = new StringContent(JsonSerializer.Serialize(jsn, options), Encoding.UTF8, "application/json");
-						response = await client.PostAsync("", jsonstring);
-						
+						await PostCheckIfErrorSingleObject(jsn);
+
+						//var jsonstring = new StringContent(JsonSerializer.Serialize(jsn, options), Encoding.UTF8, "application/json");
+						//response = await client.PostAsync("", jsonstring);
+
 						i++;
 						//just to see how far we are with generating 
 						Debug.WriteLine("added: " + i);
@@ -491,7 +505,7 @@ namespace Web_API_Service.Controllers {
 						var option = new JsonSerializerOptions {
 							Converters = { new DateTimeConverter() }
 						};
-						respSta = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+						//respSta = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
 						return respSta;
 					} else {
 						throw new HttpRequestException("statusCode: " + response.StatusCode);
