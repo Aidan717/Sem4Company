@@ -213,10 +213,10 @@ namespace Web_API_Service.Controllers {
 
 
         [HttpGet("db/{chosenDB}/{SearchParameter}")]
-        public async Task<ActionResult<DBSchemaCopy>> GetError(string chosenDB, string SearchParameter) {
+        public async Task<ActionResult<DBSchema>> GetError(string chosenDB, string SearchParameter) {
 
             string baseaddress = "";
-            var result = new DBSchemaCopy();
+            var result = new DBSchema();
 
             try {
                 using (var client = new HttpClient()) {
@@ -229,7 +229,7 @@ namespace Web_API_Service.Controllers {
                     HttpResponseMessage response = await client.GetAsync("?q=" + SearchParameter);
 
                     if (response.IsSuccessStatusCode) {
-                        result = JsonSerializer.Deserialize<DBSchemaCopy>(await response.Content.ReadAsStringAsync());
+                        result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync());
                         return result;
                     } else {
                         throw new HttpRequestException("StatusCode: " + response.StatusCode);
@@ -254,7 +254,7 @@ namespace Web_API_Service.Controllers {
         }
 
         //Skal kun kaldes igennem en anden GET metode. Er dette nødvendigt at have noget inde i HttpPost med?
-		public async Task<ActionResult<ResponseStatus>> PostNewError([FromBody] DBSchema._Source result) {
+		public async Task<ActionResult<ResponseStatus>> PostNewError(DBSchema._Source result) {
 			string baseaddress = "";
 			HttpResponseMessage response = new HttpResponseMessage();
 			var resSta = new ResponseStatus();
@@ -344,7 +344,55 @@ namespace Web_API_Service.Controllers {
 		}
 
 
+		//[HttpPost("CheckIfErrorSingle")]
+		public async Task<ActionResult<ResponseStatus>> PostCheckIfErrorSingleObject( DBSchema._Source result) {
 
+			string baseaddress = "";
+			HttpResponseMessage response = new HttpResponseMessage();
+			var respSta = new ResponseStatus();
+
+			try {
+
+				using (var client = new HttpClient()) {
+					var jsonstring = new StringContent(JsonSerializer.Serialize(result), Encoding.UTF8, "application/json");
+
+					client.BaseAddress = new Uri("http://localhost:9200/dbschema/_doc/");
+					baseaddress = client.BaseAddress.ToString();
+					client.DefaultRequestHeaders.Accept.Clear();
+					response = await client.PostAsync("", jsonstring);
+
+					int i = 0;
+					while (i < result.GetType().GetProperties().Count()) {
+						PropertyInfo pi = result.GetType().GetProperties()[i];
+							string value = (string)pi.GetValue(result);
+							if (pi.Name.Contains("exception", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(value)) {
+								i = result.GetType().GetProperties().Count();
+
+							await PostNewError(result);
+
+						}
+						i++;
+					}
+
+                    if (response.IsSuccessStatusCode) {
+
+						var option = new JsonSerializerOptions {
+							Converters = { new DateTimeConverter() }
+						};
+						respSta = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync(), option);
+
+                        return respSta;
+					} else {
+						throw new HttpRequestException("statusCode: " + response.StatusCode);
+					}
+				}
+			} catch (HttpRequestException ex) {
+
+				await PostNewError(result);
+
+				return respSta;
+			}
+		}
 
 
 
