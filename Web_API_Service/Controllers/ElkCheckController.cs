@@ -48,6 +48,7 @@ namespace Web_API_Service.Controllers {
 
 
                     result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync(), options);
+
 					int index = 0;
 					int hour = 1;
 					var errortime = new Dictionary<DateTime, int>();
