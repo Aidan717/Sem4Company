@@ -15,6 +15,7 @@ using Org.BouncyCastle.Math.EC.Rfc7748;
 using System.Diagnostics;
 using static Web_API_Service.Models.DBSchema;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -96,8 +97,8 @@ namespace Web_API_Service.Controllers {
 		// GET api/<ValuesController>/5
 		//name need to change to what it does this is just temps
 		[HttpGet("project/{error}")]
-		public async Task<ActionResult<DBSchemaCopy>> checkForError(string error) {
-			var result = new DBSchemaCopy();
+		public async Task<ActionResult<DBSchema>> checkForError(string error) {
+			var result = new DBSchema();
 			HttpResponseMessage response = new HttpResponseMessage();
 
 			long currentTimeInMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -106,13 +107,13 @@ namespace Web_API_Service.Controllers {
 			try {
 				using (var client = new HttpClient()) {
 
-					client.BaseAddress = new Uri("http://localhost:9200/" + "project" + "/_search");
+					client.BaseAddress = new Uri("http://localhost:9200/dbschema/_search");
 					client.DefaultRequestHeaders.Accept.Clear();
 					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    if (error.Equals("getAll")) {
+                    if (error.Equals("getall")) {
 						response = await client.GetAsync("?q=_exists_:\"*exception*\"&q=timestamp:["+ yesterday.ToString() + "+TO+"+ currentTimeInMs.ToString() + "]&size=5&sort=timestamp:desc&track_scores=true");
-
+						
 						//Limit delen:
 						//&size=5&sort=timestamp:asc
 
@@ -125,10 +126,11 @@ namespace Web_API_Service.Controllers {
                     if (response.IsSuccessStatusCode) {
 
 						var option = new JsonSerializerOptions {
-							Converters = { new DateTimeConverter() }
+							Converters = { new DateTimeConverter() },
+							IgnoreNullValues = true							
 						};
 
-						result = JsonSerializer.Deserialize<DBSchemaCopy>(await response.Content.ReadAsStringAsync(), option);
+						result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync(), option);
 						return result;
 					} else {
 						throw new HttpRequestException("statusCode: " + response.StatusCode);
@@ -266,7 +268,6 @@ namespace Web_API_Service.Controllers {
 			HttpResponseMessage response = new HttpResponseMessage();
 			var resSta = new ResponseStatus();
 			
-
 			try {
 
 				using (var client = new HttpClient()) {					
@@ -300,13 +301,13 @@ namespace Web_API_Service.Controllers {
 			}
 		}
 
-		[HttpPost("{chosenDB}/CheckIfError")]
+		[HttpPost("dbschema/CheckIfError")]
 		public async Task<ActionResult<ResponseStatus>> PostCheckIfError([FromBody] DBSchema result) {
 			
 			string baseaddress = "";
 			HttpResponseMessage response = new HttpResponseMessage();
 			var respSta = new ResponseStatus();
-
+			
 			try {
 
 				using (var client = new HttpClient()) {
@@ -400,12 +401,12 @@ namespace Web_API_Service.Controllers {
 				using (var client = new HttpClient()) {
 					var options = new JsonSerializerOptions {
 						IgnoreNullValues = true
-					};
-					
+					};					
 
 					client.BaseAddress = new Uri("http://localhost:9200/dbschema/_doc/");
 					baseaddress = client.BaseAddress.ToString();
 					client.DefaultRequestHeaders.Accept.Clear();
+					Stopwatch timer = Stopwatch.StartNew();
 					while (i < amount) {
 
 						var jsn = newjsons.getNewData();
@@ -417,7 +418,10 @@ namespace Web_API_Service.Controllers {
 						//just to see how far we are with generating 
 						Debug.WriteLine("added: " + i);
 					}
-					Debug.WriteLine("Done");
+					timer.Stop();
+					TimeSpan timespan = timer.Elapsed;
+					string elaps = String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10);
+					Debug.WriteLine("Done and took: " + elaps);
 
 					if (response.IsSuccessStatusCode) {
 						var option = new JsonSerializerOptions {
