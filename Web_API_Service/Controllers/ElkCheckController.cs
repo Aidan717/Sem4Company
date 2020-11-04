@@ -15,6 +15,7 @@ using Org.BouncyCastle.Math.EC.Rfc7748;
 using System.Diagnostics;
 using static Web_API_Service.Models.DBSchema;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore.Internal;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -340,6 +341,7 @@ namespace Web_API_Service.Controllers {
 
 					Debug.WriteLine(result.ToString());
 
+					int i = 0;
 					foreach (Hit s in result.hits.hits) {
 						foreach (PropertyInfo pi in s._source.GetType().GetProperties()) {
 							string value = (string)pi.GetValue(s._source);
