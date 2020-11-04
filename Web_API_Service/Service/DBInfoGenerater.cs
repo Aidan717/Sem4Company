@@ -22,7 +22,7 @@ namespace Web_API_Service.Service {
 			DBSchema._Source data = new DBSchema._Source();
 			
 			//should it generate errors of not
-			if(numGenenerater.Next(0,100)< 30) {
+			if(numGenenerater.Next(0,100)< 33) {
 				setNewError(data);
 			}
 
