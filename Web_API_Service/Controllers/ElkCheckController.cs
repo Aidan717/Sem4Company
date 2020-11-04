@@ -22,6 +22,13 @@ namespace Web_API_Service.Controllers {
 	[Route("api/[controller]")]
 	[ApiController]
 	public class ElkCheckController : ControllerBase {
+
+		public readonly IMailService mailService;
+		public ElkCheckController(IMailService mailService) {
+			this.mailService = mailService;
+		}
+
+
 		// GET: api/<ValuesController>
 		[HttpGet]
 		public IEnumerable<string> Get() {
@@ -48,6 +55,7 @@ namespace Web_API_Service.Controllers {
 
 
                     result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync(), options);
+
 					int index = 0;
 					int hour = 1;
 					var errortime = new Dictionary<DateTime, int>();
@@ -164,9 +172,9 @@ namespace Web_API_Service.Controllers {
 		}
 
 		//look at status for index when a person call something
-		[HttpGet("hey")]
-		public async Task<ActionResult<IndexStat>> GetIndexStatus(string index) {
-			var result = new IndexStat();
+		[HttpGet("hey/{index}")]
+		public async Task<ActionResult<object>> GetIndexStatus(string index) {
+			var result = new clusterHealth("Fail report");
 			HttpResponseMessage response = new HttpResponseMessage();
 
 			try {
@@ -176,20 +184,37 @@ namespace Web_API_Service.Controllers {
 					client.DefaultRequestHeaders.Accept.Clear();
 					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-					response = await client.GetAsync("schools");
+					if (index.Equals("as")) {
+						response = await client.GetAsync("/_cluster/health/schools");
 
+					} else {
+						response = await client.GetAsync("schools/_stats");
+
+					}
 					if (response.IsSuccessStatusCode) {
 
-						result = JsonSerializer.Deserialize<IndexStat>(await response.Content.ReadAsStringAsync());
+						result = JsonSerializer.Deserialize<clusterHealth>(await response.Content.ReadAsStringAsync());
+						if (index.Equals("as")) {
+							result = JsonSerializer.Deserialize<clusterHealth>(await response.Content.ReadAsStringAsync());
+
+						} else {
+							var results = new IndexStats();
+							results = JsonSerializer.Deserialize<IndexStats>(await response.Content.ReadAsStringAsync());
+							return result;
+						}
+						if (result.status == ("red"))
+							return result.status;
+
 						return result;
+
 					} else {
 						throw new HttpRequestException("statusCode: " + response.StatusCode);
 					}
 				}
-			}catch(HttpRequestException ex) {
+			} catch (HttpRequestException ex) {
+				return result;
 
-			return result;
-            }
+			}
 
 		}
 
@@ -201,8 +226,8 @@ namespace Web_API_Service.Controllers {
 
 
 
-	// POST api/<ValuesController>
-	[HttpPost("poster")]
+		// POST api/<ValuesController>
+		[HttpPost("poster")]
 		public void PostNewDataEntry([FromBody] DBSchema parametor) {
 		}
 
@@ -244,10 +269,10 @@ namespace Web_API_Service.Controllers {
 
                 //await PostNewError(result._source);
 
-                MailService warningMail = new MailService();
+                
 
                 var jsonstrings = new String(JsonSerializer.Serialize(SearchParameter));
-                await warningMail.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseaddress, ex.Message);
+                await mailService.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseaddress, ex.Message);
 
                 return result;
             }
@@ -258,10 +283,11 @@ namespace Web_API_Service.Controllers {
 			string baseaddress = "";
 			HttpResponseMessage response = new HttpResponseMessage();
 			var resSta = new ResponseStatus();
+			
 
 			try {
 
-				using (var client = new HttpClient()) {
+				using (var client = new HttpClient()) {					
 					var jsonstring = new StringContent(JsonSerializer.Serialize(result), Encoding.UTF8, "application/json");
 
 					client.BaseAddress = new Uri("http://localhost:9200/errordb/_doc/");
@@ -281,13 +307,12 @@ namespace Web_API_Service.Controllers {
 					}
 				}
 			} catch (HttpRequestException ex) {
-				MailService warningMail = new MailService();
 				var option = new JsonSerializerOptions {
 					IgnoreNullValues = true
-			};
+				};
 				var jsonstrings = new String(JsonSerializer.Serialize(result, option));
 
-				await warningMail.SendWarningEmailAsync("Post", jsonstrings, baseaddress, ex.Message);
+				await mailService.SendWarningEmailAsync("Post", jsonstrings, baseaddress, ex.Message);
 
 				return resSta = new ResponseStatus("failed to connect " + ex.Message);
 			}
@@ -415,6 +440,70 @@ namespace Web_API_Service.Controllers {
 		[HttpDelete("{id}")]
 		public void Delete(int id) {
 		}
+
+
+
+
+
+		//[HttpPost("ad")]
+		//public async Task getser(int id) {
+		//	var newjsons = new DBInfoGenerater();
+		//	await AbuseThis(newjsons);
+		//}
+
+		
+		[HttpGet("FillDB/{amount}")]
+		public async Task<ActionResult<ResponseStatus>> AbuseThisGenerater(int amount) {
+
+			string baseaddress = "";
+			HttpResponseMessage response = new HttpResponseMessage();
+			var respSta = new ResponseStatus();
+			IDBInfoGenerater newjsons = new DBInfoGenerater();
+			int i = 0;
+			
+			try {
+
+				using (var client = new HttpClient()) {
+					var options = new JsonSerializerOptions {
+						IgnoreNullValues = true
+					};
+					
+
+					client.BaseAddress = new Uri("http://localhost:9200/dbschema/_doc/");
+					baseaddress = client.BaseAddress.ToString();
+					client.DefaultRequestHeaders.Accept.Clear();
+					while (i < amount) {
+
+						var jsn = newjsons.getNewData();
+
+						var jsonstring = new StringContent(JsonSerializer.Serialize(jsn, options), Encoding.UTF8, "application/json");
+						response = await client.PostAsync("", jsonstring);
+						
+						i++;
+						//just to see how far we are with generating 
+						Debug.WriteLine("added: " + i);
+					}
+					Debug.WriteLine("Done");
+
+					if (response.IsSuccessStatusCode) {
+						var option = new JsonSerializerOptions {
+							Converters = { new DateTimeConverter() }
+						};
+						respSta = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync());
+						return respSta;
+					} else {
+						throw new HttpRequestException("statusCode: " + response.StatusCode);
+					}
+				}
+			} catch (HttpRequestException ex) {
+				//await mailService.SendWarningEmailAsync("Post", amount.ToString(), baseaddress, ex.Message);
+				return respSta;
+			}
+		}
+
+
+
+
 	}
 }
 

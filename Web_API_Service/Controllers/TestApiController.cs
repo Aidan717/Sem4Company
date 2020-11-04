@@ -33,13 +33,16 @@ using Microsoft.AspNetCore.DataProtection;
 
 namespace Web_API_Service.Controllers {
 
-
+	
 
 
 	[Route("[controller]")]
 	[ApiController]
 	public class TestApiController : ControllerBase {
-
+		public readonly IMailService mailService;
+		public TestApiController(IMailService mailService) {
+			this.mailService = mailService;
+		}
 
 
 
@@ -153,9 +156,9 @@ namespace Web_API_Service.Controllers {
 					}
 				}
 			} catch (HttpRequestException ex) {
-				MailService warningMail = new MailService();
+				//MailService warningMail = new MailService();
 				var jsonstrings = new String(JsonSerializer.Serialize(parameter));
-                await warningMail.SendWarningEmailAsync("Post", jsonstrings, baseaddress, ex.Message);
+                await mailService.SendWarningEmailAsync("Post", jsonstrings, baseaddress, ex.Message);
 
                 return result = new ResponseStatus("failed to connect" + ex.Message);
 			}
@@ -200,10 +203,10 @@ namespace Web_API_Service.Controllers {
 					}
 				}
 			} catch(HttpRequestException ex) {
-				MailService warningMail = new MailService();
+				//MailService warningMail = new MailService();
 
 				var jsonstrings = new String(JsonSerializer.Serialize(parameter));
-				await warningMail.SendWarningEmailAsync("PostParametersNotMet", jsonstrings, baseaddress, ex.Message);
+				await mailService.SendWarningEmailAsync("PostParametersNotMet", jsonstrings, baseaddress, ex.Message);
 
 				return result = new ResponseStatus(ex.Message);
 			}
@@ -241,10 +244,10 @@ namespace Web_API_Service.Controllers {
 				DBSchemaCopy ds = new DBSchemaCopy();
 				
 				
-				MailService warningMail = new MailService();
+				//MailService warningMail = new MailService();
 				
 				var jsonstrings = new String(JsonSerializer.Serialize(parameter));
-				await warningMail.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseaddress, ex.Message);
+				await mailService.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseaddress, ex.Message);
 
 				return result = new ResponseStatus(ex.Message);
 			}
