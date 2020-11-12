@@ -16,6 +16,8 @@ using System.Diagnostics;
 using static Web_API_Service.Models.DBSchema;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Query.Internal;
+using System.IO;
+using Microsoft.ML;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -34,11 +36,11 @@ namespace Web_API_Service.Controllers {
 		[HttpGet]
 		public IEnumerable<string> Get() {
 			return new string[] { "value1", "value2" };
-		}
+		}        
 
 
-		//Robins metode
-		[HttpGet("dbschema/getall")]
+        //Robins metode
+        [HttpGet("dbschema/getalldb")]
 		public async Task<ActionResult<string>> GetDbSchema() {
 
 			using (var client = new HttpClient()) {
@@ -46,7 +48,7 @@ namespace Web_API_Service.Controllers {
 				client.BaseAddress = new Uri("http://localhost:9200/dbschema/_search");
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-				HttpResponseMessage response = await client.GetAsync("?q=_exists_:\"*exception*\"&sort=timestamp:desc&track_scores=true");
+				HttpResponseMessage response = await client.GetAsync("?q=_exists_:\"*exception*\"&sort=timestamp:desc&size=10000&track_scores=true");
 
 				if (response.IsSuccessStatusCode) {
 
@@ -56,24 +58,34 @@ namespace Web_API_Service.Controllers {
 
 
                     result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync(), options);
+					Debug.WriteLine("Length of hits: " + result.hits.hits.Length);
 
 					int index = 0;
-					int hour = 1;
-					var errortime = new Dictionary<DateTime, int>();
+					int days = 0;
+					var errortime = new Dictionary<string, int>();
 					int i = 0;
 				
 
 					//sortér result via timer
-					while (i < result.hits.hits.Length && hour < 730) {
+					while (i < result.hits.hits.Length && days < 90000) {
 						//tids limit som kan addes til
-						DateTime timelimit = DateTime.Now.AddHours(-hour);
-						errortime.Add(timelimit, 0);
-						while (i < result.hits.hits.Length && DateTime.Parse(result.hits.hits[i]._source.timestamp) > timelimit) {
-							errortime[timelimit] += 1;
+						DateTime timelimit = DateTime.Now.AddDays(-days);
+						//Debug.WriteLine("Date outside inner loop: " + timelimit.ToShortDateString());
+						
+						errortime.Add(timelimit.ToShortDateString(), 0);
+						int ii = 0;
+						while (i < result.hits.hits.Length && DateTime.Parse(result.hits.hits[i]._source.timestamp).ToShortDateString().Contains(timelimit.ToShortDateString())) {
+							//Debug.WriteLine("Date inside inner loop: " + timelimit.ToShortDateString());
+							
+							
+							//Debug.WriteLine("hits date: " + DateTime.Parse(result.hits.hits[i]._source.timestamp).ToShortDateString());
+							//Debug.WriteLine("timelimit date: " + timelimit.ToShortDateString());
 							i++;
+							ii++;
 						}
+						errortime[timelimit.ToShortDateString()] = ii;
 						index++;
-						hour++;
+						days++;
 					}
 					Debug.WriteLine("[2 3[");
 					foreach (var error in errortime) {
@@ -81,6 +93,51 @@ namespace Web_API_Service.Controllers {
 							Debug.WriteLine(error.ToString());
 						}
 					}
+					Debug.WriteLine("Length of hits: " + result.hits.hits.Length);
+
+                    /**
+					 * Method for creating csv with timestamp and amount of errors per hour
+					 */
+                    //before your loop
+                    var csv = new StringBuilder();
+                    string rootDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../"));
+                    string modelPath = Path.Combine(rootDir, "Data", "ElkTestModel.csv");
+                    Stopwatch timer = Stopwatch.StartNew();
+                    using (var w = new StreamWriter(modelPath))
+                    {
+
+
+                        for (int errorTimeIndex = 0; errorTimeIndex < errortime.Keys.Count(); errorTimeIndex++)
+                        {
+                            //in your loop
+							if (errortime.ElementAt(errorTimeIndex).Value != 0) 
+							{ 
+								var first = errortime.ElementAt(errorTimeIndex).Key.ToString();
+								var second = errortime.ElementAt(errorTimeIndex).Value;
+								var line = string.Format("{0},{1}", first, second);
+							
+								//Suggestion made by KyleMit
+								var newLine = string.Format("{0},{1}", first, second);
+								//csv.AppendLine(newLine);
+								w.WriteLine(line);
+								w.Flush();
+								Debug.WriteLine("this is for loop run: " + errorTimeIndex);
+							}
+						}
+
+                    }
+                    timer.Stop();
+                    TimeSpan timespan = timer.Elapsed;
+                    string elaps = String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10);
+                    Debug.WriteLine("Done and took: " + elaps);
+                    DateTime t = DateTime.Now;
+					Debug.WriteLine("This is current date: " + t.ToShortDateString());
+
+					IMLAnomaly check = new MachineLearning();
+					check.CheckForSpikes();
+
+
+
 					var option = new JsonSerializerOptions {
 						IgnoreNullValues = true
 					};
@@ -466,31 +523,64 @@ namespace Web_API_Service.Controllers {
 		//}
 
 		
-		//[HttpGet("FillDB/{amount}")]
+		[HttpGet("FillDB/{amount}")]
 		public async Task<ActionResult<ResponseStatus>> AbuseThisGenerater(int amount) {
 
+			string baseaddress = "";
+			HttpResponseMessage response = new HttpResponseMessage();
 			var respStatus = new ResponseStatus();
 			IDBInfoGenerater newjsons = new DBInfoGenerater();
 			int i = 0;
-			
-			try {
 
-				
+			try {
 				Stopwatch timer = Stopwatch.StartNew();
-				while (i < amount) {
-					var jsn = newjsons.getNewData();
-					await PostCheckIfErrorSingleObject(jsn);
-					i++;
-					//just to see how far we are with generating 
-					Debug.WriteLine("added: " + i);
+				var options = new JsonSerializerOptions
+				{
+					IgnoreNullValues = true
+				};
+				while (i < amount)
+				{
+					using (var client = new HttpClient())
+					{
+						var jsn = newjsons.getNewData();
+						Debug.WriteLine("json object time: " + jsn.timestamp);
+						
+						var jsonstring = new StringContent(JsonSerializer.Serialize(jsn, options), Encoding.UTF8, "application/json");
+
+						client.BaseAddress = new Uri("http://localhost:9200/dbschema/_doc/");
+
+						baseaddress = client.BaseAddress.ToString();
+						client.DefaultRequestHeaders.Accept.Clear();
+						response = await client.PostAsync("", jsonstring);
+
+						i++;
+						//just to see how far we are with generating 
+						Debug.WriteLine("added: " + i);
+					}
+
 				}
 				timer.Stop();
 				TimeSpan timespan = timer.Elapsed;
 				string elaps = String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10);
 				Debug.WriteLine("Done and took: " + elaps);
 
-				return respStatus;
-				
+				if (response.IsSuccessStatusCode)
+				{
+
+
+					var option = new JsonSerializerOptions
+					{
+						Converters = { new DateTimeConverter() }
+					};
+					respStatus = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync(), option);
+					Debug.WriteLine("respstatus object id: " + respStatus._id);
+					return respStatus;
+				}
+				else
+				{
+					throw new HttpRequestException("statusCode: " + response.StatusCode);
+				}
+
 			} catch (HttpRequestException ex) {
 				//await mailService.SendWarningEmailAsync("Post", amount.ToString(), baseaddress, ex.Message);
 				return respStatus;
