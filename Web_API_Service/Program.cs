@@ -14,40 +14,45 @@ using Web_API_Service.Data;
 namespace Web_API_Service {
 	public class Program {
 
-        static readonly string _dataPath = Path.Combine(Environment.CurrentDirectory, "Data", "iris.data");
-        static readonly string _modelPath = Path.Combine(Environment.CurrentDirectory, "Data", "IrisClusteringModel.zip");
+        static readonly string _dataPath = Path.Combine(Environment.CurrentDirectory, "Data", "clusterTestData.xlsx");
+        static readonly string _modelPath = Path.Combine(Environment.CurrentDirectory, "Data", "errorClusteringModel.zip");
 
         public static void Main(string[] args) {
 			CreateHostBuilder(args).Build().Run();
-		}
+
+            ErrorClustering();
+
+        }
 
 		public static IHostBuilder CreateHostBuilder(string[] args) =>
 			Host.CreateDefaultBuilder(args)
 				.ConfigureWebHostDefaults(webBuilder => {
 					webBuilder.UseStartup<Startup>();
 				});
-	}
 
-//    public void ErrorClustering() {
-//        var mlContext = new MLContext(seed: 0);
 
-//        IDataView dataView = mlContext.Data.LoadFromTextFile<ErrorData>(_dataPath, hasHeader: false, separatorChar: ',');
 
-//        string featuresColumnName = "Features";
-//        var pipeline = mlContext.Transforms
-//            .Concatenate(featuresColumnName, "SepalLength", "SepalWidth", "PetalLength", "PetalWidth")
-//            .Append(mlContext.Clustering.Trainers.KMeans(featuresColumnName, numberOfClusters: 3));
+        public static void ErrorClustering() {
+            var mlContext = new MLContext();
 
-//        var model = pipeline.Fit(dataView);
+            IDataView dataView = mlContext.Data.LoadFromTextFile<ErrorData>(_dataPath, hasHeader: false, separatorChar: ',');
 
-//        using (var fileStream = new FileStream(_modelPath, FileMode.Create, FileAccess.Write, FileShare.Write)) {
-//            mlContext.Model.Save(model, dataView.Schema, fileStream);
+            string featuresColumnName = "Features";
+            var pipeline = mlContext.Transforms
+                .Concatenate(featuresColumnName, "Errorname", "ErrorMessage")
+                .Append(mlContext.Clustering.Trainers.KMeans(featuresColumnName, numberOfClusters: 2));
 
-//            var predictor = mlContext.Model.CreatePredictionEngine<ErrorData, ClusterPrediction>(model);
+            var model = pipeline.Fit(dataView);
 
-//            var prediction = predictor.Predict(TestErrorData.Error);
-//            Console.WriteLine($"Cluster: {prediction.PredictedError}");
-//            Console.WriteLine($"Distances: {string.Join(" ", prediction.Distances)}");
-//        }
-//    }
+            using (var fileStream = new FileStream(_modelPath, FileMode.Create, FileAccess.Write, FileShare.Write)) {
+                mlContext.Model.Save(model, dataView.Schema, fileStream);
+
+                var predictor = mlContext.Model.CreatePredictionEngine<ErrorData, ClusterPrediction>(model);
+
+                var prediction = predictor.Predict(TestErrorData.Error);
+                Console.WriteLine($"Cluster: {prediction.PredictedError}");
+                Console.WriteLine($"Distances: {string.Join(" ", prediction.Distances)}");
+            }
+        }
+    }
 }

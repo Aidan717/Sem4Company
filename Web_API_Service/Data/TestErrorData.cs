@@ -7,7 +7,8 @@ namespace Web_API_Service.Data {
     static class TestErrorData {
 
         internal static readonly ErrorData Error = new ErrorData {
-            Error = 0
+            ErrorName = "",
+            ErrorMessage = ""
         };
     }
 }
