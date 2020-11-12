@@ -793,7 +793,6 @@ namespace Web_API_Service.Models {
             public string _namespace { get; set; }
             public string orderCompletedDate { get; set; }
            // public string orderID { get; set; }
-            [JsonPropertyName("orderId")]
             public string orderId { get; set; }
             public string orderRef { get; set; }
            // public string orderid { get; set; }
