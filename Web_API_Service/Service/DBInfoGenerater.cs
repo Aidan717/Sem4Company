@@ -22,8 +22,9 @@ namespace Web_API_Service.Service {
 			DBSchema._Source data = new DBSchema._Source();
 			
 			//should it generate errors of not
-			if(numGenenerater.Next(0,100)< 30) {
+			if(numGenenerater.Next(0,100)< 33) {
 				setNewError(data);
+				data.errorForTrainer = "1";
 			}
 
 
@@ -68,8 +69,10 @@ namespace Web_API_Service.Service {
 
 		public string getRandomDate() {
 			DateTime date = new DateTime(2010, 1, 1);
-			DateTime test = new DateTime(2015, 12, 12);
-			int range = (DateTime.Today - date).Days;
+			//DateTime spike1 = new DateTime(2015, 12, 12);
+			//DateTime spike2 = new Datetime(2015, 12, 13);
+			int range = (DateTime.Now - date).Days;
+			//int range = (spike2 - spike1).Days;
 			return date.AddDays(numGenenerater.Next(range)).AddHours(numGenenerater.Next(0, 24)).AddMinutes(numGenenerater.Next(0, 60)).AddSeconds(numGenenerater.Next(0, 60)).ToString("yyyy'/'MM'/'dd' 'HH':'mm':'ss");
 
 		}
