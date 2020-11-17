@@ -69,9 +69,10 @@ namespace Web_API_Service.Service {
 
 		public string getRandomDate() {
 			DateTime date = new DateTime(2010, 1, 1);
-			DateTime test = new DateTime(2015, 1, 1);
-			//int range = (test - date).Days;
-			int range = (DateTime.Today - date).Days;
+			//DateTime spike1 = new DateTime(2015, 12, 12);
+			//DateTime spike2 = new Datetime(2015, 12, 13);
+			int range = (DateTime.Now - date).Days;
+			//int range = (spike2 - spike1).Days;
 			return date.AddDays(numGenenerater.Next(range)).AddHours(numGenenerater.Next(0, 24)).AddMinutes(numGenenerater.Next(0, 60)).AddSeconds(numGenenerater.Next(0, 60)).ToString("yyyy'/'MM'/'dd' 'HH':'mm':'ss");
 
 		}
