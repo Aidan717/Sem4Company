@@ -345,7 +345,6 @@ namespace Web_API_Service.Controllers {
 					response = await client.PostAsync("", jsonstring);
 
 					if (response.IsSuccessStatusCode) {
-
 						var option = new JsonSerializerOptions {
 							Converters = { new DateTimeConverter() }
 						};
