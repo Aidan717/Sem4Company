@@ -175,7 +175,7 @@ namespace Web_API_Service.Controllers {
 
 		//look at status for index when a person call something
 		[HttpGet("hey/{index}")]
-		public async Task<ActionResult<object>> GetIndexStatus(string index) {
+		public async Task<ActionResult<object>> GetIndexStatus(string index, clusterHealth newhealth) {
 			var result = new clusterHealth("Fail report");
 			HttpResponseMessage response = new HttpResponseMessage();
 
@@ -403,9 +403,9 @@ namespace Web_API_Service.Controllers {
 					int i = 0;
 					while (i < result.GetType().GetProperties().Count()) {
 						PropertyInfo pi = result.GetType().GetProperties()[i];
-							string value = (string)pi.GetValue(result);
-							if (pi.Name.Contains("exception", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(value)) {
-								i = result.GetType().GetProperties().Count();
+						string value = (string)pi.GetValue(result);
+						if (pi.Name.Contains("exception", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(value)) {
+							i = result.GetType().GetProperties().Count();
 
 							await PostNewError(result);
 
@@ -413,7 +413,7 @@ namespace Web_API_Service.Controllers {
 						i++;
 					}
 
-                    if (response.IsSuccessStatusCode) {
+					if (response.IsSuccessStatusCode) {
 
 						var option = new JsonSerializerOptions {
 							Converters = { new DateTimeConverter() }
@@ -429,7 +429,7 @@ namespace Web_API_Service.Controllers {
 
 				await PostNewError(result);
 
-				return respSta;
+				return respSta = new ResponseStatus(ex.StackTrace);
 			}
 		}
 
@@ -466,39 +466,71 @@ namespace Web_API_Service.Controllers {
 		//}
 
 		
-		//[HttpGet("FillDB/{amount}")]
+		[HttpGet("FillDB/{amount}")]
 		public async Task<ActionResult<ResponseStatus>> AbuseThisGenerater(int amount) {
-
+			string baseaddress = "";
+			HttpResponseMessage response = new HttpResponseMessage();
 			var respStatus = new ResponseStatus();
 			IDBInfoGenerater newjsons = new DBInfoGenerater();
 			int i = 0;
 			
 			try {
-
-				
 				Stopwatch timer = Stopwatch.StartNew();
+				var options = new JsonSerializerOptions {
+					IgnoreNullValues = true
+				};
 				while (i < amount) {
-					var jsn = newjsons.getNewData();
-					await PostCheckIfErrorSingleObject(jsn);
-					i++;
+					using (var client = new HttpClient()) {						
+						var jsn = newjsons.getNewData();
+						var jsonstring = new StringContent(JsonSerializer.Serialize(jsn, options), Encoding.UTF8, "application/json");
+
+						client.BaseAddress = new Uri("http://localhost:9200/dbschema/_doc/");
+						baseaddress = client.BaseAddress.ToString();
+						client.DefaultRequestHeaders.Accept.Clear();
+						response = await client.PostAsync("", jsonstring);
+						i++;
 					//just to see how far we are with generating 
 					Debug.WriteLine("added: " + i);
+					}
+				
 				}
 				timer.Stop();
 				TimeSpan timespan = timer.Elapsed;
 				string elaps = String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10);
 				Debug.WriteLine("Done and took: " + elaps);
 
-				return respStatus;
+				if (response.IsSuccessStatusCode) {
+
+					var option = new JsonSerializerOptions {
+						Converters = { new DateTimeConverter() }
+					};
+					respStatus = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync(), option);
+
+					return respStatus;
+				} else {
+					throw new HttpRequestException("statusCode: " + response.StatusCode);
+				}
+
+				//Stopwatch timer = Stopwatch.StartNew();
+				//while (i < amount) {
+				//	var jsn = newjsons.getNewData();
+				//	await PostCheckIfErrorSingleObject(jsn);
+				//	i++;
+				//	//just to see how far we are with generating 
+				//	Debug.WriteLine("added: " + i);
+				//}
+				//timer.Stop();
+				//TimeSpan timespan = timer.Elapsed;
+				//string elaps = String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10);
+				//Debug.WriteLine("Done and took: " + elaps);
+
+				//return respStatus;
 				
 			} catch (HttpRequestException ex) {
 				//await mailService.SendWarningEmailAsync("Post", amount.ToString(), baseaddress, ex.Message);
 				return respStatus;
 			}
 		}
-
-
-
 
 	}
 }
