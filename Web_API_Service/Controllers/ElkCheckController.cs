@@ -26,15 +26,15 @@ namespace Web_API_Service.Controllers {
 	[ApiController]
 	public class ElkCheckController : ControllerBase {
 
-		public readonly IMailService mailService;
-		public readonly IElasticConnectionService _elasticConnection;
+		public readonly IMailService _mailService;
+		public readonly IDBConnectionService _DBConnection;
 
 		public ResponseStatus respondStatus = new ResponseStatus();
 		public HttpResponseMessage response = new HttpResponseMessage();
 
-		public ElkCheckController(IMailService mailService, IElasticConnectionService elasticConnection) {
-			this.mailService = mailService;
-			_elasticConnection = elasticConnection;
+		public ElkCheckController(IMailService mailService, IDBConnectionService DBConnection) {
+			_mailService = mailService;
+			_DBConnection = DBConnection;
 		}
 
 
@@ -161,52 +161,60 @@ namespace Web_API_Service.Controllers {
 		// GET api/<ValuesController>/5
 		//name need to change to what it does this is just temps
 		[HttpGet("project/{error}")]
-		public async Task<ActionResult<DBSchema>> checkForError(string error) {
-			var result = new DBSchema();
-			HttpResponseMessage response = new HttpResponseMessage();
+		public async Task<DBSchema> checkForError(string error) {
+            DBSchema result = new DBSchema();
 
-			long currentTimeInMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            long currentTimeInMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 			long yesterday = DateTimeOffset.UtcNow.AddHours(-24).ToUnixTimeMilliseconds();
 
 			try {
-				using (var client = new HttpClient()) {
+				string responseString = "";
 
-					client.BaseAddress = new Uri("http://localhost:9200/dbschema/_search");
-					client.DefaultRequestHeaders.Accept.Clear();
-					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+				if (error.Equals("getall")) {
+					responseString = await _DBConnection.GetFromEsMainDBWithQueryString("_search?q=_exists_:\"*exception*\"&q=timestamp:[" + yesterday.ToString() + "+TO+" + currentTimeInMs.ToString() + "]&size=5&sort=timestamp:desc&track_scores=true");
 
-                    if (error.Equals("getall")) {
-						response = await client.GetAsync("?q=_exists_:\"*exception*\"&q=timestamp:["+ yesterday.ToString() + "+TO+"+ currentTimeInMs.ToString() + "]&size=5&sort=timestamp:desc&track_scores=true");
-
-					} else {
-						response = await client.GetAsync("?q=_exists_:\"*" + error + "*\"&q=timestamp:[" + yesterday.ToString() + "+TO+" + currentTimeInMs.ToString() + "]&size=5&sort=timestamp:desc&track_scores=true");
-					}
-					
-					//Forklaring af strengen der står i getAsync:
-					//"?q=" er starten af vores query som fortæller "_search" fra baseAddress hvad den skal lede efter
-					//"_exists_" beder "client" om at retunere de objecter som indeholder det søgte streng
-					//"\"*exception*\"" eller "error" er det vi søger efter
-					//"&q=timestamp:["+ yesterday.ToString() + "+TO+"+ currentTimeInMs.ToString() + "]" er hvor vi beder om kun at få objecter fra et bestemt tidsrum
-					//"&size" er hvor mange objecter vi får ud
-					//"&sort=timestamp:" sortere vores objecter så vi enten får de ælste først eller de nyeste først
-					//"&track_scores=true" er for at forhindre fejl når vi køre metoden
-
-					if (response.IsSuccessStatusCode) {
-
-						var option = new JsonSerializerOptions {
-							Converters = { new DateTimeConverter() },
-							IgnoreNullValues = true							
-						};
-
-						result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync(), option);
-						return result;
-					} else {
-						throw new HttpRequestException("statusCode: " + response.StatusCode);
-					}
+				} else {
+					responseString = await _DBConnection.GetFromEsMainDBWithQueryString("_search?q=_exists:" + error + "&q=timestamp:[" + yesterday.ToString() + "+TO+" + currentTimeInMs.ToString() + "]&size=5&sort=timestamp:desc&track_scores=true");
 				}
+				//Forklaring af strengen der står i GetFromEsMainDBWithCommandstring:
+				//"?q=" er starten af vores query som fortæller "_search" fra baseAddress hvad den skal lede efter
+				//"_exists_" beder "client" om at retunere de objecter som indeholder det søgte streng
+				//"\"*exception*\"" eller "error" er det vi søger efter
+				//"&q=timestamp:["+ yesterday.ToString() + "+TO+"+ currentTimeInMs.ToString() + "]" er hvor vi beder om kun at få objecter fra et bestemt tidsrum
+				//"&size" er hvor mange objecter vi får ud
+				//"&sort=timestamp:" sortere vores objecter så vi enten får de ælste først eller de nyeste først
+				//"&track_scores=true" er for at forhindre fejl når vi køre metoden
+
+
+				var option = new JsonSerializerOptions {
+					Converters = { new DateTimeConverter() },
+					IgnoreNullValues = true
+				};
+
+                result = JsonSerializer.Deserialize<DBSchema>(responseString, option);
+
+                return result;
+
+				//using (var client = new HttpClient()) {
+					
+
+
+				//	if (response.IsSuccessStatusCode) {
+
+				//		var option = new JsonSerializerOptions {
+				//			Converters = { new DateTimeConverter() },
+				//			IgnoreNullValues = true							
+				//		};
+
+				//		result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync(), option);
+				//		return result;
+				//	} else {
+				//		throw new HttpRequestException("statusCode: " + response.StatusCode);
+				//	}
+				//}
 			} catch (HttpRequestException ex) {
 
-				return result;
+				throw ex;
 			}
 		}
 
@@ -318,7 +326,7 @@ namespace Web_API_Service.Controllers {
                 
 
                 var jsonstrings = new String(JsonSerializer.Serialize(SearchParameter));
-                await mailService.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseaddress, ex.Message);
+                await _mailService.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseaddress, ex.Message);
 
                 return result;
             }
@@ -340,7 +348,7 @@ namespace Web_API_Service.Controllers {
 
 					StringContent jsonstring = new StringContent(JsonSerializer.Serialize(result, options), Encoding.UTF8, "application/json");
 
-				respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _elasticConnection.InsertInToEsErrorDB(jsonstring), options);
+				respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _DBConnection.InsertInToEsErrorDB(jsonstring), options);
 				return respondStatus;
 
 			} catch (HttpRequestException ex) {
@@ -573,7 +581,7 @@ namespace Web_API_Service.Controllers {
 		public async Task<ResponseStatus> AbuseThisGeneraterShort(int amount) {
 			//ResponseStatus respondStatus = new ResponseStatus();
 			//HttpResponseMessage response = new HttpResponseMessage();
-			IDBInfoGenerater newjsons = new DBInfoGenerater();
+			IDBInfoGenerater jsons = new DBInfoGenerater();
 			int i = 0;			
 
 			var seOptions = new JsonSerializerOptions {
@@ -587,10 +595,10 @@ namespace Web_API_Service.Controllers {
 			Stopwatch timer = Stopwatch.StartNew();
 			while (i < amount) {
 
-				var jsn = newjsons.getNewData();
+				var jsn = jsons.getNewData();
 
 				StringContent jsonstring = new StringContent(JsonSerializer.Serialize(jsn, seOptions), Encoding.UTF8, "application/json");
-				respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _elasticConnection.InsertInToEsMainDB(jsonstring), deOptions);
+				respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _DBConnection.InsertInToEsMainDB(jsonstring), deOptions);
 				
 				i++;
 				Debug.WriteLine("added: " + i);
