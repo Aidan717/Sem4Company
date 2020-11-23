@@ -27,8 +27,14 @@ namespace Web_API_Service.Controllers {
 	public class ElkCheckController : ControllerBase {
 
 		public readonly IMailService mailService;
-		public ElkCheckController(IMailService mailService) {
+		public readonly IElasticConnectionService _elasticConnection;
+
+		public ResponseStatus respondStatus = new ResponseStatus();
+		public HttpResponseMessage response = new HttpResponseMessage();
+
+		public ElkCheckController(IMailService mailService, IElasticConnectionService elasticConnection) {
 			this.mailService = mailService;
+			_elasticConnection = elasticConnection;
 		}
 
 
@@ -582,6 +588,38 @@ namespace Web_API_Service.Controllers {
 			}
 		}
 
+		[HttpGet("FillDB2/{amount}")]
+		public async Task<ResponseStatus> AbuseThisGeneraterShort(int amount) {
+			//ResponseStatus respondStatus = new ResponseStatus();
+			//HttpResponseMessage response = new HttpResponseMessage();
+			IDBInfoGenerater newjsons = new DBInfoGenerater();
+			int i = 0;			
+
+			var seOptions = new JsonSerializerOptions {
+				IgnoreNullValues = true
+			};
+			var deOptions = new JsonSerializerOptions {
+				IgnoreNullValues = true,
+				Converters = { new DateTimeConverter() }
+			};
+
+			Stopwatch timer = Stopwatch.StartNew();
+			while (i < amount) {
+
+				var jsn = newjsons.getNewData();
+
+				StringContent jsonstring = new StringContent(JsonSerializer.Serialize(jsn, seOptions), Encoding.UTF8, "application/json");
+				respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _elasticConnection.InsertIndToEsMainDB(jsonstring), deOptions);
+				
+				i++;
+				Debug.WriteLine("added: " + i);
+			}
+			timer.Stop();
+			TimeSpan timespan = timer.Elapsed;
+			string elaps = String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10);
+			Debug.WriteLine("Done and took: " + elaps);
+			return respondStatus;
+		}
 	}
 }
 

@@ -928,7 +928,6 @@ namespace Web_API_Service.Models {
             //public string username { get; set; }
             public string errorForTrainer { get; set; } = "0";
 
-            public string errorForTrainer { get; set; } = "0";
 
         }
     }
