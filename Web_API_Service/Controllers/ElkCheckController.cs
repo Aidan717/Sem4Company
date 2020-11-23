@@ -329,46 +329,34 @@ namespace Web_API_Service.Controllers {
             }
         }
 
-        //Skal kun kaldes igennem en anden GET metode. Er dette nødvendigt at have noget inde i HttpPost med?
+		//Skal kun kaldes igennem en anden GET metode. Er dette nødvendigt at have noget inde i HttpPost med?
+
 		public async Task<ActionResult<ResponseStatus>> PostNewError(DBSchema._Source result) {
-			string baseaddress = "";
-			HttpResponseMessage response = new HttpResponseMessage();
-			var resSta = new ResponseStatus();
+
+			//string baseaddress = "";
 			
 			try {
 
-				using (var client = new HttpClient()) {
+				//using (var client = new HttpClient()) {
 
 					var options = new JsonSerializerOptions {
 						IgnoreNullValues = true
 					};
 
-					var jsonstring = new StringContent(JsonSerializer.Serialize(result, options), Encoding.UTF8, "application/json");
+					StringContent jsonstring = new StringContent(JsonSerializer.Serialize(result, options), Encoding.UTF8, "application/json");
 
-					client.BaseAddress = new Uri("http://localhost:9200/errordb/_doc/");
-					baseaddress = client.BaseAddress.ToString();
-					client.DefaultRequestHeaders.Accept.Clear();
-					response = await client.PostAsync("", jsonstring);
+				respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _elasticConnection.InsertInToEsErrorDB(jsonstring), options);
+				return respondStatus;
 
-					if (response.IsSuccessStatusCode) {
-						var option = new JsonSerializerOptions {
-							Converters = { new DateTimeConverter() }
-						};
-						resSta = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync(), option);
-						return resSta;
-					} else {
-						throw new HttpRequestException("statusCode: " + response.StatusCode);
-					}
-				}
 			} catch (HttpRequestException ex) {
 				var option = new JsonSerializerOptions {
 					IgnoreNullValues = true
 				};
 				var jsonstrings = new String(JsonSerializer.Serialize(result, option));
 
-				await mailService.SendWarningEmailAsync("Post", jsonstrings, baseaddress, ex.Message);
+				//await mailService.SendWarningEmailAsync("Post", jsonstrings, baseaddress, ex.Message);
 
-				return resSta = new ResponseStatus("failed to connect " + ex.Message);
+				return respondStatus = new ResponseStatus("failed to connect " + ex.Message);
 			}
 		}
 
@@ -394,7 +382,6 @@ namespace Web_API_Service.Controllers {
 
 					Debug.WriteLine(result.ToString());
 
-					int i = 0;
 					foreach (Hit s in result.hits.hits) {
 						foreach (PropertyInfo pi in s._source.GetType().GetProperties()) {
 							string value = (string)pi.GetValue(s._source);
@@ -609,7 +596,7 @@ namespace Web_API_Service.Controllers {
 				var jsn = newjsons.getNewData();
 
 				StringContent jsonstring = new StringContent(JsonSerializer.Serialize(jsn, seOptions), Encoding.UTF8, "application/json");
-				respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _elasticConnection.InsertIndToEsMainDB(jsonstring), deOptions);
+				respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _elasticConnection.InsertInToEsMainDB(jsonstring), deOptions);
 				
 				i++;
 				Debug.WriteLine("added: " + i);

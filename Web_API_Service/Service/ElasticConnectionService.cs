@@ -23,7 +23,7 @@ namespace Web_API_Service.Service {
 		}
 
 		//Es stand for ElasticSearch
-		public async Task<string> InsertIndToEsMainDB(StringContent jsonString) {
+		public async Task<string> InsertInToEsMainDB(StringContent jsonString) {
 			//HttpResponseMessage response = new HttpResponseMessage();
 			//ResponseStatus respond = new ResponseStatus();
 			
@@ -53,7 +53,7 @@ namespace Web_API_Service.Service {
 		}
 
 		//this method only handle insert to errorDB
-		public async Task<string> InsertIndToEsErrorDB(StringContent jsonString) {
+		public async Task<string> InsertInToEsErrorDB(StringContent jsonString) {
 			
 			try {
 
@@ -70,7 +70,7 @@ namespace Web_API_Service.Service {
 						var option = new JsonSerializerOptions {
 							Converters = { new DateTimeConverter() }
 						};
-						respondString = JsonSerializer.Deserialize<string>(await response.Content.ReadAsStringAsync(), option);
+						respondString = await response.Content.ReadAsStringAsync();
 
 						return respondString;
 					} else {
