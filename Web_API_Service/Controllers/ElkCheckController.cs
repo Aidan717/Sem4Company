@@ -254,7 +254,7 @@ namespace Web_API_Service.Controllers {
 							return result;
 						}
 						if (result.status == ("red"))
-							return result.status;
+							return false;
 
 						return result;
 
@@ -268,11 +268,6 @@ namespace Web_API_Service.Controllers {
 			}
 
 		}
-
-
-		//http://localhost:9200/_cat/indices?h=index laver en en liste af alle indexes
-		//http://localhost:9200/_cluster/health?level=indices henter alle indexes med en oversigt heriblandt status.
-
 
 
 
