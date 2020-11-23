@@ -22,6 +22,10 @@ namespace Web_API_Service {
 			services.AddControllers();
 			services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
 			services.AddTransient<Service.IMailService, Service.MailService>();
+			
+			services.Configure<ElasticConnection>(Configuration.GetSection("ElasticConnection"));
+			services.AddTransient<IElasticConnectionService, ElasticConnectionService>();
+
 
 		}
 

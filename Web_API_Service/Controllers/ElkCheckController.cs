@@ -27,8 +27,14 @@ namespace Web_API_Service.Controllers {
 	public class ElkCheckController : ControllerBase {
 
 		public readonly IMailService mailService;
-		public ElkCheckController(IMailService mailService) {
+		public readonly IElasticConnectionService _elasticConnection;
+
+		public ResponseStatus respondStatus = new ResponseStatus();
+		public HttpResponseMessage response = new HttpResponseMessage();
+
+		public ElkCheckController(IMailService mailService, IElasticConnectionService elasticConnection) {
 			this.mailService = mailService;
+			_elasticConnection = elasticConnection;
 		}
 
 
@@ -218,7 +224,7 @@ namespace Web_API_Service.Controllers {
 
 		//look at status for index when a person call something
 		[HttpGet("hey/{index}")]
-		public async Task<ActionResult<object>> GetIndexStatus(string index) {
+		public async Task<ActionResult<object>> GetIndexStatus(string index, clusterHealth newhealth) {
 			var result = new clusterHealth("Fail report");
 			HttpResponseMessage response = new HttpResponseMessage();
 
@@ -248,7 +254,7 @@ namespace Web_API_Service.Controllers {
 							return result;
 						}
 						if (result.status == ("red"))
-							return result.status;
+							return false;
 
 						return result;
 
@@ -262,11 +268,6 @@ namespace Web_API_Service.Controllers {
 			}
 
 		}
-
-
-		//http://localhost:9200/_cat/indices?h=index laver en en liste af alle indexes
-		//http://localhost:9200/_cluster/health?level=indices henter alle indexes med en oversigt heriblandt status.
-
 
 
 
@@ -323,47 +324,34 @@ namespace Web_API_Service.Controllers {
             }
         }
 
-        //Skal kun kaldes igennem en anden GET metode. Er dette nødvendigt at have noget inde i HttpPost med?
+		//Skal kun kaldes igennem en anden GET metode. Er dette nødvendigt at have noget inde i HttpPost med?
+
 		public async Task<ActionResult<ResponseStatus>> PostNewError(DBSchema._Source result) {
-			string baseaddress = "";
-			HttpResponseMessage response = new HttpResponseMessage();
-			var resSta = new ResponseStatus();
+
+			//string baseaddress = "";
 			
 			try {
 
-				using (var client = new HttpClient()) {
+				//using (var client = new HttpClient()) {
 
 					var options = new JsonSerializerOptions {
 						IgnoreNullValues = true
 					};
 
-					var jsonstring = new StringContent(JsonSerializer.Serialize(result, options), Encoding.UTF8, "application/json");
+					StringContent jsonstring = new StringContent(JsonSerializer.Serialize(result, options), Encoding.UTF8, "application/json");
 
-					client.BaseAddress = new Uri("http://localhost:9200/errordb/_doc/");
-					baseaddress = client.BaseAddress.ToString();
-					client.DefaultRequestHeaders.Accept.Clear();
-					response = await client.PostAsync("", jsonstring);
+				respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _elasticConnection.InsertInToEsErrorDB(jsonstring), options);
+				return respondStatus;
 
-					if (response.IsSuccessStatusCode) {
-
-						var option = new JsonSerializerOptions {
-							Converters = { new DateTimeConverter() }
-						};
-						resSta = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync(), option);
-						return resSta;
-					} else {
-						throw new HttpRequestException("statusCode: " + response.StatusCode);
-					}
-				}
 			} catch (HttpRequestException ex) {
 				var option = new JsonSerializerOptions {
 					IgnoreNullValues = true
 				};
 				var jsonstrings = new String(JsonSerializer.Serialize(result, option));
 
-				await mailService.SendWarningEmailAsync("Post", jsonstrings, baseaddress, ex.Message);
+				//await mailService.SendWarningEmailAsync("Post", jsonstrings, baseaddress, ex.Message);
 
-				return resSta = new ResponseStatus("failed to connect " + ex.Message);
+				return respondStatus = new ResponseStatus("failed to connect " + ex.Message);
 			}
 		}
 
@@ -389,7 +377,6 @@ namespace Web_API_Service.Controllers {
 
 					Debug.WriteLine(result.ToString());
 
-					int i = 0;
 					foreach (Hit s in result.hits.hits) {
 						foreach (PropertyInfo pi in s._source.GetType().GetProperties()) {
 							string value = (string)pi.GetValue(s._source);
@@ -446,9 +433,9 @@ namespace Web_API_Service.Controllers {
 					int i = 0;
 					while (i < result.GetType().GetProperties().Count()) {
 						PropertyInfo pi = result.GetType().GetProperties()[i];
-							string value = (string)pi.GetValue(result);
-							if (pi.Name.Contains("exception", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(value)) {
-								i = result.GetType().GetProperties().Count();
+						string value = (string)pi.GetValue(result);
+						if (pi.Name.Contains("exception", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(value)) {
+							i = result.GetType().GetProperties().Count();
 
 							await PostNewError(result);
 
@@ -456,7 +443,7 @@ namespace Web_API_Service.Controllers {
 						i++;
 					}
 
-                    if (response.IsSuccessStatusCode) {
+					if (response.IsSuccessStatusCode) {
 
 						var option = new JsonSerializerOptions {
 							Converters = { new DateTimeConverter() }
@@ -472,7 +459,7 @@ namespace Web_API_Service.Controllers {
 
 				await PostNewError(result);
 
-				return respSta;
+				return respSta = new ResponseStatus(ex.StackTrace);
 			}
 		}
 
@@ -549,31 +536,71 @@ namespace Web_API_Service.Controllers {
 				string elaps = String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10);
 				Debug.WriteLine("Done and took: " + elaps);
 
-				if (response.IsSuccessStatusCode)
-				{
+				if (response.IsSuccessStatusCode) {
 
-					var option = new JsonSerializerOptions
-					{
+					var option = new JsonSerializerOptions {
 						Converters = { new DateTimeConverter() }
 					};
 					respStatus = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync(), option);
-					Debug.WriteLine("respstatus object id: " + respStatus._id);
+
 					return respStatus;
-				}
-				else
-				{
+				} else {
 					throw new HttpRequestException("statusCode: " + response.StatusCode);
 				}
 
+				//Stopwatch timer = Stopwatch.StartNew();
+				//while (i < amount) {
+				//	var jsn = newjsons.getNewData();
+				//	await PostCheckIfErrorSingleObject(jsn);
+				//	i++;
+				//	//just to see how far we are with generating 
+				//	Debug.WriteLine("added: " + i);
+				//}
+				//timer.Stop();
+				//TimeSpan timespan = timer.Elapsed;
+				//string elaps = String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10);
+				//Debug.WriteLine("Done and took: " + elaps);
+
+				//return respStatus;
+				
 			} catch (HttpRequestException ex) {
 				//await mailService.SendWarningEmailAsync("Post", amount.ToString(), baseaddress, ex.Message);
 				return respStatus;
 			}
 		}
 
+		[HttpGet("FillDB2/{amount}")]
+		public async Task<ResponseStatus> AbuseThisGeneraterShort(int amount) {
+			//ResponseStatus respondStatus = new ResponseStatus();
+			//HttpResponseMessage response = new HttpResponseMessage();
+			IDBInfoGenerater newjsons = new DBInfoGenerater();
+			int i = 0;			
 
+			var seOptions = new JsonSerializerOptions {
+				IgnoreNullValues = true
+			};
+			var deOptions = new JsonSerializerOptions {
+				IgnoreNullValues = true,
+				Converters = { new DateTimeConverter() }
+			};
 
+			Stopwatch timer = Stopwatch.StartNew();
+			while (i < amount) {
 
+				var jsn = newjsons.getNewData();
+
+				StringContent jsonstring = new StringContent(JsonSerializer.Serialize(jsn, seOptions), Encoding.UTF8, "application/json");
+				respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _elasticConnection.InsertInToEsMainDB(jsonstring), deOptions);
+				
+				i++;
+				Debug.WriteLine("added: " + i);
+			}
+			timer.Stop();
+			TimeSpan timespan = timer.Elapsed;
+			string elaps = String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10);
+			Debug.WriteLine("Done and took: " + elaps);
+			return respondStatus;
+		}
 	}
 }
 
