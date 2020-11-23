@@ -529,7 +529,6 @@ namespace Web_API_Service.Controllers {
 					using (var client = new HttpClient())
 					{
 						var jsn = newjsons.getNewData();
-						Debug.WriteLine("json object time: " + jsn.timestamp);
 						
 						var jsonstring = new StringContent(JsonSerializer.Serialize(jsn, options), Encoding.UTF8, "application/json");
 
@@ -552,7 +551,6 @@ namespace Web_API_Service.Controllers {
 
 				if (response.IsSuccessStatusCode)
 				{
-
 
 					var option = new JsonSerializerOptions
 					{
