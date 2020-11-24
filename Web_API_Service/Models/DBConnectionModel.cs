@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Web_API_Service.Models {
-	public class dbConnectionModel {
+	public class DBConnectionModel {
 
 		public string uRI { get; set; }
 		public string mainIndex { get; set; }

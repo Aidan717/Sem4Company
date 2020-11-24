@@ -21,9 +21,8 @@ namespace Web_API_Service {
 			services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
 			services.AddTransient<Service.IMailService, Service.MailService>();
 			
-			services.Configure<dbConnectionModel>(Configuration.GetSection("ElasticTestConnection"));
+			services.Configure<DBConnectionModel>(Configuration.GetSection("ElasticTestConnection"));
 			services.AddTransient<IDBConnectionService, DBConnectionService>();
-
 
 		}
 
