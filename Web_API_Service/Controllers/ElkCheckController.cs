@@ -13,7 +13,7 @@ using Web_API_Service.Utility;
 using Web_API_Service.Service;
 using Org.BouncyCastle.Math.EC.Rfc7748;
 using System.Diagnostics;
-using static Web_API_Service.Models.DBSchema;
+//using static Web_API_Service.Models.DBSchema;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using System.IO;
@@ -340,8 +340,6 @@ namespace Web_API_Service.Controllers {
 			
 			try {
 
-				//using (var client = new HttpClient()) {
-
 					var options = new JsonSerializerOptions {
 						IgnoreNullValues = true
 					};
@@ -366,26 +364,17 @@ namespace Web_API_Service.Controllers {
 		[HttpPost("dbschema/CheckIfError")]
 		public async Task<ActionResult<ResponseStatus>> PostCheckIfError([FromBody] DBSchema result) {
 			
-			string baseaddress = "";
-			HttpResponseMessage response = new HttpResponseMessage();
-			var respSta = new ResponseStatus();
-			
+			//string baseaddress = "";
+
 			try {
 
-				using (var client = new HttpClient()) {
-					var jsonstring = new StringContent(JsonSerializer.Serialize(result), Encoding.UTF8, "application/json");
+				var option = new JsonSerializerOptions {
+					Converters = { new DateTimeConverter() }
+				};
 
-					client.BaseAddress = new Uri("http://localhost:9200/dbschema/_doc/");
-					baseaddress = client.BaseAddress.ToString();
-					client.DefaultRequestHeaders.Accept.Clear();
-					response = await client.PostAsync("", jsonstring);
+				StringContent jsonstring = new StringContent(JsonSerializer.Serialize(result), Encoding.UTF8, "application/json");
 
-					
-					var errorAdd = new DBSchema();
-
-					Debug.WriteLine(result.ToString());
-
-					foreach (Hit s in result.hits.hits) {
+					foreach (DBSchema.Hit s in result.hits.hits) {
 						foreach (PropertyInfo pi in s._source.GetType().GetProperties()) {
 							string value = (string)pi.GetValue(s._source);
 							if (pi.Name.Contains("exception") && !string.IsNullOrEmpty(value)) {
@@ -394,22 +383,14 @@ namespace Web_API_Service.Controllers {
 						}
 					}
 
-					if (response.IsSuccessStatusCode) {
+				respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _DBConnection.InsertInToMainDB(jsonstring), option);
+				return respondStatus;
 
-						var option = new JsonSerializerOptions {
-							Converters = { new DateTimeConverter() }
-						};
-						respSta = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync(), option);
-						return respSta;
-					} else {
-						throw new HttpRequestException("statusCode: " + response.StatusCode);
-					}
-				}
 			} catch (HttpRequestException ex) {
 
 				await PostNewError(result.hits.hits[0]._source);
 
-				return respSta;
+				return respondStatus = new ResponseStatus("failed to connect " + ex.Message);
 			}
 		}
 
