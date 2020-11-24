@@ -79,7 +79,7 @@ namespace Web_API_Service.Service {
 		//	smtp.Disconnect(true);
 		//}
 
-		public async Task SendWarningEmailAsync(string methodName, string Query, string Destination, string Error) {
+		public async Task SendWarningEmailAsync(string methodName, string query, string destination, string error) {
            // IOptions<MailSettings> _mailSettings = Options.Create(mSettings);
            // MailSettings mailSettings = _mailSettings.Value;
 
@@ -87,23 +87,23 @@ namespace Web_API_Service.Service {
             var email = new MimeMessage();
             var builder = new BodyBuilder();
 
-            warningRequest.Body += "Method:<br />" + methodName;
-            warningRequest.Body += "<br /><br />Query:<br />" + Query;
-            warningRequest.Body += "<br /><br />Destination:<br />" + Destination;
-            warningRequest.Body += "<br /><br />Error message:<br />" + Error;
+            warningRequest.body += "Method:<br />" + methodName;
+            warningRequest.body += "<br /><br />Query:<br />" + query;
+            warningRequest.body += "<br /><br />Destination:<br />" + destination;
+            warningRequest.body += "<br /><br />Error message:<br />" + error;
 
-            builder.HtmlBody = warningRequest.Body;
+            builder.HtmlBody = warningRequest.body;
 
-            email.Sender = MailboxAddress.Parse(_mailSettings.MailReciever);
+            email.Sender = MailboxAddress.Parse(_mailSettings.mailReciever);
             //email.To.Add(MailboxAddress.Parse(warningRequest.ToEmail));
-            email.To.Add(MailboxAddress.Parse(_mailSettings.MailSender));
+            email.To.Add(MailboxAddress.Parse(_mailSettings.mailSender));
             //email.Subject = warningRequest.Subject;
             email.Subject = "Error for HTTPRequest";
             email.Body = builder.ToMessageBody();
 
             using var smtp = new SmtpClient();
-            smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
-            smtp.Authenticate(_mailSettings.MailReciever, _mailSettings.Password);
+            smtp.Connect(_mailSettings.host, _mailSettings.port, SecureSocketOptions.StartTls);
+            smtp.Authenticate(_mailSettings.mailReciever, _mailSettings.password);
             await smtp.SendAsync(email);
             smtp.Disconnect(true);
         }

@@ -292,9 +292,9 @@ namespace Web_API_Service.Controllers {
 
 
         [HttpGet("db/{chosenDB}/{SearchParameter}")]
-        public async Task<ActionResult<DBSchema>> GetError(string chosenDB, string SearchParameter) {
+        public async Task<ActionResult<DBSchema>> GetError(string chosenDB, string searchParameter) {
 
-            string baseaddress = "";
+            string baseAddress = "";
             var result = new DBSchema();
 
             try {
@@ -302,10 +302,10 @@ namespace Web_API_Service.Controllers {
 
 
                     client.BaseAddress = new Uri("http://localhost:9200/" + chosenDB + "/_search");
-                    baseaddress = client.BaseAddress.ToString();
+                    baseAddress = client.BaseAddress.ToString();
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    HttpResponseMessage response = await client.GetAsync("?q=" + SearchParameter);
+                    HttpResponseMessage response = await client.GetAsync("?q=" + searchParameter);
 
                     if (response.IsSuccessStatusCode) {
                         result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync());
@@ -325,8 +325,8 @@ namespace Web_API_Service.Controllers {
 
                 
 
-                var jsonstrings = new String(JsonSerializer.Serialize(SearchParameter));
-                await _mailService.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseaddress, ex.Message);
+                var jsonstrings = new String(JsonSerializer.Serialize(searchParameter));
+                await _mailService.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseAddress, ex.Message);
 
                 return result;
             }
@@ -366,9 +366,9 @@ namespace Web_API_Service.Controllers {
 		[HttpPost("dbschema/CheckIfError")]
 		public async Task<ActionResult<ResponseStatus>> PostCheckIfError([FromBody] DBSchema result) {
 			
-			string baseaddress = "";
+			string baseAddress = "";
 			HttpResponseMessage response = new HttpResponseMessage();
-			var respSta = new ResponseStatus();
+			var respStatus = new ResponseStatus();
 			
 			try {
 
@@ -376,7 +376,7 @@ namespace Web_API_Service.Controllers {
 					var jsonstring = new StringContent(JsonSerializer.Serialize(result), Encoding.UTF8, "application/json");
 
 					client.BaseAddress = new Uri("http://localhost:9200/dbschema/_doc/");
-					baseaddress = client.BaseAddress.ToString();
+					baseAddress = client.BaseAddress.ToString();
 					client.DefaultRequestHeaders.Accept.Clear();
 					response = await client.PostAsync("", jsonstring);
 
@@ -399,8 +399,8 @@ namespace Web_API_Service.Controllers {
 						var option = new JsonSerializerOptions {
 							Converters = { new DateTimeConverter() }
 						};
-						respSta = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync(), option);
-						return respSta;
+						respStatus = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync(), option);
+						return respStatus;
 					} else {
 						throw new HttpRequestException("statusCode: " + response.StatusCode);
 					}
@@ -409,7 +409,7 @@ namespace Web_API_Service.Controllers {
 
 				await PostNewError(result.hits.hits[0]._source);
 
-				return respSta;
+				return respStatus;
 			}
 		}
 
@@ -417,9 +417,9 @@ namespace Web_API_Service.Controllers {
 		[HttpPost("CheckIfErrorSingle")]
 		public async Task<ActionResult<ResponseStatus>> PostCheckIfErrorSingleObject([FromBody] DBSchema._Source result) {
 
-			string baseaddress = "";
+			string baseAddress = "";
 			HttpResponseMessage response = new HttpResponseMessage();
-			var respSta = new ResponseStatus();
+			var respStatus = new ResponseStatus();
 
 			try {
 
@@ -432,7 +432,7 @@ namespace Web_API_Service.Controllers {
 					var jsonstring = new StringContent(JsonSerializer.Serialize(result, options), Encoding.UTF8, "application/json");
 
 					client.BaseAddress = new Uri("http://localhost:9200/dbschema/_doc/");
-					baseaddress = client.BaseAddress.ToString();
+					baseAddress = client.BaseAddress.ToString();
 					client.DefaultRequestHeaders.Accept.Clear();
 					response = await client.PostAsync("", jsonstring);
 
@@ -456,9 +456,9 @@ namespace Web_API_Service.Controllers {
 						var option = new JsonSerializerOptions {
 							Converters = { new DateTimeConverter() }
 						};
-						respSta = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync(), option);
+						respStatus = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync(), option);
 
-                        return respSta;
+                        return respStatus;
 					} else {
 						throw new HttpRequestException("statusCode: " + response.StatusCode);
 					}
@@ -467,7 +467,7 @@ namespace Web_API_Service.Controllers {
 
 				await PostNewError(result);
 
-				return respSta = new ResponseStatus(ex.StackTrace);
+				return respStatus = new ResponseStatus(ex.StackTrace);
 			}
 		}
 
@@ -510,7 +510,7 @@ namespace Web_API_Service.Controllers {
 			string baseaddress = "";
 			HttpResponseMessage response = new HttpResponseMessage();
 			var respStatus = new ResponseStatus();
-			IDBInfoGenerater newjsons = new DBInfoGenerater();
+			IDBInfoGenerater newJsons = new DBInfoGenerater();
 			int i = 0;
 
 			try {
@@ -523,7 +523,7 @@ namespace Web_API_Service.Controllers {
 				{
 					using (var client = new HttpClient())
 					{
-						var jsn = newjsons.GetNewData();
+						var jsn = newJsons.GetNewData();
 						
 						var jsonstring = new StringContent(JsonSerializer.Serialize(jsn, options), Encoding.UTF8, "application/json");
 
@@ -540,8 +540,8 @@ namespace Web_API_Service.Controllers {
 
 				}
 				timer.Stop();
-				TimeSpan timespan = timer.Elapsed;
-				string elaps = String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10);
+				TimeSpan timeSpan = timer.Elapsed;
+				string elaps = String.Format("{0:00}:{1:00}:{2:00}", timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds / 10);
 				Debug.WriteLine("Done and took: " + elaps);
 
 				if (response.IsSuccessStatusCode) {
