@@ -161,7 +161,7 @@ namespace Web_API_Service.Controllers {
 		// GET api/<ValuesController>/5
 		//name need to change to what it does this is just temps
 		[HttpGet("project/{error}")]
-		public async Task<DBSchema> checkForError(string error) {
+		public async Task<DBSchema> CheckForError(string error) {
             DBSchema result = new DBSchema();
 
             long currentTimeInMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -504,7 +504,7 @@ namespace Web_API_Service.Controllers {
 		//}
 
 		
-		[HttpGet("FillDB/{amount}")]
+		[HttpGet("FillDBold/{amount}")]
 		public async Task<ActionResult<ResponseStatus>> AbuseThisGenerater(int amount) {
 
 			string baseaddress = "";
@@ -523,7 +523,7 @@ namespace Web_API_Service.Controllers {
 				{
 					using (var client = new HttpClient())
 					{
-						var jsn = newjsons.getNewData();
+						var jsn = newjsons.GetNewData();
 						
 						var jsonstring = new StringContent(JsonSerializer.Serialize(jsn, options), Encoding.UTF8, "application/json");
 
@@ -554,30 +554,14 @@ namespace Web_API_Service.Controllers {
 					return respStatus;
 				} else {
 					throw new HttpRequestException("statusCode: " + response.StatusCode);
-				}
-
-				//Stopwatch timer = Stopwatch.StartNew();
-				//while (i < amount) {
-				//	var jsn = newjsons.getNewData();
-				//	await PostCheckIfErrorSingleObject(jsn);
-				//	i++;
-				//	//just to see how far we are with generating 
-				//	Debug.WriteLine("added: " + i);
-				//}
-				//timer.Stop();
-				//TimeSpan timespan = timer.Elapsed;
-				//string elaps = String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10);
-				//Debug.WriteLine("Done and took: " + elaps);
-
-				//return respStatus;
-				
+				}				
 			} catch (HttpRequestException ex) {
 				//await mailService.SendWarningEmailAsync("Post", amount.ToString(), baseaddress, ex.Message);
 				return respStatus;
 			}
 		}
 
-		[HttpGet("FillDB2/{amount}")]
+		[HttpGet("FillDB/{amount}")]
 		public async Task<ResponseStatus> AbuseThisGeneraterShort(int amount) {
 			//ResponseStatus respondStatus = new ResponseStatus();
 			//HttpResponseMessage response = new HttpResponseMessage();
@@ -595,7 +579,7 @@ namespace Web_API_Service.Controllers {
 			Stopwatch timer = Stopwatch.StartNew();
 			while (i < amount) {
 
-				var jsn = jsons.getNewData();
+				var jsn = jsons.GetNewData();
 
 				StringContent jsonstring = new StringContent(JsonSerializer.Serialize(jsn, seOptions), Encoding.UTF8, "application/json");
 				respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _DBConnection.InsertInToMainDB(jsonstring), deOptions);

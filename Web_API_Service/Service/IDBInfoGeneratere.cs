@@ -8,6 +8,6 @@ using Web_API_Service.Models;
 
 namespace Web_API_Service.Service {
 	interface IDBInfoGenerater {
-		DBSchema._Source getNewData();
+		DBSchema._Source GetNewData();
 	}
 }

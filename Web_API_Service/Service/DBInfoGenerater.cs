@@ -15,7 +15,7 @@ namespace Web_API_Service.Service {
 		Random numGenenerater = new Random();
 
 
-		public DBSchema._Source getNewData() {
+		public DBSchema._Source GetNewData() {
 			
 
 			int i = 0;
@@ -25,13 +25,13 @@ namespace Web_API_Service.Service {
 			//should it generate errors of not
 			if(numGenenerater.Next(0,100)< 40) {
 				
-				setNewError(data);
+				SetNewError(data);
 				data.errorForTrainer = "1";
 			}
 
 
-			data.name = getName();
-			data.timestamp = getRandomDate();
+			data.name = GetName();
+			data.timestamp = GetRandomDate();
 
 
 			
@@ -39,26 +39,26 @@ namespace Web_API_Service.Service {
 		}
 
 
-		public void setNewError(DBSchema._Source data) {
+		public void SetNewError(DBSchema._Source data) {
 			int numberOFerrors = numGenenerater.Next(1, 4);
 			int ii = 0;
 			while (ii < numberOFerrors) {
 				int i = numGenenerater.Next(1, 4);
 				switch (i) {
                     case 1:
-                        data.exceptionstackTraceString = getRandomStackTrace();
+                        data.exceptionstackTraceString = GetRandomStackTrace();
                         break;
                     case 2:
-                        data.exceptioninnerExceptionmessage = getRandomInnerException();
+                        data.exceptioninnerExceptionmessage = GetRandomInnerException();
                         break;
                     case 3:
-                        data.exceptionfailedRecipient = getRandomFailedRecipient();
+                        data.exceptionfailedRecipient = GetRandomFailedRecipient();
                         break;
                         //case 4:
-                        //	data.exceptionerrorsserver = getRandomServerError();
+                        //	data.exceptionerrorsserver = GetRandomServerError();
                         //	break;
                         //case 5:
-                        //	data.activitiestype = getRandomStackTrace();
+                        //	data.activitiestype = GetRandomStackTrace();
                         //	break;
                 }
 				ii++;
@@ -66,11 +66,11 @@ namespace Web_API_Service.Service {
 				Debug.WriteLine(i);
 			}
 		}
-		public string getName() {
+		public string GetName() {
 			return new Utility.UserNameList().Name;			
 		}
 
-		public string getRandomDate() {
+		public string GetRandomDate() {
 			DateTime date = new DateTime(2010, 1, 1);
 			//DateTime spike1 = new DateTime(2015, 12, 12);
 			//DateTime spike2 = new Datetime(2015, 12, 13);
@@ -80,7 +80,7 @@ namespace Web_API_Service.Service {
 
 		}
 
-		public string getRandomStackTrace() {
+		public string GetRandomStackTrace() {
 			string result = "";
 			int indexMessage = numGenenerater.Next(1,5);
 
@@ -120,7 +120,7 @@ namespace Web_API_Service.Service {
 			return result;
 		}
 
-		public string getRandomInnerException() {
+		public string GetRandomInnerException() {
 			string result = "";
 			int indexMessage = numGenenerater.Next(1, 4);
 
@@ -160,7 +160,7 @@ namespace Web_API_Service.Service {
 			return result;
 		}
 
-		public string getRandomFailedRecipient() {
+		public string GetRandomFailedRecipient() {
 			string result = "";
 			int indexMessage = numGenenerater.Next(1, 6);
 
@@ -200,7 +200,7 @@ namespace Web_API_Service.Service {
 			return result;
 		}
 
-		public string getRandomServerError() {
+		public string GetRandomServerError() {
 			string result = "";
 			int indexMessage = numGenenerater.Next(1, 5);
 

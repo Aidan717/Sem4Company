@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 namespace Web_API_Service.Models {
 	public class dbConnectionModel {
 
-		public string URI { get; set; }
-		public string MainIndex { get; set; }
-		public string ErrorIndex { get; set; }
-		public string CustomIndex { get; set; }
-		public string QueryString { get; set; }
+		public string uRI { get; set; }
+		public string mainIndex { get; set; }
+		public string errorIndex { get; set; }
+		public string customIndex { get; set; }
+		public string queryString { get; set; }
 
 	}
 }
