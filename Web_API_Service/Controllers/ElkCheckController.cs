@@ -334,7 +334,7 @@ namespace Web_API_Service.Controllers {
 
 		//Skal kun kaldes igennem en anden GET metode. Er dette nødvendigt at have noget inde i HttpPost med?
 
-		public async Task<ActionResult<ResponseStatus>> PostNewError(DBSchema._Source result) {
+		public async Task<ResponseStatus> PostNewError(DBSchema._Source result) {
 
 			//string baseaddress = "";
 			
@@ -362,7 +362,7 @@ namespace Web_API_Service.Controllers {
 		}
 
 		[HttpPost("dbschema/CheckIfError")]
-		public async Task<ActionResult<ResponseStatus>> PostCheckIfError([FromBody] DBSchema result) {
+		public async Task<ResponseStatus> PostCheckIfError([FromBody] DBSchema result) {
 			
 			//string baseaddress = "";
 
@@ -396,59 +396,44 @@ namespace Web_API_Service.Controllers {
 
 
 		[HttpPost("CheckIfErrorSingle")]
-		public async Task<ActionResult<ResponseStatus>> PostCheckIfErrorSingleObject([FromBody] DBSchema._Source result) {
-
-			string baseAddress = "";
-			HttpResponseMessage response = new HttpResponseMessage();
-			var respStatus = new ResponseStatus();
+		public async Task<ResponseStatus> PostCheckIfErrorSingleObject([FromBody] DBSchema._Source result) {
 
 			try {
 
-				using (var client = new HttpClient()) {
+				var options = new JsonSerializerOptions {
+					IgnoreNullValues = true
+				};
 
-					var options = new JsonSerializerOptions {
-						IgnoreNullValues = true
-					};
+				var jsonstring = new StringContent(JsonSerializer.Serialize(result, options), Encoding.UTF8, "application/json");
 
-					var jsonstring = new StringContent(JsonSerializer.Serialize(result, options), Encoding.UTF8, "application/json");
+				int i = 0;
+				while (i < result.GetType().GetProperties().Count()) {
+					PropertyInfo pi = result.GetType().GetProperties()[i];
+					string value = (string)pi.GetValue(result);
+					if (pi.Name.Contains("exception", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(value)) {
+						i = result.GetType().GetProperties().Count();
+						respondStatus = await PostNewError(result);
 
-					client.BaseAddress = new Uri("http://localhost:9200/dbschema/_doc/");
-					baseAddress = client.BaseAddress.ToString();
-					client.DefaultRequestHeaders.Accept.Clear();
-					response = await client.PostAsync("", jsonstring);
-
-
-
-					int i = 0;
-					while (i < result.GetType().GetProperties().Count()) {
-						PropertyInfo pi = result.GetType().GetProperties()[i];
-						string value = (string)pi.GetValue(result);
-						if (pi.Name.Contains("exception", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(value)) {
-							i = result.GetType().GetProperties().Count();
-
-							await PostNewError(result);
-
+						if (respondStatus.result != "created") {
+							throw new HttpRequestException();
 						}
-						i++;
 					}
-
-					if (response.IsSuccessStatusCode) {
-
-						var option = new JsonSerializerOptions {
-							Converters = { new DateTimeConverter() }
-						};
-						respStatus = JsonSerializer.Deserialize<ResponseStatus>(await response.Content.ReadAsStringAsync(), option);
-
-                        return respStatus;
-					} else {
-						throw new HttpRequestException("statusCode: " + response.StatusCode);
-					}
+					i++;
 				}
+
+				var option = new JsonSerializerOptions {
+					Converters = { new DateTimeConverter() }
+				};
+
+				respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _DBConnection.InsertInToMainDB(jsonstring), option);
+
+				return respondStatus;
+
 			} catch (HttpRequestException ex) {
 
-				await PostNewError(result);
+				//await PostNewError(result);
 
-				return respStatus = new ResponseStatus(ex.StackTrace);
+				return respondStatus = new ResponseStatus(ex.StackTrace);
 			}
 		}
 

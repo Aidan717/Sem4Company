@@ -58,7 +58,7 @@ namespace Web_API_Service.Service {
 
 					//next line should look like something like this is the default havent been changed
 					//client.BaseAddress = new Uri("http://localhost:9200/errodb/_doc/");
-					client.BaseAddress = new Uri($"{_DBconSetting.uRI}/{_DBconSetting.mainIndex}/{_DBconSetting.queryString}");
+					client.BaseAddress = new Uri($"{_DBconSetting.uRI}/{_DBconSetting.errorIndex}/{_DBconSetting.queryString}");
 					client.DefaultRequestHeaders.Accept.Clear();
 					response = await client.PostAsync("", jsonString);
 
@@ -112,7 +112,7 @@ namespace Web_API_Service.Service {
 
 					//next line should look like something like this is the default havent been changed
 					//client.BaseAddress = new Uri("http://localhost:9200/errodb/_doc/");
-					client.BaseAddress = new Uri($"{_DBconSetting.uRI}/{_DBconSetting.mainIndex}/{_DBconSetting.queryString}");
+					client.BaseAddress = new Uri($"{_DBconSetting.uRI}/{_DBconSetting.errorIndex}/{_DBconSetting.queryString}");
 					client.DefaultRequestHeaders.Accept.Clear();
 					response = await client.GetAsync("");
 
