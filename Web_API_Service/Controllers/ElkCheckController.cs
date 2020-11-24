@@ -563,8 +563,6 @@ namespace Web_API_Service.Controllers {
 
 		[HttpGet("FillDB/{amount}")]
 		public async Task<ResponseStatus> AbuseThisGeneraterShort(int amount) {
-			//ResponseStatus respondStatus = new ResponseStatus();
-			//HttpResponseMessage response = new HttpResponseMessage();
 			IDBInfoGenerater jsons = new DBInfoGenerater();
 			int i = 0;			
 
@@ -576,22 +574,29 @@ namespace Web_API_Service.Controllers {
 				Converters = { new DateTimeConverter() }
 			};
 
-			Stopwatch timer = Stopwatch.StartNew();
-			while (i < amount) {
-
-				var jsn = jsons.GetNewData();
-
-				StringContent jsonstring = new StringContent(JsonSerializer.Serialize(jsn, seOptions), Encoding.UTF8, "application/json");
-				respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _DBConnection.InsertInToMainDB(jsonstring), deOptions);
+			try {
 				
-				i++;
-				Debug.WriteLine("added: " + i);
+				Stopwatch timer = Stopwatch.StartNew();
+				while (i < amount) {
+
+					var jsn = jsons.GetNewData();
+
+					StringContent jsonstring = new StringContent(JsonSerializer.Serialize(jsn, seOptions), Encoding.UTF8, "application/json");
+					respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _DBConnection.InsertInToMainDB(jsonstring), deOptions);
+				
+					i++;
+					Debug.WriteLine("added: " + i);
+				}
+				timer.Stop();
+				TimeSpan timespan = timer.Elapsed;
+				string elaps = String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10);
+				Debug.WriteLine("Done and took: " + elaps);
+				return respondStatus;
+
+			} catch (HttpRequestException ex) {
+
+				throw ex;
 			}
-			timer.Stop();
-			TimeSpan timespan = timer.Elapsed;
-			string elaps = String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10);
-			Debug.WriteLine("Done and took: " + elaps);
-			return respondStatus;
 		}
 	}
 }

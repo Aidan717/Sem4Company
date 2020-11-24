@@ -29,7 +29,7 @@ namespace Web_API_Service.Service {
 
 					//next line should look like something like this is the default havent been changed
 					//client.BaseAddress = new Uri("http://localhost:9200/maindb/_doc/");
-					client.BaseAddress = new Uri($"{_DBconSetting.URI}/{_DBconSetting.MainIndex}/{_DBconSetting.QueryString}");					
+					client.BaseAddress = new Uri($"{_DBconSetting.uRI}/{_DBconSetting.mainIndex}/{_DBconSetting.queryString}");					
 					client.DefaultRequestHeaders.Accept.Clear();
 					response = await client.PostAsync("", jsonString);					
 
@@ -58,7 +58,7 @@ namespace Web_API_Service.Service {
 
 					//next line should look like something like this is the default havent been changed
 					//client.BaseAddress = new Uri("http://localhost:9200/errodb/_doc/");
-					client.BaseAddress = new Uri($"{_DBconSetting.URI}/{_DBconSetting.MainIndex}/{_DBconSetting.QueryString}");
+					client.BaseAddress = new Uri($"{_DBconSetting.uRI}/{_DBconSetting.mainIndex}/{_DBconSetting.queryString}");
 					client.DefaultRequestHeaders.Accept.Clear();
 					response = await client.PostAsync("", jsonString);
 
@@ -81,12 +81,12 @@ namespace Web_API_Service.Service {
 
 		public async Task<string> GetFromMainDBWithQueryString(string commandString) {
 			try {
-				_DBconSetting.QueryString = commandString;
+				_DBconSetting.queryString = commandString;
 				using (var client = new HttpClient()) {
 
 					//next line should look like something like this is the default havent been changed
 					//client.BaseAddress = new Uri("http://localhost:9200/maindb/_doc/");
-					client.BaseAddress = new Uri($"{_DBconSetting.URI}/{_DBconSetting.MainIndex}/{_DBconSetting.QueryString}");
+					client.BaseAddress = new Uri($"{_DBconSetting.uRI}/{_DBconSetting.mainIndex}/{_DBconSetting.queryString}");
 					client.DefaultRequestHeaders.Accept.Clear();
 					response = await client.GetAsync("");
 
@@ -107,12 +107,12 @@ namespace Web_API_Service.Service {
 
 		public async Task<string> GetFromErrorDBWithQueryString(string commandString) {
 			try {
-				_DBconSetting.QueryString = commandString;
+				_DBconSetting.queryString = commandString;
 				using (var client = new HttpClient()) {
 
 					//next line should look like something like this is the default havent been changed
 					//client.BaseAddress = new Uri("http://localhost:9200/errodb/_doc/");
-					client.BaseAddress = new Uri($"{_DBconSetting.URI}/{_DBconSetting.MainIndex}/{_DBconSetting.QueryString}");
+					client.BaseAddress = new Uri($"{_DBconSetting.uRI}/{_DBconSetting.mainIndex}/{_DBconSetting.queryString}");
 					client.DefaultRequestHeaders.Accept.Clear();
 					response = await client.GetAsync("");
 
