@@ -171,10 +171,10 @@ namespace Web_API_Service.Controllers {
 				string responseString = "";
 
 				if (error.Equals("getall")) {
-					responseString = await _DBConnection.GetFromEsMainDBWithQueryString("_search?q=_exists_:\"*exception*\"&q=timestamp:[" + yesterday.ToString() + "+TO+" + currentTimeInMs.ToString() + "]&size=5&sort=timestamp:desc&track_scores=true");
+					responseString = await _DBConnection.GetFromMainDBWithQueryString("_search?q=_exists_:\"*exception*\"&q=timestamp:[" + yesterday.ToString() + "+TO+" + currentTimeInMs.ToString() + "]&size=5&sort=timestamp:desc&track_scores=true");
 
 				} else {
-					responseString = await _DBConnection.GetFromEsMainDBWithQueryString("_search?q=_exists:" + error + "&q=timestamp:[" + yesterday.ToString() + "+TO+" + currentTimeInMs.ToString() + "]&size=5&sort=timestamp:desc&track_scores=true");
+					responseString = await _DBConnection.GetFromMainDBWithQueryString("_search?q=_exists:" + error + "&q=timestamp:[" + yesterday.ToString() + "+TO+" + currentTimeInMs.ToString() + "]&size=5&sort=timestamp:desc&track_scores=true");
 				}
 				//Forklaring af strengen der står i GetFromEsMainDBWithCommandstring:
 				//"?q=" er starten af vores query som fortæller "_search" fra baseAddress hvad den skal lede efter
@@ -348,7 +348,7 @@ namespace Web_API_Service.Controllers {
 
 					StringContent jsonstring = new StringContent(JsonSerializer.Serialize(result, options), Encoding.UTF8, "application/json");
 
-				respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _DBConnection.InsertInToEsErrorDB(jsonstring), options);
+				respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _DBConnection.InsertInToErrorDB(jsonstring), options);
 				return respondStatus;
 
 			} catch (HttpRequestException ex) {
@@ -598,7 +598,7 @@ namespace Web_API_Service.Controllers {
 				var jsn = jsons.getNewData();
 
 				StringContent jsonstring = new StringContent(JsonSerializer.Serialize(jsn, seOptions), Encoding.UTF8, "application/json");
-				respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _DBConnection.InsertInToEsMainDB(jsonstring), deOptions);
+				respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _DBConnection.InsertInToMainDB(jsonstring), deOptions);
 				
 				i++;
 				Debug.WriteLine("added: " + i);

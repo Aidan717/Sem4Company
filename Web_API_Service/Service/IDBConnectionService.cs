@@ -8,11 +8,10 @@ using Web_API_Service.Models;
 namespace Web_API_Service.Service {
 	public interface IDBConnectionService {
 
-		//Es stand for ElasticSearch
-		Task<string> InsertInToEsMainDB(StringContent jsonString);
-		Task<string> InsertInToEsErrorDB(StringContent jsonString);
-		Task<string> GetFromEsMainDBWithQueryString(string commandString);
-		Task<string> GetFromEsErrorDBWithQueryString(string commandString);
+		Task<string> InsertInToMainDB(StringContent jsonString);
+		Task<string> InsertInToErrorDB(StringContent jsonString);
+		Task<string> GetFromMainDBWithQueryString(string commandString);
+		Task<string> GetFromErrorDBWithQueryString(string commandString);
 
 	}
 }

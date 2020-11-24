@@ -22,10 +22,7 @@ namespace Web_API_Service.Service {
 			_DBconSetting = DBconection.Value;
 		}
 
-		//Es stand for ElasticSearch
-		public async Task<string> InsertInToEsMainDB(StringContent jsonString) {
-			//HttpResponseMessage response = new HttpResponseMessage();
-			//ResponseStatus respond = new ResponseStatus();
+		public async Task<string> InsertInToMainDB(StringContent jsonString) {
 			
 			try {
 				using (var client = new HttpClient()) {
@@ -53,7 +50,7 @@ namespace Web_API_Service.Service {
 		}
 
 		//this method only handle insert to errorDB
-		public async Task<string> InsertInToEsErrorDB(StringContent jsonString) {
+		public async Task<string> InsertInToErrorDB(StringContent jsonString) {
 			
 			try {
 
@@ -82,7 +79,7 @@ namespace Web_API_Service.Service {
 
 
 
-		public async Task<string> GetFromEsMainDBWithQueryString(string commandString) {
+		public async Task<string> GetFromMainDBWithQueryString(string commandString) {
 			try {
 				_DBconSetting.QueryString = commandString;
 				using (var client = new HttpClient()) {
@@ -93,7 +90,6 @@ namespace Web_API_Service.Service {
 					client.DefaultRequestHeaders.Accept.Clear();
 					response = await client.GetAsync("");
 
-					Debug.WriteLine("Uri:" + client.BaseAddress.ToString());
 					if (response.IsSuccessStatusCode) {
 
 						respondString = await response.Content.ReadAsStringAsync();
@@ -109,7 +105,7 @@ namespace Web_API_Service.Service {
 			}
 		}
 
-		public async Task<string> GetFromEsErrorDBWithQueryString(string commandString) {
+		public async Task<string> GetFromErrorDBWithQueryString(string commandString) {
 			try {
 				_DBconSetting.QueryString = commandString;
 				using (var client = new HttpClient()) {
@@ -122,7 +118,7 @@ namespace Web_API_Service.Service {
 
 					if (response.IsSuccessStatusCode) {
 
-						respondString = JsonSerializer.Deserialize<string>(await response.Content.ReadAsStringAsync());
+						respondString = await response.Content.ReadAsStringAsync();
 
 						return respondString;
 					} else {
