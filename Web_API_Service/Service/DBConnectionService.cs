@@ -13,12 +13,12 @@ using Web_API_Service.Utility;
 namespace Web_API_Service.Service {
 	public class DBConnectionService : IDBConnectionService {		
 
-		private readonly dbConnectionModel _DBconSetting;
+		private readonly DBConnectionModel _DBconSetting;
 		private HttpResponseMessage response = new HttpResponseMessage();
 		private ResponseStatus respond = new ResponseStatus();
 		private string respondString;
 
-		public DBConnectionService(IOptions<dbConnectionModel> DBconection) {
+		public DBConnectionService(IOptions<DBConnectionModel> DBconection) {
 			_DBconSetting = DBconection.Value;
 		}
 
