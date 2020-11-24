@@ -39,9 +39,9 @@ namespace Web_API_Service.Controllers {
         //}
 
         //[HttpPost("warning")]
-        public async Task<IActionResult> SendWarningMail(string methodName, string Query, string Destination, string Error) {
+        public async Task<IActionResult> SendWarningMail(string methodName, string query, string destination, string error) {
             try {
-                await mailService.SendWarningEmailAsync(methodName, Query, Destination, Error);
+                await mailService.SendWarningEmailAsync(methodName, query, destination, error);
                 return Ok();
             } catch (Exception ex) {
                 throw;

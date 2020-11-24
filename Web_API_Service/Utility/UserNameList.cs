@@ -14,7 +14,7 @@ namespace Web_API_Service.Utility {
 		}
 
 		private string GetRandomName() {
-			string[] nameList = myList();
+			string[] nameList = MyList();
 			Random Numbers = new Random();
 			int index = Numbers.Next(nameList.Length);
 			string selectedName = nameList[index];
