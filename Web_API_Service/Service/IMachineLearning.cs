@@ -8,7 +8,7 @@ namespace Web_API_Service.Service
     interface IMachineLearning
     {
         public void CheckForSpikes();
-
+        public void Forecaster();
 
 
     }

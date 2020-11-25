@@ -250,7 +250,7 @@ namespace Web_API_Service.Controllers {
 					}
 				}
 			} catch (HttpRequestException ex) {
-				return result;
+				throw ex;
 
 			}
 
@@ -528,7 +528,9 @@ namespace Web_API_Service.Controllers {
 
 					StringContent jsonstring = new StringContent(JsonSerializer.Serialize(jsn, seOptions), Encoding.UTF8, "application/json");
 					respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _DBConnection.InsertInToMainDB(jsonstring), deOptions);
-				
+
+					respondStatus = await PostNewError(jsn);
+
 					i++;
 					Debug.WriteLine("added: " + i);
 				}
@@ -543,6 +545,16 @@ namespace Web_API_Service.Controllers {
 				throw ex;
 			}
 		}
+
+
+		[HttpGet("fc")]
+		public  void ForecasterTest(int amount) {
+
+			IMachineLearning check = new MachineLearningService();
+			check.Forecaster();
+		}
+
+
 	}
 }
 
