@@ -271,7 +271,7 @@ namespace Web_API_Service.Controllers {
 					}
 				}
 			} catch (HttpRequestException ex) {
-				return result;
+				throw ex;
 
 			}
 
@@ -334,7 +334,7 @@ namespace Web_API_Service.Controllers {
 
 		//Skal kun kaldes igennem en anden GET metode. Er dette nødvendigt at have noget inde i HttpPost med?
 
-		public async Task<ActionResult<ResponseStatus>> PostNewError(DBSchema._Source result) {
+		public async Task<ResponseStatus> PostNewError(DBSchema._Source result) {
 
 			//string baseaddress = "";
 			
@@ -583,7 +583,9 @@ namespace Web_API_Service.Controllers {
 
 					StringContent jsonstring = new StringContent(JsonSerializer.Serialize(jsn, seOptions), Encoding.UTF8, "application/json");
 					respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _DBConnection.InsertInToMainDB(jsonstring), deOptions);
-				
+
+					respondStatus = await PostNewError(jsn);
+
 					i++;
 					Debug.WriteLine("added: " + i);
 				}
