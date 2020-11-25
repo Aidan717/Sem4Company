@@ -9,8 +9,7 @@ using MachineLearning.Service;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 
-namespace MachineLearning
-{
+namespace MachineLearning   {
     public class MLForecast {
 
         static readonly string _dataPath = Path.Combine(Environment.CurrentDirectory, "Data", "ElkTestModel.csv");
