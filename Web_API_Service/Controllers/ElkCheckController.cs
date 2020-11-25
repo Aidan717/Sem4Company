@@ -18,6 +18,7 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using System.IO;
 using Microsoft.ML;
+using System.Globalization;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -94,7 +95,8 @@ namespace Web_API_Service.Controllers {
 			var csv = new StringBuilder();
 			string rootDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../"));
 			string modelPath = Path.Combine(rootDir, "Data", "ElkTestModel.csv");
-			Stopwatch timer = Stopwatch.StartNew();
+			Stopwatch timer = Stopwatch.StartNew();			
+
 			using (var w = new StreamWriter(modelPath))	{
 
 
