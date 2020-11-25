@@ -10,4 +10,10 @@
     <PackageReference Include="Microsoft.ML.TimeSeries" Version="1.5.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Data\ElkTestModel.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -9,15 +9,12 @@ using MachineLearning.Service;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 
-namespace MachineLearning
-{
-    class MLForecast
-    {
+namespace MachineLearning   {
+    public class MLForecast {
 
         static readonly string _dataPath = Path.Combine(Environment.CurrentDirectory, "Data", "ElkTestModel.csv");
 
-        public void Hello()
-        {
+        public void Hello() {
 
             Debug.WriteLine("Hello World");
         }
