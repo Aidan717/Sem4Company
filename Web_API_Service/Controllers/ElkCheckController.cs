@@ -57,7 +57,7 @@ namespace Web_API_Service.Controllers {
                 Converters = { new DateTimeConverter() }
             };
 
-            string result = await _elasticConnection.GetFromEsMainDBWithCommandstring(commandString);
+            string result = await _DBConnection.GetFromMainDBWithQueryString(commandString);
 			dbSchema = JsonSerializer.Deserialize<DBSchema>(result, options);
 
 			int index = 0;

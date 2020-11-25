@@ -8,11 +8,11 @@ namespace Web_API_Service.Service
 {
     public class MachineLearningService : IMachineLearning
     {
-        MLAnomaly ml = new MLAnomaly();
-        
+        MLAnomaly mLAnomaly = new MLAnomaly();
+        MLForecast mLforecast = new MLForecast();
         public void CheckForSpikes()
         {
-            ml.MLCheckForSpikes();
+            mLAnomaly.MLCheckForSpikes();
             
         }
     }

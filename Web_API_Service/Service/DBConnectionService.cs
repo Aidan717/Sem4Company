@@ -88,7 +88,6 @@ namespace Web_API_Service.Service {
 					//client.BaseAddress = new Uri("http://localhost:9200/maindb/_doc/");
 					client.BaseAddress = new Uri($"{_DBconSetting.uRI}/{_DBconSetting.mainIndex}/{_DBconSetting.queryString}");
 					client.DefaultRequestHeaders.Accept.Clear();
-					Debug.WriteLine("Client base address: " + client.BaseAddress);
 					response = await client.GetAsync("");
 
 					if (response.IsSuccessStatusCode) {
