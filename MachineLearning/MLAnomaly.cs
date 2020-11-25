@@ -33,7 +33,7 @@ namespace MachineLearning
 
             DetectSpike(mlContext, _docsize, dataView);
 
-
+            
             return null;
         }
 

@@ -62,8 +62,6 @@ namespace Web_API_Service.Service {
                         //	break;
                 }
 				ii++;
-
-				Debug.WriteLine(i);
 			}
 		}
 		public string GetName() {
