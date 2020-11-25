@@ -18,6 +18,7 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using System.IO;
 using Microsoft.ML;
+using System.Globalization;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -42,118 +43,99 @@ namespace Web_API_Service.Controllers {
 		[HttpGet]
 		public IEnumerable<string> Get() {
 			return new string[] { "value1", "value2" };
-		}        
+		}
 
 
-        //Robins metode
-        [HttpGet("dbschema/getalldb")]
+		//Robins metode
+		[HttpGet("dbschema/getalldb")]
 		public async Task<ActionResult<string>> GetDbSchema() {
+			DBSchema dbSchema = new DBSchema();
+			string commandString = "_search?q=_exists_:\"*exception*\"&sort=timestamp:desc&size=10000&track_scores=true";
 
-			using (var client = new HttpClient()) {
-				var result = new DBSchema();
-				client.BaseAddress = new Uri("http://localhost:9200/dbschema/_search");
-				client.DefaultRequestHeaders.Accept.Clear();
-				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-				HttpResponseMessage response = await client.GetAsync("?q=_exists_:\"*exception*\"&sort=timestamp:desc&size=10000&track_scores=true");
+			var options = new JsonSerializerOptions	{
+				IgnoreNullValues = true,
+                Converters = { new DateTimeConverter() }
+            };
 
-				if (response.IsSuccessStatusCode) {
+            string result = await _DBConnection.GetFromMainDBWithQueryString(commandString);
+			dbSchema = JsonSerializer.Deserialize<DBSchema>(result, options);
 
-                    var options = new JsonSerializerOptions {
-                        Converters = { new DateTimeConverter() }
-                    };
+			int index = 0;
+			int days = 0;
+			var errortime = new Dictionary<string, int>();
+			int i = 0;
 
-
-                    result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync(), options);
-					Debug.WriteLine("Length of hits: " + result.hits.hits.Length);
-
-					int index = 0;
-					int days = 0;
-					var errortime = new Dictionary<string, int>();
-					int i = 0;
+			//sortér result via timer
+			while (i < dbSchema.hits.hits.Length && days < 90000) {
+				//tids limit som kan addes til
 				
+				DateTime timelimit = DateTime.Now.AddDays(-days);
 
-					//sortér result via timer
-					while (i < result.hits.hits.Length && days < 90000) {
-						//tids limit som kan addes til
-						DateTime timelimit = DateTime.Now.AddDays(-days);
-						//Debug.WriteLine("Date outside inner loop: " + timelimit.ToShortDateString());
-						
-						errortime.Add(timelimit.ToShortDateString(), 0);
-						int ii = 0;
-						while (i < result.hits.hits.Length && DateTime.Parse(result.hits.hits[i]._source.timestamp).ToShortDateString().Contains(timelimit.ToShortDateString())) {
-							//Debug.WriteLine("Date inside inner loop: " + timelimit.ToShortDateString());
-							
-							
-							//Debug.WriteLine("hits date: " + DateTime.Parse(result.hits.hits[i]._source.timestamp).ToShortDateString());
-							//Debug.WriteLine("timelimit date: " + timelimit.ToShortDateString());
-							i++;
-							ii++;
-						}
-						errortime[timelimit.ToShortDateString()] = ii;
-						index++;
-						days++;
-					}
-					Debug.WriteLine("[2 3[");
-					foreach (var error in errortime) {
-						if (error.Value != 0) {
-							Debug.WriteLine(error.ToString());
-						}
-					}
-					Debug.WriteLine("Length of hits: " + result.hits.hits.Length);
+				errortime.Add(timelimit.ToShortDateString(), 0);
+				int ii = 0;
+				while (i < dbSchema.hits.hits.Length && DateTime.Parse(dbSchema.hits.hits[i]._source.timestamp).ToShortDateString().Contains(timelimit.ToShortDateString())) {
+					i++;
+					ii++;
+				}
+				errortime[timelimit.ToShortDateString()] = ii;
+				index++;
+				days++;
+			}
 
-                    /**
-					 * Method for creating csv with timestamp and amount of errors per hour
-					 */
-                    //before your loop
-                    var csv = new StringBuilder();
-                    string rootDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../"));
-                    string modelPath = Path.Combine(rootDir, "Data", "ElkTestModel.csv");
-                    Stopwatch timer = Stopwatch.StartNew();
-                    using (var w = new StreamWriter(modelPath))
-                    {
-
-
-                        for (int errorTimeIndex = 0; errorTimeIndex < errortime.Keys.Count(); errorTimeIndex++)
-                        {
-                            //in your loop
-							if (errortime.ElementAt(errorTimeIndex).Value != 0) 
-							{ 
-								var first = errortime.ElementAt(errorTimeIndex).Key.ToString();
-								var second = errortime.ElementAt(errorTimeIndex).Value;
-								var line = string.Format("{0},{1}", first, second);
-							
-								//Suggestion made by KyleMit
-								var newLine = string.Format("{0},{1}", first, second);
-								//csv.AppendLine(newLine);
-								w.WriteLine(line);
-								w.Flush();
-								Debug.WriteLine("this is for loop run: " + errorTimeIndex);
-							}
-						}
-
-                    }
-                    timer.Stop();
-                    TimeSpan timespan = timer.Elapsed;
-                    string elaps = String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10);
-                    Debug.WriteLine("Done and took: " + elaps);
-                    DateTime t = DateTime.Now;
-					Debug.WriteLine("This is current date: " + t.ToShortDateString());
-
-					IMLAnomaly check = new MachineLearning();
-					check.CheckForSpikes();
-
-
-
-					var option = new JsonSerializerOptions {
-						IgnoreNullValues = true
-					};
-
-					var jsonstrings = new String(JsonSerializer.Serialize(result, option));
-					return jsonstrings;
-				} else {
-					return result.ToString();
+			foreach (var error in errortime) {
+				if (error.Value != 0) {
+					Debug.WriteLine(error.ToString());
 				}
 			}
+			Debug.WriteLine("Length of hits: " + dbSchema.hits.hits.Length);
+
+			/**
+				* Method for creating csv with timestamp and amount of errors per hour
+				*/
+			//before your loop
+			var csv = new StringBuilder();
+			string rootDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../"));
+			string modelPath = Path.Combine(rootDir, "Data", "ElkTestModel.csv");
+			Stopwatch timer = Stopwatch.StartNew();			
+
+			using (var w = new StreamWriter(modelPath))	{
+
+
+				for (int errorTimeIndex = 0; errorTimeIndex < errortime.Keys.Count(); errorTimeIndex++)	{
+					//in your loop
+					if (errortime.ElementAt(errorTimeIndex).Value != 0)	{
+						var first = errortime.ElementAt(errorTimeIndex).Key.ToString();
+						var second = errortime.ElementAt(errorTimeIndex).Value;
+						var line = string.Format("{0};{1}", first, second);
+
+						//Suggestion made by KyleMit
+						var newLine = string.Format("{0};{1}", first, second);
+						//csv.AppendLine(newLine);
+						w.WriteLine(line);
+						w.Flush();
+						Debug.WriteLine("this is for loop run: " + errorTimeIndex);
+					}
+				}
+			}
+
+			timer.Stop();
+			TimeSpan timespan = timer.Elapsed;
+			string elaps = String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10);
+			Debug.WriteLine("Done and took: " + elaps);
+			DateTime t = DateTime.Now;
+			Debug.WriteLine("This is current date: " + t.ToShortDateString());
+
+			IMachineLearning check = new MachineLearningService();
+			check.CheckForSpikes();
+
+
+
+			var option = new JsonSerializerOptions {
+				IgnoreNullValues = true
+			};
+
+			var jsonstrings = new String(JsonSerializer.Serialize(result, option));
+			return jsonstrings;
 		}
 
 
@@ -162,9 +144,9 @@ namespace Web_API_Service.Controllers {
 		//name need to change to what it does this is just temps
 		[HttpGet("project/{error}")]
 		public async Task<DBSchema> CheckForError(string error) {
-            DBSchema result = new DBSchema();
+			DBSchema result = new DBSchema();
 
-            long currentTimeInMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+			long currentTimeInMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 			long yesterday = DateTimeOffset.UtcNow.AddHours(-24).ToUnixTimeMilliseconds();
 
 			try {
@@ -194,7 +176,7 @@ namespace Web_API_Service.Controllers {
 					IgnoreNullValues = true
 				};
 
-                result = JsonSerializer.Deserialize<DBSchema>(responseString, option);
+				result = JsonSerializer.Deserialize<DBSchema>(responseString, option);
 
                 return result;
 			} catch (HttpRequestException ex) {
@@ -217,49 +199,57 @@ namespace Web_API_Service.Controllers {
 
 		//look at status for index when a person call something
 		[HttpGet("hey/{index}")]
-		public async Task<ActionResult<object>> GetIndexStatus(string index, clusterHealth newhealth) {
+		public async Task<object> GetIndexStatus(string index) {
 			var result = new clusterHealth("Fail report");
-			HttpResponseMessage response = new HttpResponseMessage();
-
 			try {
-				using (var client = new HttpClient()) {
+				string responseString = "";
 
-					client.BaseAddress = new Uri("http://localhost:9200/" + "_cluster/health/");
-					client.DefaultRequestHeaders.Accept.Clear();
-					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+				if (index.Equals("maindb")) {
+					responseString = await _DBConnection.GetHealthFromMainDB();
 
-					if (index.Equals("as")) {
-						response = await client.GetAsync("/_cluster/health/schools");
-
-					} else {
-						response = await client.GetAsync("schools/_stats");
-
-					}
-					if (response.IsSuccessStatusCode) {
-
-						result = JsonSerializer.Deserialize<clusterHealth>(await response.Content.ReadAsStringAsync());
-						if (index.Equals("as")) {
-							result = JsonSerializer.Deserialize<clusterHealth>(await response.Content.ReadAsStringAsync());
-
-						} else {
-							var results = new IndexStats();
-							results = JsonSerializer.Deserialize<IndexStats>(await response.Content.ReadAsStringAsync());
-							return result;
-						}
-						if (result.status == ("red"))
-							return false;
-
-						return result;
-
-					} else {
-						throw new HttpRequestException("statusCode: " + response.StatusCode);
-					}
+				} else if (index.Equals("errordb")) {
+					responseString = await _DBConnection.GetHealthFromErrorDB();
 				}
-			} catch (HttpRequestException ex) {
+				result = JsonSerializer.Deserialize<clusterHealth>(responseString);
+
+				if (result.status == ("red")) {
+					throw new HttpRequestException();//planen ville være at opsætte en metode, som kontakter den ind i mellem for at checke om den er rød eller ej. 
+
+				}
 				return result;
 
+			} catch (HttpRequestException ex) {
+				throw ex;
 			}
+			//try {
+			//	string responseString = "";
 
+			//	if (index.Equals("")) {
+			//		responseString = await _DBConnection.GetFromMainDBWithQueryStringIndexHealth("_cluster/health");
+
+			//	} else {
+			//		//responseString = await _DBConnection.GetFromMainDBWithQueryStringIndexHealth("_stats");
+			//		throw new HttpRequestException();
+
+			//	}
+			//		result = JsonSerializer.Deserialize<clusterHealth>(responseString);
+			//		if (index.Equals("as")) {
+			//			result = JsonSerializer.Deserialize<clusterHealth>(responseString);
+
+			//		} else {
+			//			var results = new IndexStats();
+			//			results = JsonSerializer.Deserialize<IndexStats>(responseString);
+			//			return result;
+			//		}
+			//		if (result.status == ("red"))
+			//			return false;
+
+			//		return result;
+
+			//} catch (HttpRequestException ex) {
+			//	throw ex;
+
+			//}
 		}
 
 
@@ -534,7 +524,9 @@ namespace Web_API_Service.Controllers {
 
 					StringContent jsonstring = new StringContent(JsonSerializer.Serialize(jsn, seOptions), Encoding.UTF8, "application/json");
 					respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _DBConnection.InsertInToMainDB(jsonstring), deOptions);
-				
+
+					respondStatus = await PostNewError(jsn);
+
 					i++;
 					Debug.WriteLine("added: " + i);
 				}
@@ -549,6 +541,16 @@ namespace Web_API_Service.Controllers {
 				throw ex;
 			}
 		}
+
+
+		[HttpGet("fc")]
+		public  void ForecasterTest(int amount) {
+
+			IMachineLearning check = new MachineLearningService();
+			check.Forecaster();
+		}
+
+
 	}
 }
 
