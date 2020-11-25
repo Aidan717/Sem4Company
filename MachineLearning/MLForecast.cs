@@ -9,7 +9,7 @@ using MachineLearning.Service;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 
-namespace MachineLearning.Models
+namespace MachineLearning
 {
     class MLForecast
     {

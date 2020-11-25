@@ -10,6 +10,7 @@ namespace Web_API_Service.Service
     {
         MLAnomaly ml = new MLAnomaly();
         
+        
         public void CheckForSpikes()
         {
             ml.MLCheckForSpikes();
