@@ -68,6 +68,7 @@ namespace Web_API_Service.Controllers {
 			//sortér result via timer
 			while (i < dbSchema.hits.hits.Length && days < 90000) {
 				//tids limit som kan addes til
+				
 				DateTime timelimit = DateTime.Now.AddDays(-days);
 
 				errortime.Add(timelimit.ToShortDateString(), 0);
@@ -105,10 +106,10 @@ namespace Web_API_Service.Controllers {
 					if (errortime.ElementAt(errorTimeIndex).Value != 0)	{
 						var first = errortime.ElementAt(errorTimeIndex).Key.ToString();
 						var second = errortime.ElementAt(errorTimeIndex).Value;
-						var line = string.Format("{0},{1}", first, second);
+						var line = string.Format("{0};{1}", first, second);
 
 						//Suggestion made by KyleMit
-						var newLine = string.Format("{0},{1}", first, second);
+						var newLine = string.Format("{0};{1}", first, second);
 						//csv.AppendLine(newLine);
 						w.WriteLine(line);
 						w.Flush();

@@ -28,7 +28,7 @@ namespace MachineLearning
 
             //Data in ML.NET is represented as an IDataView class. IDataView is a flexible, efficient way of describing tabular data (numeric and text). Data can be loaded from a text file or from other sources (for example, SQL database or log files) to an IDataView object.
             //The LoadFromTextFile() defines the data schema and reads in the file. It takes in the data path variables and returns an IDataView.
-            IDataView dataView = mlContext.Data.LoadFromTextFile<SpikesModel>(path: _dataPath, hasHeader: true, separatorChar: ',');
+            IDataView dataView = mlContext.Data.LoadFromTextFile<SpikesModel>(path: _dataPath, hasHeader: true, separatorChar: ';');
             int _docsize = dataView.GetColumn<string>("date").Count();
 
             DetectSpike(mlContext, _docsize, dataView);

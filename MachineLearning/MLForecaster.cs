@@ -24,8 +24,8 @@ namespace MachineLearning{
 
 			MLContext mlContext = new MLContext();
 
-			IDataView dataView = mlContext.Data.LoadFromTextFile<ForecasterModel>(path: _dataPath, hasHeader: true, separatorChar: ',');
-			int size = dataView.GetColumn<DateTime>("month").Count();
+			IDataView dataView = mlContext.Data.LoadFromTextFile<ForecasterModel>(path: _dataPath, hasHeader: true, separatorChar: ';');
+			int size = dataView.GetColumn<string>("month").Count();
 
 			var forecastingPipeline = mlContext.Forecasting.ForecastBySsa(
 				outputColumnName: "Forecast",
@@ -67,11 +67,12 @@ namespace MachineLearning{
 			
 			//this method need to be redone so we dont need mlcontext just to print
 			static void Forecast(TimeSeriesPredictionEngine<ForecasterModel, ForecastingData> forecaster) {
-			NumberFormatInfo nf = new CultureInfo("en-US", false).NumberFormat; 
+			NumberFormatInfo nf = new CultureInfo("en-US", false).NumberFormat;
+			
 			ForecastingData forecast = forecaster.Predict();
 				Debug.WriteLine("Forecast\tLowerforecast\tUpperForecasting}");
 				for (int i = 0; i < forecast.Forecast.Length; i++) {
-					Debug.WriteLine($"{forecast.Forecast[i]}, {forecast.LowerForecasting[i]}, {forecast.UpperForecasting[i]}");
+					Debug.WriteLine($"{forecast.Forecast[i]}; {forecast.LowerForecasting[i]}; {forecast.UpperForecasting[i]}");
 				}
 
 
