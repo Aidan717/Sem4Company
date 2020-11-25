@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Web_API_Service.Controllers
+namespace Web_API_Service.Service
 {
-    interface IMLAnomaly
+    interface IMachineLearning
     {
-        public string CheckForSpikes();
+        public void CheckForSpikes();
 
 
 
