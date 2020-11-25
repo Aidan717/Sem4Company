@@ -94,15 +94,14 @@ namespace Web_API_Service.Service {
 					//client.BaseAddress = new Uri("http://localhost:9200/errodb/_doc/");
 					client.BaseAddress = new Uri($"{_DBconSetting.ElasticURI}/{_DBconSetting.ElasticMainIndex}/{_DBconSetting.ElasticCommandString}");
 					client.DefaultRequestHeaders.Accept.Clear();
+					Debug.WriteLine("Client base address: " + client.BaseAddress);
 					response = await client.GetAsync("");
 
 					Debug.WriteLine("Uri:" + client.BaseAddress.ToString());
+					Debug.WriteLine("Response Status: " + response.StatusCode);
 					if (response.IsSuccessStatusCode) {
 
-						var option = new JsonSerializerOptions {
-							Converters = { new DateTimeConverter() }
-						};
-						respondString = JsonSerializer.Deserialize<string>(await response.Content.ReadAsStringAsync(), option);
+						respondString = await response.Content.ReadAsStringAsync();
 
 						return respondString;
 					} else {

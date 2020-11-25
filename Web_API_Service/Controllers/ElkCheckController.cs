@@ -42,118 +42,101 @@ namespace Web_API_Service.Controllers {
 		[HttpGet]
 		public IEnumerable<string> Get() {
 			return new string[] { "value1", "value2" };
-		}        
+		}
 
 
-        //Robins metode
-        [HttpGet("dbschema/getalldb")]
+		//Robins metode
+		[HttpGet("dbschema/getalldb")]
 		public async Task<ActionResult<string>> GetDbSchema() {
+			DBSchema dbSchema = new DBSchema();
+			string commandString = "_search?q=_exists_:\"*exception*\"&sort=timestamp:desc&size=10000&track_scores=true";
 
-			using (var client = new HttpClient()) {
-				var result = new DBSchema();
-				client.BaseAddress = new Uri("http://localhost:9200/dbschema/_search");
-				client.DefaultRequestHeaders.Accept.Clear();
-				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-				HttpResponseMessage response = await client.GetAsync("?q=_exists_:\"*exception*\"&sort=timestamp:desc&size=10000&track_scores=true");
+			var options = new JsonSerializerOptions
+			{
+				IgnoreNullValues = true,
+                Converters = { new DateTimeConverter() }
+            };
 
-				if (response.IsSuccessStatusCode) {
+            string result = await _elasticConnection.GetFromEsMainDBWithCommandstring(commandString);
+			dbSchema = JsonSerializer.Deserialize<DBSchema>(result, options);
 
-                    var options = new JsonSerializerOptions {
-                        Converters = { new DateTimeConverter() }
-                    };
+			int index = 0;
+			int days = 0;
+			var errortime = new Dictionary<string, int>();
+			int i = 0;
 
+			//sortér result via timer
+			while (i < dbSchema.hits.hits.Length && days < 90000) {
+				//tids limit som kan addes til
+				DateTime timelimit = DateTime.Now.AddDays(-days);
 
-                    result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync(), options);
-					Debug.WriteLine("Length of hits: " + result.hits.hits.Length);
+				errortime.Add(timelimit.ToShortDateString(), 0);
+				int ii = 0;
+				while (i < dbSchema.hits.hits.Length && DateTime.Parse(dbSchema.hits.hits[i]._source.timestamp).ToShortDateString().Contains(timelimit.ToShortDateString())) {
+					i++;
+					ii++;
+				}
+				errortime[timelimit.ToShortDateString()] = ii;
+				index++;
+				days++;
+			}
 
-					int index = 0;
-					int days = 0;
-					var errortime = new Dictionary<string, int>();
-					int i = 0;
-				
-
-					//sortér result via timer
-					while (i < result.hits.hits.Length && days < 90000) {
-						//tids limit som kan addes til
-						DateTime timelimit = DateTime.Now.AddDays(-days);
-						//Debug.WriteLine("Date outside inner loop: " + timelimit.ToShortDateString());
-						
-						errortime.Add(timelimit.ToShortDateString(), 0);
-						int ii = 0;
-						while (i < result.hits.hits.Length && DateTime.Parse(result.hits.hits[i]._source.timestamp).ToShortDateString().Contains(timelimit.ToShortDateString())) {
-							//Debug.WriteLine("Date inside inner loop: " + timelimit.ToShortDateString());
-							
-							
-							//Debug.WriteLine("hits date: " + DateTime.Parse(result.hits.hits[i]._source.timestamp).ToShortDateString());
-							//Debug.WriteLine("timelimit date: " + timelimit.ToShortDateString());
-							i++;
-							ii++;
-						}
-						errortime[timelimit.ToShortDateString()] = ii;
-						index++;
-						days++;
-					}
-					Debug.WriteLine("[2 3[");
-					foreach (var error in errortime) {
-						if (error.Value != 0) {
-							Debug.WriteLine(error.ToString());
-						}
-					}
-					Debug.WriteLine("Length of hits: " + result.hits.hits.Length);
-
-                    /**
-					 * Method for creating csv with timestamp and amount of errors per hour
-					 */
-                    //before your loop
-                    var csv = new StringBuilder();
-                    string rootDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../"));
-                    string modelPath = Path.Combine(rootDir, "Data", "ElkTestModel.csv");
-                    Stopwatch timer = Stopwatch.StartNew();
-                    using (var w = new StreamWriter(modelPath))
-                    {
-
-
-                        for (int errorTimeIndex = 0; errorTimeIndex < errortime.Keys.Count(); errorTimeIndex++)
-                        {
-                            //in your loop
-							if (errortime.ElementAt(errorTimeIndex).Value != 0) 
-							{ 
-								var first = errortime.ElementAt(errorTimeIndex).Key.ToString();
-								var second = errortime.ElementAt(errorTimeIndex).Value;
-								var line = string.Format("{0},{1}", first, second);
-							
-								//Suggestion made by KyleMit
-								var newLine = string.Format("{0},{1}", first, second);
-								//csv.AppendLine(newLine);
-								w.WriteLine(line);
-								w.Flush();
-								Debug.WriteLine("this is for loop run: " + errorTimeIndex);
-							}
-						}
-
-                    }
-                    timer.Stop();
-                    TimeSpan timespan = timer.Elapsed;
-                    string elaps = String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10);
-                    Debug.WriteLine("Done and took: " + elaps);
-                    DateTime t = DateTime.Now;
-					Debug.WriteLine("This is current date: " + t.ToShortDateString());
-
-					IMLAnomaly check = new MachineLearning();
-					check.CheckForSpikes();
-
-
-
-					var option = new JsonSerializerOptions {
-						IgnoreNullValues = true
-					};
-
-					var jsonstrings = new String(JsonSerializer.Serialize(result, option));
-					return jsonstrings;
-				} else {
-					return result.ToString();
+			foreach (var error in errortime) {
+				if (error.Value != 0) {
+					Debug.WriteLine(error.ToString());
 				}
 			}
+			Debug.WriteLine("Length of hits: " + dbSchema.hits.hits.Length);
+
+			/**
+				* Method for creating csv with timestamp and amount of errors per hour
+				*/
+			//before your loop
+			var csv = new StringBuilder();
+			string rootDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../"));
+			string modelPath = Path.Combine(rootDir, "Data", "ElkTestModel.csv");
+			Stopwatch timer = Stopwatch.StartNew();
+			using (var w = new StreamWriter(modelPath))
+			{
+
+
+				for (int errorTimeIndex = 0; errorTimeIndex < errortime.Keys.Count(); errorTimeIndex++)
+				{
+					//in your loop
+					if (errortime.ElementAt(errorTimeIndex).Value != 0)
+					{
+						var first = errortime.ElementAt(errorTimeIndex).Key.ToString();
+						var second = errortime.ElementAt(errorTimeIndex).Value;
+						var line = string.Format("{0},{1}", first, second);
+
+						//Suggestion made by KyleMit
+						var newLine = string.Format("{0},{1}", first, second);
+						//csv.AppendLine(newLine);
+						w.WriteLine(line);
+						w.Flush();
+						Debug.WriteLine("this is for loop run: " + errorTimeIndex);
+					}
+				}
+			}
+
+			timer.Stop();
+			TimeSpan timespan = timer.Elapsed;
+			string elaps = String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10);
+			Debug.WriteLine("Done and took: " + elaps);
+			DateTime t = DateTime.Now;
+			Debug.WriteLine("This is current date: " + t.ToShortDateString());
+
+			IMachineLearning check = new MachineLearningService();
+			check.CheckForSpikes();
+
+
+
+			var option = new JsonSerializerOptions {
+				IgnoreNullValues = true
+			};
+
+			var jsonstrings = new String(JsonSerializer.Serialize(result, option));
+			return jsonstrings;
 		}
 
 
