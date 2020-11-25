@@ -7,7 +7,7 @@ namespace MachineLearning.Models {
 	class ForecasterModel {
 
 		[LoadColumn(0)]
-		public DateTime month { get; set; }
+		public string month { get; set; }
 		//[LoadColumn(4)]
 		//public float year { get; set; }
 		[LoadColumn(2)]
