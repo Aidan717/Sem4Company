@@ -176,14 +176,17 @@ namespace Web_API_Service.Controllers {
 				} else {
 					responseString = await _DBConnection.GetFromMainDBWithQueryString("_search?q=_exists:" + error + "&q=timestamp:[" + yesterday.ToString() + "+TO+" + currentTimeInMs.ToString() + "]&size=5&sort=timestamp:desc&track_scores=true");
 				}
+
 				//Forklaring af strengen der står i GetFromEsMainDBWithCommandstring:
-				//"?q=" er starten af vores query som fortæller "_search" fra baseAddress hvad den skal lede efter
-				//"_exists_" beder "client" om at retunere de objecter som indeholder det søgte streng
-				//"\"*exception*\"" eller "error" er det vi søger efter
-				//"&q=timestamp:["+ yesterday.ToString() + "+TO+"+ currentTimeInMs.ToString() + "]" er hvor vi beder om kun at få objecter fra et bestemt tidsrum
-				//"&size" er hvor mange objecter vi får ud
-				//"&sort=timestamp:" sortere vores objecter så vi enten får de ælste først eller de nyeste først
-				//"&track_scores=true" er for at forhindre fejl når vi køre metoden
+				/*
+				 * "?q=" er starten af vores query som fortæller "_search" fra baseAddress hvad den skal lede efter
+				 * "_exists_" beder "client" om at retunere de objecter som indeholder det søgte streng
+				 * "\"*exception*\"" eller "error" er det vi søger efter
+				 * "&q=timestamp:["+ yesterday.ToString() + "+TO+"+ currentTimeInMs.ToString() + "]" er hvor vi beder om kun at få objecter fra et bestemt tidsrum
+				 * "&size" er hvor mange objecter vi får ud
+				 * "&sort=timestamp:" sortere vores objecter så vi enten får de ælste først eller de nyeste først
+				 * "&track_scores=true" er for at forhindre fejl når vi køre metoden
+				 */
 
 
 				var option = new JsonSerializerOptions {
@@ -194,24 +197,6 @@ namespace Web_API_Service.Controllers {
                 result = JsonSerializer.Deserialize<DBSchema>(responseString, option);
 
                 return result;
-
-				//using (var client = new HttpClient()) {
-					
-
-
-				//	if (response.IsSuccessStatusCode) {
-
-				//		var option = new JsonSerializerOptions {
-				//			Converters = { new DateTimeConverter() },
-				//			IgnoreNullValues = true							
-				//		};
-
-				//		result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync(), option);
-				//		return result;
-				//	} else {
-				//		throw new HttpRequestException("statusCode: " + response.StatusCode);
-				//	}
-				//}
 			} catch (HttpRequestException ex) {
 
 				throw ex;
