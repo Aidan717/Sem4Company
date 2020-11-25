@@ -18,6 +18,7 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using System.IO;
 using Microsoft.ML;
+using System.Globalization;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -51,8 +52,7 @@ namespace Web_API_Service.Controllers {
 			DBSchema dbSchema = new DBSchema();
 			string commandString = "_search?q=_exists_:\"*exception*\"&sort=timestamp:desc&size=10000&track_scores=true";
 
-			var options = new JsonSerializerOptions
-			{
+			var options = new JsonSerializerOptions	{
 				IgnoreNullValues = true,
                 Converters = { new DateTimeConverter() }
             };
@@ -68,6 +68,7 @@ namespace Web_API_Service.Controllers {
 			//sortér result via timer
 			while (i < dbSchema.hits.hits.Length && days < 90000) {
 				//tids limit som kan addes til
+				
 				DateTime timelimit = DateTime.Now.AddDays(-days);
 
 				errortime.Add(timelimit.ToShortDateString(), 0);
@@ -95,22 +96,20 @@ namespace Web_API_Service.Controllers {
 			var csv = new StringBuilder();
 			string rootDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../"));
 			string modelPath = Path.Combine(rootDir, "Data", "ElkTestModel.csv");
-			Stopwatch timer = Stopwatch.StartNew();
-			using (var w = new StreamWriter(modelPath))
-			{
+			Stopwatch timer = Stopwatch.StartNew();			
+
+			using (var w = new StreamWriter(modelPath))	{
 
 
-				for (int errorTimeIndex = 0; errorTimeIndex < errortime.Keys.Count(); errorTimeIndex++)
-				{
+				for (int errorTimeIndex = 0; errorTimeIndex < errortime.Keys.Count(); errorTimeIndex++)	{
 					//in your loop
-					if (errortime.ElementAt(errorTimeIndex).Value != 0)
-					{
+					if (errortime.ElementAt(errorTimeIndex).Value != 0)	{
 						var first = errortime.ElementAt(errorTimeIndex).Key.ToString();
 						var second = errortime.ElementAt(errorTimeIndex).Value;
-						var line = string.Format("{0},{1}", first, second);
+						var line = string.Format("{0};{1}", first, second);
 
 						//Suggestion made by KyleMit
-						var newLine = string.Format("{0},{1}", first, second);
+						var newLine = string.Format("{0};{1}", first, second);
 						//csv.AppendLine(newLine);
 						w.WriteLine(line);
 						w.Flush();
