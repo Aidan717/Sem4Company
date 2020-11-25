@@ -9,13 +9,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using MachineLearning.Models;
-using System.Threading;
-using System.Globalization;
+using MachineLearning.Service;
+
 
 namespace MachineLearning{
 	public class MLForecaster {
-		
 
+			readonly static ISaveFile SaveFile = new SaveFile();
 			static readonly string _dataPath = Path.Combine(Environment.CurrentDirectory, "Data", "ElkTestModelResults.csv");
 			static readonly string _modelPath = Path.Combine(Environment.CurrentDirectory, "Data", "ModelData.zip");
 
@@ -31,7 +31,7 @@ namespace MachineLearning{
 				outputColumnName: "Forecast",
 				inputColumnName: "errorTrainer",
 				windowSize: 7,
-				seriesLength: 1400,
+				seriesLength: size,
 				trainSize: size,
 				horizon: 7,
 				confidenceLevel: 0.95f,
@@ -43,7 +43,7 @@ namespace MachineLearning{
 
 			Evaluate(dataView, forecaster, mlContext);
 
-			var forecastEngine = forecaster.CreateTimeSeriesEngine<ForecasterModel, ForecastingData>(mlContext);
+			var forecastEngine = forecaster.CreateTimeSeriesEngine<ForecasterModel, ForecastingDataModel>(mlContext);
 
 			forecastEngine.CheckPoint(mlContext, _modelPath);
 
@@ -53,7 +53,7 @@ namespace MachineLearning{
 			static void Evaluate(IDataView dataView, ITransformer model, MLContext mlContext) {
 				IDataView predictions = model.Transform(dataView);
 				IEnumerable<float> actual = mlContext.Data.CreateEnumerable<ForecasterModel>(dataView, true).Select(observed => observed.errorTrainer);
-				IEnumerable<float> forecast = mlContext.Data.CreateEnumerable<ForecastingData>(predictions, true).Select(prediction => prediction.Forecast[0]);
+				IEnumerable<float> forecast = mlContext.Data.CreateEnumerable<ForecastingDataModel>(predictions, true).Select(prediction => prediction.Forecast[0]);
 				var metrics = actual.Zip(forecast, (actualValue, forecastValue) => actualValue - forecastValue);
 				var MAE = metrics.Average(error => Math.Abs(error)); // Mean Absolute Error
 				var RMSE = Math.Sqrt(metrics.Average(error => Math.Pow(error, 2))); // Root Mean Squared Error
@@ -66,15 +66,15 @@ namespace MachineLearning{
 			}
 			
 			//this method need to be redone so we dont need mlcontext just to print
-			static void Forecast(TimeSeriesPredictionEngine<ForecasterModel, ForecastingData> forecaster) {
-			NumberFormatInfo nf = new CultureInfo("en-US", false).NumberFormat;
+			static void Forecast(TimeSeriesPredictionEngine<ForecasterModel, ForecastingDataModel> forecaster) {
+			//NumberFormatInfo nf = new CultureInfo("en-US", false).NumberFormat;
 			
-			ForecastingData forecast = forecaster.Predict();
-				Debug.WriteLine("Forecast\tLowerforecast\tUpperForecasting}");
-				for (int i = 0; i < forecast.Forecast.Length; i++) {
-					Debug.WriteLine($"{forecast.Forecast[i]}; {forecast.LowerForecasting[i]}; {forecast.UpperForecasting[i]}");
-				}
-
+				ForecastingDataModel forecast = forecaster.Predict();
+				//Debug.WriteLine("Forecast\tLowerforecast\tUpperForecasting}");
+				//for (int i = 0; i < forecast.Forecast.Length; i++) {
+				//	Debug.WriteLine($"{forecast.Forecast[i]}; {forecast.LowerForecasting[i]}; {forecast.UpperForecasting[i]}");
+				//}
+				SaveFile.SaveForecastToCsvFile(forecast);
 
 			}
 
