@@ -12,7 +12,8 @@ namespace Web_API_Service.Service {
 		Task<string> InsertInToErrorDB(StringContent jsonString);
 		Task<string> GetFromMainDBWithQueryString(string commandString);
 		Task<string> GetFromErrorDBWithQueryString(string commandString);
-		Task<string> GetFromMainDBWithQueryStringIndexHealth(string commandString);
+		Task<string> GetHealthFromMainDB();
+		Task<string> GetHealthFromErrorDB();
 
 	}
 }

@@ -214,21 +214,21 @@ namespace Web_API_Service.Controllers {
 
 		//look at status for index when a person call something
 		[HttpGet("hey/{index}")]
-		public async Task<ActionResult<object>> GetIndexStatus(string index, clusterHealth newhealth) {
+		public async Task<object> GetIndexStatus(string index) {
 			var result = new clusterHealth("Fail report");
 			try {
 				string responseString = "";
 
 				if (index.Equals("maindb")) {
-					responseString = await _DBConnection.GetFromMainDBWithQueryStringIndexHealth("_cluster/health");
+					responseString = await _DBConnection.GetHealthFromMainDB();
 
 				} else if (index.Equals("errordb")) {
-					responseString = await _DBConnection.GetFromMainDBWithQueryStringIndexHealth("_cluster/health");//metode ikke lavet endnu(change to errordb)
+					responseString = await _DBConnection.GetHealthFromErrorDB();
 				}
 				result = JsonSerializer.Deserialize<clusterHealth>(responseString);
 
 				if (result.status == ("red")) {
-					throw new HttpRequestException();
+					throw new HttpRequestException();//planen ville være at opsætte en metode, som kontakter den ind i mellem for at checke om den er rød eller ej. 
 
 				}
 				return result;
