@@ -52,8 +52,7 @@ namespace Web_API_Service.Controllers {
 			DBSchema dbSchema = new DBSchema();
 			string commandString = "_search?q=_exists_:\"*exception*\"&sort=timestamp:desc&size=10000&track_scores=true";
 
-			var options = new JsonSerializerOptions
-			{
+			var options = new JsonSerializerOptions	{
 				IgnoreNullValues = true,
                 Converters = { new DateTimeConverter() }
             };
@@ -98,15 +97,13 @@ namespace Web_API_Service.Controllers {
 			string rootDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../"));
 			string modelPath = Path.Combine(rootDir, "Data", "ElkTestModel.csv");
 			Stopwatch timer = Stopwatch.StartNew();			
-			using (var w = new StreamWriter(modelPath))
-			{
+
+			using (var w = new StreamWriter(modelPath))	{
 
 
-				for (int errorTimeIndex = 0; errorTimeIndex < errortime.Keys.Count(); errorTimeIndex++)
-				{
+				for (int errorTimeIndex = 0; errorTimeIndex < errortime.Keys.Count(); errorTimeIndex++)	{
 					//in your loop
-					if (errortime.ElementAt(errorTimeIndex).Value != 0)
-					{
+					if (errortime.ElementAt(errorTimeIndex).Value != 0)	{
 						var first = errortime.ElementAt(errorTimeIndex).Key.ToString();
 						var second = errortime.ElementAt(errorTimeIndex).Value;
 						var line = string.Format("{0};{1}", first, second);
