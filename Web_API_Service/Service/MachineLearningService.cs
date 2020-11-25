@@ -6,14 +6,15 @@ using MachineLearning;
 
 namespace Web_API_Service.Service
 {
-    public class MachineLearningService : IMachineLearning
-    {
+    public class MachineLearningService : IMachineLearning {
         MLAnomaly mLAnomaly = new MLAnomaly();
-        MLForecast mLforecast = new MLForecast();
-        public void CheckForSpikes()
-        {
-            mLAnomaly.MLCheckForSpikes();
-            
+        MLForecaster mLforecaster = new MLForecaster();
+        public void CheckForSpikes() {
+            mLAnomaly.MLCheckForSpikes();            
         }
+
+        public void Forecaster() {
+            mLforecaster.StartForcaster();
+		}
     }
 }

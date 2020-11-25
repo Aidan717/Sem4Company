@@ -549,6 +549,16 @@ namespace Web_API_Service.Controllers {
 				throw ex;
 			}
 		}
+
+
+		[HttpGet("fc")]
+		public  void ForecasterTest(int amount) {
+
+			IMachineLearning check = new MachineLearningService();
+			check.Forecaster();
+		}
+
+
 	}
 }
 
