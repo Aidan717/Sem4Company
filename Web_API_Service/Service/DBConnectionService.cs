@@ -11,28 +11,25 @@ using Web_API_Service.Models;
 using Web_API_Service.Utility;
 
 namespace Web_API_Service.Service {
-	public class ElasticConnectionService : IElasticConnectionService {		
+	public class DBConnectionService : IDBConnectionService {		
 
-		private readonly ElasticConnection _DBconSetting;
+		private readonly DBConnectionModel _DBconSetting;
 		private HttpResponseMessage response = new HttpResponseMessage();
 		private ResponseStatus respond = new ResponseStatus();
 		private string respondString;
 
-		public ElasticConnectionService(IOptions<ElasticConnection> DBconection) {
+		public DBConnectionService(IOptions<DBConnectionModel> DBconection) {
 			_DBconSetting = DBconection.Value;
 		}
 
-		//Es stand for ElasticSearch
-		public async Task<string> InsertIndToEsMainDB(StringContent jsonString) {
-			//HttpResponseMessage response = new HttpResponseMessage();
-			//ResponseStatus respond = new ResponseStatus();
+		public async Task<string> InsertInToMainDB(StringContent jsonString) {
 			
 			try {
 				using (var client = new HttpClient()) {
 
 					//next line should look like something like this is the default havent been changed
 					//client.BaseAddress = new Uri("http://localhost:9200/maindb/_doc/");
-					client.BaseAddress = new Uri($"{_DBconSetting.ElasticURI}/{_DBconSetting.ElasticMainIndex}/{_DBconSetting.ElasticCommandString}");					
+					client.BaseAddress = new Uri($"{_DBconSetting.uRI}/{_DBconSetting.mainIndex}/{_DBconSetting.queryString}");					
 					client.DefaultRequestHeaders.Accept.Clear();
 					response = await client.PostAsync("", jsonString);					
 
@@ -53,7 +50,7 @@ namespace Web_API_Service.Service {
 		}
 
 		//this method only handle insert to errorDB
-		public async Task<string> InsertIndToEsErrorDB(StringContent jsonString) {
+		public async Task<string> InsertInToErrorDB(StringContent jsonString) {
 			
 			try {
 
@@ -61,16 +58,13 @@ namespace Web_API_Service.Service {
 
 					//next line should look like something like this is the default havent been changed
 					//client.BaseAddress = new Uri("http://localhost:9200/errodb/_doc/");
-					client.BaseAddress = new Uri($"{_DBconSetting.ElasticURI}/{_DBconSetting.ElasticErrorIndex}/{_DBconSetting.ElasticCommandString}");
+					client.BaseAddress = new Uri($"{_DBconSetting.uRI}/{_DBconSetting.errorIndex}/{_DBconSetting.queryString}");
 					client.DefaultRequestHeaders.Accept.Clear();
 					response = await client.PostAsync("", jsonString);
 
 					if (response.IsSuccessStatusCode) {
 
-						var option = new JsonSerializerOptions {
-							Converters = { new DateTimeConverter() }
-						};
-						respondString = JsonSerializer.Deserialize<string>(await response.Content.ReadAsStringAsync(), option);
+						respondString = await response.Content.ReadAsStringAsync();
 
 						return respondString;
 					} else {
@@ -85,20 +79,18 @@ namespace Web_API_Service.Service {
 
 
 
-		public async Task<string> GetFromEsMainDBWithCommandstring(string commandString) {
+		public async Task<string> GetFromMainDBWithQueryString(string commandString) {
 			try {
-				_DBconSetting.ElasticCommandString = commandString;
+				_DBconSetting.queryString = commandString;
 				using (var client = new HttpClient()) {
 
 					//next line should look like something like this is the default havent been changed
-					//client.BaseAddress = new Uri("http://localhost:9200/errodb/_doc/");
-					client.BaseAddress = new Uri($"{_DBconSetting.ElasticURI}/{_DBconSetting.ElasticMainIndex}/{_DBconSetting.ElasticCommandString}");
+					//client.BaseAddress = new Uri("http://localhost:9200/maindb/_doc/");
+					client.BaseAddress = new Uri($"{_DBconSetting.uRI}/{_DBconSetting.mainIndex}/{_DBconSetting.queryString}");
 					client.DefaultRequestHeaders.Accept.Clear();
 					Debug.WriteLine("Client base address: " + client.BaseAddress);
 					response = await client.GetAsync("");
 
-					Debug.WriteLine("Uri:" + client.BaseAddress.ToString());
-					Debug.WriteLine("Response Status: " + response.StatusCode);
 					if (response.IsSuccessStatusCode) {
 
 						respondString = await response.Content.ReadAsStringAsync();
@@ -114,23 +106,20 @@ namespace Web_API_Service.Service {
 			}
 		}
 
-		public async Task<string> GetFromEsErrorDBWithCommandstring(string commandString) {
+		public async Task<string> GetFromErrorDBWithQueryString(string commandString) {
 			try {
-				_DBconSetting.ElasticCommandString = commandString;
+				_DBconSetting.queryString = commandString;
 				using (var client = new HttpClient()) {
 
 					//next line should look like something like this is the default havent been changed
 					//client.BaseAddress = new Uri("http://localhost:9200/errodb/_doc/");
-					client.BaseAddress = new Uri($"{_DBconSetting.ElasticURI}/{_DBconSetting.ElasticErrorIndex}/{_DBconSetting.ElasticCommandString}");
+					client.BaseAddress = new Uri($"{_DBconSetting.uRI}/{_DBconSetting.errorIndex}/{_DBconSetting.queryString}");
 					client.DefaultRequestHeaders.Accept.Clear();
 					response = await client.GetAsync("");
 
 					if (response.IsSuccessStatusCode) {
 
-						var option = new JsonSerializerOptions {
-							Converters = { new DateTimeConverter() }
-						};
-						respondString = JsonSerializer.Deserialize<string>(await response.Content.ReadAsStringAsync(), option);
+						respondString = await response.Content.ReadAsStringAsync();
 
 						return respondString;
 					} else {

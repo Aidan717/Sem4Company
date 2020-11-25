@@ -8,6 +8,6 @@ namespace Web_API_Service.Service {
     public interface IMailService {
         //Task SendEmailAsync(MailRequest mailRequest);
         //Task SendWelcomeEmailAsync(WelcomeRequest request);
-        Task SendWarningEmailAsync(string methodName, string Query, string Destination, string Error);
+        Task SendWarningEmailAsync(string methodName, string query, string destination, string error);
     }
 }

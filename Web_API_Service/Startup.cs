@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Org.BouncyCastle.Bcpg.Sig;
-using System.Text.Json;
 using Web_API_Service.Models;
 using Web_API_Service.Service;
 
@@ -23,9 +21,8 @@ namespace Web_API_Service {
 			services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
 			services.AddTransient<Service.IMailService, Service.MailService>();
 			
-			services.Configure<ElasticConnection>(Configuration.GetSection("ElasticConnection"));
-			services.AddTransient<IElasticConnectionService, ElasticConnectionService>();
-
+			services.Configure<DBConnectionModel>(Configuration.GetSection("ElasticTestConnection"));
+			services.AddTransient<IDBConnectionService, DBConnectionService>();
 
 		}
 
