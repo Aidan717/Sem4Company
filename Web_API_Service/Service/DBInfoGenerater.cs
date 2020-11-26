@@ -21,12 +21,14 @@ namespace Web_API_Service.Service {
 			int i = 0;
 			//while (i < amount) { }
 			DBSchema._Source data = new DBSchema._Source();
-			
+
+			//data.errorForTrainer = "0";
+
 			//should it generate errors of not
 			if(numGenenerater.Next(0,100)< 50) {
 				
 				SetNewError(data);
-				data.errorForTrainer = "1";
+				//data.errorForTrainer = "1";
 			}
 
 

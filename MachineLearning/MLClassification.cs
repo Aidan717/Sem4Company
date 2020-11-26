@@ -110,7 +110,7 @@ namespace MachineLearning {
         }
 
         public Boolean ClassificationPrediction(string PredictionLine) {
-            ClassificationStart();
+            //ClassificationStart();
 
             Boolean pass = false;
 

@@ -554,17 +554,17 @@ namespace Web_API_Service.Controllers {
         }
 
 		[HttpPost("clm")]
-		public void ClassificationCheck([FromBody]DBSchema._Source classificationSource) {
+		public async Task<ResponseStatus> ClassificationCheck([FromBody]DBSchema._Source classificationSource) {
 			IMachineLearning machineLearning = new MachineLearningService();
 
-			string stringContent = JsonSerializer.Serialize(classificationSource);
+			String mlJsonstring = JsonSerializer.Serialize(classificationSource);
+			StringContent jsonContent = new StringContent(JsonSerializer.Serialize(classificationSource), Encoding.UTF8, "application/json");
 
-			Classification dezClassification = JsonSerializer.Deserialize<Classification>(stringContent);
+			Classification dezClassification = JsonSerializer.Deserialize<Classification>(mlJsonstring);
 
 			string str = "";
 			foreach (PropertyInfo item in dezClassification.GetType().GetProperties()) {
 				str += $"{ (string)item.GetValue(dezClassification) };";
-				Debug.WriteLine(str);
 			}
 			str = str.Remove(str.Length - 1);
             Debug.WriteLine(str);
@@ -573,7 +573,14 @@ namespace Web_API_Service.Controllers {
 
 			Debug.WriteLine(pass);
 
-			//Post the dbschema to maindb if "pass" equals 1 and both maindb and errordb if "pass" equals 0
+            respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _DBConnection.InsertInToMainDB(jsonContent));
+
+			if (pass) {
+                //respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _DBConnection.InsertInToErrorDB(jsonContent));
+                await _DBConnection.InsertInToErrorDB(jsonContent);
+            }
+
+			return respondStatus;
 		}
 	}
 }
