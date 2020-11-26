@@ -309,7 +309,7 @@ namespace Web_API_Service.Controllers {
         }
 
 		//Skal kun kaldes igennem en anden GET metode. Er dette nødvendigt at have noget inde i HttpPost med?
-
+		[HttpPost("quickpost")]
 		public async Task<ResponseStatus> PostNewError(DBSchema._Source result) {
 
 			//string baseaddress = "";
@@ -529,7 +529,7 @@ namespace Web_API_Service.Controllers {
 					StringContent jsonstring = new StringContent(JsonSerializer.Serialize(jsn, seOptions), Encoding.UTF8, "application/json");
 					respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _DBConnection.InsertInToMainDB(jsonstring), deOptions);
 
-					respondStatus = await PostNewError(jsn);
+					//respondStatus = await PostNewError(jsn);
 
 					i++;
 					Debug.WriteLine("added: " + i);
@@ -574,7 +574,7 @@ namespace Web_API_Service.Controllers {
 
 			Debug.WriteLine(pass);
 
-
+			//Post the dbschema to maindb if "pass" equals 1 and both maindb and errordb if "pass" equals 0
 		}
 	}
 }

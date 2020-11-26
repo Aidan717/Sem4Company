@@ -13,7 +13,7 @@ namespace MachineLearning {
         static readonly string _trainDataPath = Path.Combine(Environment.CurrentDirectory, "Data", "GroupHalfTraining.csv");
 
         //private static string _testDataPath => Path.Combine(_appPath, "..", "..", "..", "Data", "GroupingTest.csv");
-        static readonly string _testDataPath = Path.Combine(Environment.CurrentDirectory, "Data", "GroupHalfTest.csv");
+        static readonly string _testDataPath = Path.Combine(Environment.CurrentDirectory, "Data", "GroupHalfTraining.csv");
 
         //private static string _modelPath => Path.Combine(_appPath, "..", "..", "..", "Models", "model.zip");
         static readonly string _modelPath = Path.Combine(Environment.CurrentDirectory, "Data", "classificationDataModel.zip");
@@ -109,7 +109,7 @@ namespace MachineLearning {
             Console.WriteLine($"=============== Single Prediction - Result: {prediction.errorForTrainer} ===============");
         }
 
-        public Boolean ClassificationPrediction(string line) {
+        public Boolean ClassificationPrediction(string PredictionLine) {
             ClassificationStart();
 
             Boolean pass = false;
@@ -118,7 +118,7 @@ namespace MachineLearning {
 
             ITransformer loadedModel = _mlContext.Model.Load(_modelPath, out var modelInputSchema);
 
-            ClassificationModel clm = new ClassificationModel(line);
+            ClassificationModel clm = new ClassificationModel(PredictionLine);
 
             _predEngine = _mlContext.Model.CreatePredictionEngine<ClassificationModel, ClassificationPredictionModel>(loadedModel);
 
@@ -126,7 +126,7 @@ namespace MachineLearning {
 
             Debug.WriteLine($"=============== Single Prediction - Result: {prediction.errorForTrainer} ===============");
 
-            if (prediction.errorForTrainer.Equals(1)) {
+            if (prediction.errorForTrainer.Equals("1")) {
                 pass = true;
             }
 
