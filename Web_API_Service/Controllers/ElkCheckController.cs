@@ -50,8 +50,7 @@ namespace Web_API_Service.Controllers {
 		[HttpGet("dbschema/getalldb")]
 		public async Task<ActionResult<string>> GetDbSchema() {
 			DBSchema dbSchema = new DBSchema();
-			string commandString = "_search?q=_exists_:\"*exception*\"&sort=timestamp:desc&size=10000&track_scores=true";
-
+			string commandString = "_search?q=_exists_:\"*exception*\"&sort=timestamp:desc&size=10000&track_scores=true";			
 			var options = new JsonSerializerOptions	{
 				IgnoreNullValues = true,
                 Converters = { new DateTimeConverter() }
@@ -551,7 +550,7 @@ namespace Web_API_Service.Controllers {
 
 
 		[HttpGet("fc")]
-		public  void ForecasterTest(int amount) {
+		public  void ForecasterTest() {
 
 			IMachineLearning check = new MachineLearningService();
 			check.Forecaster();

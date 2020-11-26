@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.ML.Data;
+using System.Collections;
 
 namespace MachineLearning.Models {
 	class ForecasterModel {

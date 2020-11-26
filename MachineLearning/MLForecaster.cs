@@ -23,7 +23,6 @@ namespace MachineLearning{
 
 
 			MLContext mlContext = new MLContext();
-
 			IDataView dataView = mlContext.Data.LoadFromTextFile<ForecasterModel>(path: _dataPath, hasHeader: true, separatorChar: ';');
 			int size = dataView.GetColumn<string>("month").Count();
 
@@ -67,13 +66,12 @@ namespace MachineLearning{
 			
 			//this method need to be redone so we dont need mlcontext just to print
 			static void Forecast(TimeSeriesPredictionEngine<ForecasterModel, ForecastingDataModel> forecaster) {
-			//NumberFormatInfo nf = new CultureInfo("en-US", false).NumberFormat;
-			
+				
+				//string str = "12/34/45, 123";
+				//string[] strSplit = str.Split(',');
+				//ForecasterModel newmodel = new ForecasterModel() { strSplit[0] };
 				ForecastingDataModel forecast = forecaster.Predict();
-				//Debug.WriteLine("Forecast\tLowerforecast\tUpperForecasting}");
-				//for (int i = 0; i < forecast.Forecast.Length; i++) {
-				//	Debug.WriteLine($"{forecast.Forecast[i]}; {forecast.LowerForecasting[i]}; {forecast.UpperForecasting[i]}");
-				//}
+				
 				SaveFile.SaveForecastToCsvFile(forecast);
 
 			}
