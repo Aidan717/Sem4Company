@@ -9,6 +9,8 @@ namespace Web_API_Service.Service
     public class MachineLearningService : IMachineLearning {
         MLAnomaly mLAnomaly = new MLAnomaly();
         MLForecaster mLforecaster = new MLForecaster();
+        MLClassification mLClassification = new MLClassification();
+        
         public void CheckForSpikes() {
             mLAnomaly.MLCheckForSpikes();            
         }
@@ -16,5 +18,9 @@ namespace Web_API_Service.Service
         public void Forecaster() {
             mLforecaster.StartForcaster();
 		}
+
+        public Boolean Classification(string line) {
+            return mLClassification.ClassificationPrediction(line);
+        }
     }
 }

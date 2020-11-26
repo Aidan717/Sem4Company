@@ -19,6 +19,7 @@ using Microsoft.EntityFrameworkCore.Query.Internal;
 using System.IO;
 using Microsoft.ML;
 using System.Globalization;
+using MachineLearning;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -157,14 +158,17 @@ namespace Web_API_Service.Controllers {
 				} else {
 					responseString = await _DBConnection.GetFromMainDBWithQueryString("_search?q=_exists:" + error + "&q=timestamp:[" + yesterday.ToString() + "+TO+" + currentTimeInMs.ToString() + "]&size=5&sort=timestamp:desc&track_scores=true");
 				}
+
 				//Forklaring af strengen der står i GetFromEsMainDBWithCommandstring:
-				//"?q=" er starten af vores query som fortæller "_search" fra baseAddress hvad den skal lede efter
-				//"_exists_" beder "client" om at retunere de objecter som indeholder det søgte streng
-				//"\"*exception*\"" eller "error" er det vi søger efter
-				//"&q=timestamp:["+ yesterday.ToString() + "+TO+"+ currentTimeInMs.ToString() + "]" er hvor vi beder om kun at få objecter fra et bestemt tidsrum
-				//"&size" er hvor mange objecter vi får ud
-				//"&sort=timestamp:" sortere vores objecter så vi enten får de ælste først eller de nyeste først
-				//"&track_scores=true" er for at forhindre fejl når vi køre metoden
+				/*
+				 * "?q=" er starten af vores query som fortæller "_search" fra baseAddress hvad den skal lede efter
+				 * "_exists_" beder "client" om at retunere de objecter som indeholder det søgte streng
+				 * "\"*exception*\"" eller "error" er det vi søger efter
+				 * "&q=timestamp:["+ yesterday.ToString() + "+TO+"+ currentTimeInMs.ToString() + "]" er hvor vi beder om kun at få objecter fra et bestemt tidsrum
+				 * "&size" er hvor mange objecter vi får ud
+				 * "&sort=timestamp:" sortere vores objecter så vi enten får de ælste først eller de nyeste først
+				 * "&track_scores=true" er for at forhindre fejl når vi køre metoden
+				 */
 
 
 				var option = new JsonSerializerOptions {
@@ -174,25 +178,7 @@ namespace Web_API_Service.Controllers {
 
 				result = JsonSerializer.Deserialize<DBSchema>(responseString, option);
 
-				return result;
-
-				//using (var client = new HttpClient()) {
-
-
-
-				//	if (response.IsSuccessStatusCode) {
-
-				//		var option = new JsonSerializerOptions {
-				//			Converters = { new DateTimeConverter() },
-				//			IgnoreNullValues = true							
-				//		};
-
-				//		result = JsonSerializer.Deserialize<DBSchema>(await response.Content.ReadAsStringAsync(), option);
-				//		return result;
-				//	} else {
-				//		throw new HttpRequestException("statusCode: " + response.StatusCode);
-				//	}
-				//}
+                return result;
 			} catch (HttpRequestException ex) {
 
 				throw ex;
@@ -349,6 +335,9 @@ namespace Web_API_Service.Controllers {
 				return respondStatus = new ResponseStatus("failed to connect " + ex.Message);
 			}
 		}
+
+
+		//public async Task<>
 
 		[HttpPost("dbschema/CheckIfError")]
 		public async Task<ResponseStatus> PostCheckIfError([FromBody] DBSchema result) {
@@ -559,11 +548,33 @@ namespace Web_API_Service.Controllers {
 
 		[HttpGet("fc")]
 		public  void ForecasterTest() {
-			IMachineLearning check = new MachineLearningService();
-			check.Forecaster();
+
+            IMachineLearning check = new MachineLearningService();
+            check.Forecaster();
+        }
+
+		[HttpPost("clm")]
+		public void ClassificationCheck([FromBody]DBSchema._Source classificationSource) {
+			IMachineLearning machineLearning = new MachineLearningService();
+
+			string stringContent = JsonSerializer.Serialize(classificationSource);
+
+			Classification dezClassification = JsonSerializer.Deserialize<Classification>(stringContent);
+
+			string str = "";
+			foreach (PropertyInfo item in dezClassification.GetType().GetProperties()) {
+				str += $"{ (string)item.GetValue(dezClassification) };";
+				Debug.WriteLine(str);
+			}
+			str = str.Remove(str.Length - 1);
+            Debug.WriteLine(str);
+
+            Boolean pass = machineLearning.Classification(str);
+
+			Debug.WriteLine(pass);
+
+
 		}
-
-
 	}
 }
 
