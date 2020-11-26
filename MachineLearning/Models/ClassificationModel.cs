@@ -26,11 +26,6 @@ namespace MachineLearning {
         [LoadColumn(5)]
         public string exceptionfailedRecipient { get; set; }
 
-        //[LoadColumn(6)]
-        //public string activitiesExceptionsMessage { get; set; }
-
-        //[LoadColumn(6)]
-        //public string exceptionDetailMessage { get; set; }
 
         public ClassificationModel() { }
 

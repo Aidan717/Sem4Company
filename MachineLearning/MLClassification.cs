@@ -13,7 +13,7 @@ namespace MachineLearning {
         static readonly string _trainDataPath = Path.Combine(Environment.CurrentDirectory, "Data", "GroupHalfTraining.csv");
 
         //private static string _testDataPath => Path.Combine(_appPath, "..", "..", "..", "Data", "GroupingTest.csv");
-        static readonly string _testDataPath = Path.Combine(Environment.CurrentDirectory, "Data", "GroupHalfTraining.csv");
+        static readonly string _testDataPath = Path.Combine(Environment.CurrentDirectory, "Data", "GroupHalfTest.csv");
 
         //private static string _modelPath => Path.Combine(_appPath, "..", "..", "..", "Models", "model.zip");
         static readonly string _modelPath = Path.Combine(Environment.CurrentDirectory, "Data", "classificationDataModel.zip");
@@ -25,7 +25,7 @@ namespace MachineLearning {
 
 
         public void ClassificationStart() {
-            _mlContext = new MLContext(seed: 0);
+            _mlContext = new MLContext(seed: 1);
 
             _trainingDataView = _mlContext.Data.LoadFromTextFile<ClassificationModel> (_trainDataPath, hasHeader: true, separatorChar: ';');
 
@@ -57,19 +57,19 @@ namespace MachineLearning {
 
             _predEngine = _mlContext.Model.CreatePredictionEngine<ClassificationModel, ClassificationPredictionModel>(_trainedModel);
 
-            ClassificationModel issue = new ClassificationModel() {
-                exceptionstackTraceString = "",
-                exceptioninnerExceptionMessage = ""
-                //error = 1
+            //ClassificationModel issue = new ClassificationModel() {
+            //    exceptionstackTraceString = "",
+            //    exceptioninnerExceptionMessage = ""
+            //    //error = 1
 
-                //timeStamp = "Nov 11 2012 @ 13:59:50.000",
-                //name = "Bjarne"
-                //error = 0
-            };
+            //    //timeStamp = "Nov 11 2012 @ 13:59:50.000",
+            //    //name = "Bjarne"
+            //    //error = 0
+            //};
 
-            var prediction = _predEngine.Predict(issue);
+            //var prediction = _predEngine.Predict(issue);
 
-            Debug.WriteLine($"=============== Single Prediction just-trained-model - Result: {prediction.errorForTrainer} ===============");
+            //Debug.WriteLine($"=============== Single Prediction just-trained-model - Result: {prediction.errorForTrainer} ===============");
 
             return trainingPipeline;
         }

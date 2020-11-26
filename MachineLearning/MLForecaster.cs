@@ -21,7 +21,6 @@ namespace MachineLearning{
 
 		public void StartForcaster() {
 
-
 			MLContext mlContext = new MLContext();
 
 			IDataView dataView = mlContext.Data.LoadFromTextFile<ForecasterModel>(path: _dataPath, hasHeader: true, separatorChar: ';');
@@ -50,35 +49,24 @@ namespace MachineLearning{
 			Forecast(forecastEngine);
 		}
 
-			static void Evaluate(IDataView dataView, ITransformer model, MLContext mlContext) {
-				IDataView predictions = model.Transform(dataView);
-				IEnumerable<float> actual = mlContext.Data.CreateEnumerable<ForecasterModel>(dataView, true).Select(observed => observed.errorTrainer);
-				IEnumerable<float> forecast = mlContext.Data.CreateEnumerable<ForecastingDataModel>(predictions, true).Select(prediction => prediction.Forecast[0]);
-				var metrics = actual.Zip(forecast, (actualValue, forecastValue) => actualValue - forecastValue);
-				var MAE = metrics.Average(error => Math.Abs(error)); // Mean Absolute Error
-				var RMSE = Math.Sqrt(metrics.Average(error => Math.Pow(error, 2))); // Root Mean Squared Error
+		static void Evaluate(IDataView dataView, ITransformer model, MLContext mlContext) {
+			IDataView predictions = model.Transform(dataView);
+			IEnumerable<float> actual = mlContext.Data.CreateEnumerable<ForecasterModel>(dataView, true).Select(observed => observed.errorTrainer);
+			IEnumerable<float> forecast = mlContext.Data.CreateEnumerable<ForecastingDataModel>(predictions, true).Select(prediction => prediction.Forecast[0]);
+			var metrics = actual.Zip(forecast, (actualValue, forecastValue) => actualValue - forecastValue);
+			var MAE = metrics.Average(error => Math.Abs(error)); // Mean Absolute Error
+			var RMSE = Math.Sqrt(metrics.Average(error => Math.Pow(error, 2))); // Root Mean Squared Error
 
-				Console.WriteLine("Evaluation Metrics");
-				Console.WriteLine("---------------------");
-				Console.WriteLine($"Mean Absolute Error: {MAE:F2}");
-				Console.WriteLine($"Root Mean Squared Error: {RMSE:F2}\n");
+			Console.WriteLine("Evaluation Metrics");
+			Console.WriteLine("---------------------");
+			Console.WriteLine($"Mean Absolute Error: {MAE:F2}");
+			Console.WriteLine($"Root Mean Squared Error: {RMSE:F2}\n");
 
-			}
+		}
 			
-			//this method need to be redone so we dont need mlcontext just to print
-			static void Forecast(TimeSeriesPredictionEngine<ForecasterModel, ForecastingDataModel> forecaster) {
-			//NumberFormatInfo nf = new CultureInfo("en-US", false).NumberFormat;
-			
-				ForecastingDataModel forecast = forecaster.Predict();
-				//Debug.WriteLine("Forecast\tLowerforecast\tUpperForecasting}");
-				//for (int i = 0; i < forecast.Forecast.Length; i++) {
-				//	Debug.WriteLine($"{forecast.Forecast[i]}; {forecast.LowerForecasting[i]}; {forecast.UpperForecasting[i]}");
-				//}
-				SaveFile.SaveForecastToCsvFile(forecast);
-
-			}
-
-			//Console.ReadLine();
-			
+		static void Forecast(TimeSeriesPredictionEngine<ForecasterModel, ForecastingDataModel> forecaster) {				
+			ForecastingDataModel forecast = forecaster.Predict();				
+			SaveFile.SaveForecastToCsvFile(forecast);
+		}			
 	}
 }
