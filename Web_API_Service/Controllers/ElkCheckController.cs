@@ -386,7 +386,7 @@ namespace Web_API_Service.Controllers {
 
 		[HttpPost("CheckIfErrorSingle")]
 		public async Task<ResponseStatus> PostCheckIfErrorSingleObject([FromBody] DBSchema._Source result) {
-
+			
 			try {
 
 				var options = new JsonSerializerOptions {
@@ -539,7 +539,7 @@ namespace Web_API_Service.Controllers {
 					StringContent jsonstring = new StringContent(JsonSerializer.Serialize(jsn, seOptions), Encoding.UTF8, "application/json");
 					respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _DBConnection.InsertInToMainDB(jsonstring), deOptions);
 
-					respondStatus = await PostNewError(jsn);
+					//respondStatus = await PostNewError(jsn);
 
 					i++;
 					Debug.WriteLine("added: " + i);
@@ -559,7 +559,6 @@ namespace Web_API_Service.Controllers {
 
 		[HttpGet("fc")]
 		public  void ForecasterTest() {
-
 			IMachineLearning check = new MachineLearningService();
 			check.Forecaster();
 		}

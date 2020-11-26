@@ -23,7 +23,7 @@ namespace Web_API_Service.Service {
 			DBSchema._Source data = new DBSchema._Source();
 			
 			//should it generate errors of not
-			if(numGenenerater.Next(0,100)< 40) {
+			if(numGenenerater.Next(0,100)< 1) {
 				
 				SetNewError(data);
 				data.errorForTrainer = "1";
