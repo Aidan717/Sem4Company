@@ -23,5 +23,14 @@
     <ProjectReference Include="..\MachineLearning\MachineLearning.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Data\GroupHalfTest.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\GroupHalfTraining.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 
 </Project>

@@ -19,6 +19,7 @@ using Microsoft.EntityFrameworkCore.Query.Internal;
 using System.IO;
 using Microsoft.ML;
 using System.Globalization;
+using MachineLearning;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -336,6 +337,9 @@ namespace Web_API_Service.Controllers {
 			}
 		}
 
+
+		//public async Task<>
+
 		[HttpPost("dbschema/CheckIfError")]
 		public async Task<ResponseStatus> PostCheckIfError([FromBody] DBSchema result) {
 			
@@ -544,13 +548,34 @@ namespace Web_API_Service.Controllers {
 
 
 		[HttpGet("fc")]
-		public  void ForecasterTest(int amount) {
+		public  void ForecasterTest() {
 
-			IMachineLearning check = new MachineLearningService();
-			check.Forecaster();
+            IMachineLearning check = new MachineLearningService();
+            check.Forecaster();
+        }
+
+		[HttpPost("clm")]
+		public void ClassificationCheck([FromBody]DBSchema._Source classificationSource) {
+			IMachineLearning machineLearning = new MachineLearningService();
+
+			string stringContent = JsonSerializer.Serialize(classificationSource);
+
+			Classification dezClassification = JsonSerializer.Deserialize<Classification>(stringContent);
+
+			string str = "";
+			foreach (PropertyInfo item in dezClassification.GetType().GetProperties()) {
+				str += $"{ (string)item.GetValue(dezClassification) };";
+				Debug.WriteLine(str);
+			}
+			str = str.Remove(str.Length - 1);
+            Debug.WriteLine(str);
+
+            Boolean pass = machineLearning.Classification(str);
+
+			Debug.WriteLine(pass);
+
+
 		}
-
-
 	}
 }
 

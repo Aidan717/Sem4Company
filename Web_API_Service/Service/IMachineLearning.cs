@@ -9,7 +9,6 @@ namespace Web_API_Service.Service
     {
         public void CheckForSpikes();
         public void Forecaster();
-
-
+        public Boolean Classification(string line);
     }
 }
