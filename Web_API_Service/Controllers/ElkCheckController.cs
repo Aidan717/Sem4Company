@@ -143,9 +143,9 @@ namespace Web_API_Service.Controllers {
 		//name need to change to what it does this is just temps
 		[HttpGet("project/{error}")]
 		public async Task<DBSchema> CheckForError(string error) {
-            DBSchema result = new DBSchema();
+			DBSchema result = new DBSchema();
 
-            long currentTimeInMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+			long currentTimeInMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 			long yesterday = DateTimeOffset.UtcNow.AddHours(-24).ToUnixTimeMilliseconds();
 
 			try {
@@ -172,12 +172,12 @@ namespace Web_API_Service.Controllers {
 					IgnoreNullValues = true
 				};
 
-                result = JsonSerializer.Deserialize<DBSchema>(responseString, option);
+				result = JsonSerializer.Deserialize<DBSchema>(responseString, option);
 
-                return result;
+				return result;
 
 				//using (var client = new HttpClient()) {
-					
+
 
 
 				//	if (response.IsSuccessStatusCode) {
@@ -213,49 +213,57 @@ namespace Web_API_Service.Controllers {
 
 		//look at status for index when a person call something
 		[HttpGet("hey/{index}")]
-		public async Task<ActionResult<object>> GetIndexStatus(string index, clusterHealth newhealth) {
+		public async Task<object> GetIndexStatus(string index) {
 			var result = new clusterHealth("Fail report");
-			HttpResponseMessage response = new HttpResponseMessage();
-
 			try {
-				using (var client = new HttpClient()) {
+				string responseString = "";
 
-					client.BaseAddress = new Uri("http://localhost:9200/" + "_cluster/health/");
-					client.DefaultRequestHeaders.Accept.Clear();
-					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+				if (index.Equals("maindb")) {
+					responseString = await _DBConnection.GetHealthFromMainDB();
 
-					if (index.Equals("as")) {
-						response = await client.GetAsync("/_cluster/health/schools");
-
-					} else {
-						response = await client.GetAsync("schools/_stats");
-
-					}
-					if (response.IsSuccessStatusCode) {
-
-						result = JsonSerializer.Deserialize<clusterHealth>(await response.Content.ReadAsStringAsync());
-						if (index.Equals("as")) {
-							result = JsonSerializer.Deserialize<clusterHealth>(await response.Content.ReadAsStringAsync());
-
-						} else {
-							var results = new IndexStats();
-							results = JsonSerializer.Deserialize<IndexStats>(await response.Content.ReadAsStringAsync());
-							return result;
-						}
-						if (result.status == ("red"))
-							return false;
-
-						return result;
-
-					} else {
-						throw new HttpRequestException("statusCode: " + response.StatusCode);
-					}
+				} else if (index.Equals("errordb")) {
+					responseString = await _DBConnection.GetHealthFromErrorDB();
 				}
+				result = JsonSerializer.Deserialize<clusterHealth>(responseString);
+
+				if (result.status == ("red")) {
+					throw new HttpRequestException();//planen ville være at opsætte en metode, som kontakter den ind i mellem for at checke om den er rød eller ej. 
+
+				}
+				return result;
+
 			} catch (HttpRequestException ex) {
 				throw ex;
-
 			}
+			//try {
+			//	string responseString = "";
 
+			//	if (index.Equals("")) {
+			//		responseString = await _DBConnection.GetFromMainDBWithQueryStringIndexHealth("_cluster/health");
+
+			//	} else {
+			//		//responseString = await _DBConnection.GetFromMainDBWithQueryStringIndexHealth("_stats");
+			//		throw new HttpRequestException();
+
+			//	}
+			//		result = JsonSerializer.Deserialize<clusterHealth>(responseString);
+			//		if (index.Equals("as")) {
+			//			result = JsonSerializer.Deserialize<clusterHealth>(responseString);
+
+			//		} else {
+			//			var results = new IndexStats();
+			//			results = JsonSerializer.Deserialize<IndexStats>(responseString);
+			//			return result;
+			//		}
+			//		if (result.status == ("red"))
+			//			return false;
+
+			//		return result;
+
+			//} catch (HttpRequestException ex) {
+			//	throw ex;
+
+			//}
 		}
 
 
