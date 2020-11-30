@@ -180,22 +180,10 @@ namespace Web_API_Service.Controllers {
 
                 return result;
 			} catch (HttpRequestException ex) {
-
 				throw ex;
 			}
 		}
 
-		//look up something specific with in the last hour that have given an exception or something
-		[HttpGet("{error}")]
-		public string LookUpSomeThingSpecific() {
-			return "value";
-		}
-
-		//look at status for index when a person call something
-		[HttpGet("{error}")]
-		public string LookforIndexStatus() {
-			return "value";
-		}
 
 		//look at status for index when a person call something
 		[HttpGet("hey/{index}")]
@@ -210,6 +198,7 @@ namespace Web_API_Service.Controllers {
 				} else if (index.Equals("errordb")) {
 					responseString = await _DBConnection.GetHealthFromErrorDB();
 				}
+
 				result = JsonSerializer.Deserialize<clusterHealth>(responseString);
 
 				if (result.status == ("red")) {
@@ -221,49 +210,7 @@ namespace Web_API_Service.Controllers {
 			} catch (HttpRequestException ex) {
 				throw ex;
 			}
-			//try {
-			//	string responseString = "";
-
-			//	if (index.Equals("")) {
-			//		responseString = await _DBConnection.GetFromMainDBWithQueryStringIndexHealth("_cluster/health");
-
-			//	} else {
-			//		//responseString = await _DBConnection.GetFromMainDBWithQueryStringIndexHealth("_stats");
-			//		throw new HttpRequestException();
-
-			//	}
-			//		result = JsonSerializer.Deserialize<clusterHealth>(responseString);
-			//		if (index.Equals("as")) {
-			//			result = JsonSerializer.Deserialize<clusterHealth>(responseString);
-
-			//		} else {
-			//			var results = new IndexStats();
-			//			results = JsonSerializer.Deserialize<IndexStats>(responseString);
-			//			return result;
-			//		}
-			//		if (result.status == ("red"))
-			//			return false;
-
-			//		return result;
-
-			//} catch (HttpRequestException ex) {
-			//	throw ex;
-
-			//}
 		}
-
-
-
-
-		// POST api/<ValuesController>
-		[HttpPost("poster")]
-		public void PostNewDataEntry([FromBody] DBSchema parametor) {
-		}
-
-		//post to dbRecord of all prier post/request types that have been done		
-		public void PostToRequestDB([FromBody] string value) {
-		}
-
 
 
         [HttpGet("db/{chosenDB}/{SearchParameter}")]
@@ -297,8 +244,6 @@ namespace Web_API_Service.Controllers {
                 result.hits.hits[i]._source.exception = ex.ToString();
 
                 //await PostNewError(result._source);
-
-                
 
                 var jsonstrings = new String(JsonSerializer.Serialize(searchParameter));
                 await _mailService.SendWarningEmailAsync("UpdateIndexWithId", jsonstrings, baseAddress, ex.Message);
@@ -414,39 +359,6 @@ namespace Web_API_Service.Controllers {
 				return respondStatus = new ResponseStatus(ex.StackTrace);
 			}
 		}
-
-
-
-
-
-
-		// PUT api/<ValuesController>/5
-		[HttpPut("{id}")]
-		public void Put(int id, [FromBody] string value) {
-		}
-
-
-
-
-
-
-
-
-		// DELETE api/<ValuesController>/5
-		[HttpDelete("{id}")]
-		public void Delete(int id) {
-		}
-
-
-
-
-
-		//[HttpPost("ad")]
-		//public async Task getser(int id) {
-		//	var newjsons = new DBInfoGenerater();
-		//	await AbuseThis(newjsons);
-		//}
-
 		
 		[HttpGet("FillDBold/{amount}")]
 		public async Task<ActionResult<ResponseStatus>> AbuseThisGenerater(int amount) {
