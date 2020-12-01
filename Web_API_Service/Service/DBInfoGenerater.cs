@@ -30,13 +30,8 @@ namespace Web_API_Service.Service {
 				SetNewError(data);
 				//data.errorForTrainer = "1";
 			}
-
-
 			data.name = GetName();
-			data.timestamp = GetRandomDate();
-
-
-			
+			data.timestamp = GetRandomDate();			
 			return data;
 		}
 
