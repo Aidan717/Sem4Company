@@ -19,10 +19,11 @@ namespace Web_API_Service {
 		public void ConfigureServices(IServiceCollection services) {
 			services.AddControllers();
 			services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
-			services.AddTransient<Service.IMailService, Service.MailService>();
+			services.AddSingleton<Service.IMailService, Service.MailService>();
 			
 			services.Configure<DBConnectionModel>(Configuration.GetSection("ElasticConnection"));
-			services.AddTransient<IDBConnectionService, DBConnectionService>();
+			services.AddSingleton<IDBConnectionService, DBConnectionService>();
+			
 
 		}
 
