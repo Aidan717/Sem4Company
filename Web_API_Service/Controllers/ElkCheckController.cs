@@ -268,9 +268,10 @@ namespace Web_API_Service.Controllers {
             check.Forecaster();
         }
 
-
+		//Don't run through if classification model doesn't bind to dbschema._source
 		[HttpPost("clm")]
 		public async Task<ResponseStatus> ClassificationCheck([FromBody]DBSchema._Source classificationSource) {
+			
 			IMachineLearning machineLearning = new MachineLearningService();
 
 			String mlJsonstring = JsonSerializer.Serialize(classificationSource);
