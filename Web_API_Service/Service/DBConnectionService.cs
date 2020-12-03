@@ -29,7 +29,7 @@ namespace Web_API_Service.Service {
 
 					//next line should look like something like this is the default havent been changed
 					//client.BaseAddress = new Uri("http://localhost:9200/maindb/_doc/");
-					client.BaseAddress = new Uri($"{_DBconSetting.uRI}/{_DBconSetting.mainIndex}/{_DBconSetting.queryString}");					
+					client.BaseAddress = new Uri($"{_DBconSetting.uRI}/--{_DBconSetting.mainIndex}/{_DBconSetting.queryString}");					
 					client.DefaultRequestHeaders.Accept.Clear();
 					response = await client.PostAsync("", jsonString);					
 
@@ -79,9 +79,9 @@ namespace Web_API_Service.Service {
 
 
 
-		public async Task<string> GetFromMainDBWithQueryString(string commandString) {
+		public async Task<string> GetFromMainDBWithQueryString(string queryString) {
 			try {
-				_DBconSetting.queryString = commandString;
+				_DBconSetting.queryString = queryString;
 				using (var client = new HttpClient()) {
 
 					//next line should look like something like this is the default havent been changed
@@ -105,14 +105,63 @@ namespace Web_API_Service.Service {
 			}
 		}
 
-		public async Task<string> GetFromErrorDBWithQueryString(string commandString) {
+		public async Task<string> GetFromErrorDBWithQueryString(string queryString) {
 			try {
-				_DBconSetting.queryString = commandString;
+				_DBconSetting.queryString = queryString;
 				using (var client = new HttpClient()) {
 
 					//next line should look like something like this is the default havent been changed
 					//client.BaseAddress = new Uri("http://localhost:9200/errodb/_doc/");
 					client.BaseAddress = new Uri($"{_DBconSetting.uRI}/{_DBconSetting.errorIndex}/{_DBconSetting.queryString}");
+					client.DefaultRequestHeaders.Accept.Clear();
+					response = await client.GetAsync("");
+
+					if (response.IsSuccessStatusCode) {
+
+						respondString = await response.Content.ReadAsStringAsync();
+
+						return respondString;
+					} else {
+						throw new HttpRequestException("statusCode: " + response.StatusCode);
+					}
+				}
+
+			} catch (HttpRequestException ex) {
+				throw ex;
+			}
+		}
+
+		public async Task<string> GetHealthFromMainDB() {
+			try {
+				using (var client = new HttpClient()) {
+
+					//next line should look like something like this is the default havent been changed
+					//client.BaseAddress = new Uri("http://localhost:9200/_cluster/health/maindb");
+					client.BaseAddress = new Uri($"{_DBconSetting.uRI}/_cluster/health/{_DBconSetting.mainIndex}");
+					client.DefaultRequestHeaders.Accept.Clear();
+					response = await client.GetAsync("");
+
+					if (response.IsSuccessStatusCode) {
+
+						respondString = await response.Content.ReadAsStringAsync();
+
+						return respondString;
+					} else {
+						throw new HttpRequestException("statusCode: " + response.StatusCode);
+					}
+				}
+
+			} catch (HttpRequestException ex) {
+				throw ex;
+			}
+		}
+		public async Task<string> GetHealthFromErrorDB() {
+			try {
+				using (var client = new HttpClient()) {
+
+					//next line should look like something like this is the default havent been changed
+					//client.BaseAddress = new Uri("http://localhost:9200/_cluster/health/errordb");
+					client.BaseAddress = new Uri($"{_DBconSetting.uRI}/_cluster/health/{_DBconSetting.errorIndex}");
 					client.DefaultRequestHeaders.Accept.Clear();
 					response = await client.GetAsync("");
 
