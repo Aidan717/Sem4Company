@@ -49,100 +49,106 @@ namespace Web_API_Service.Controllers {
 		//Robins metode
 		[HttpGet("dbschema/getalldb")]
 		public async Task<ActionResult<string>> GetDbSchema() {
-			DBSchema dbSchema = new DBSchema();
-			string commandString = "_search?q=_exists_:\"*exception*\"&sort=timestamp:desc&size=10000&track_scores=true";
+            DBSchema dbSchema = new DBSchema();
+            string commandString = "_search?q=_exists_:\"*exception*\"&sort=timestamp:desc&size=10000&track_scores=true";
 
-			var options = new JsonSerializerOptions	{
-				IgnoreNullValues = true,
+            var options = new JsonSerializerOptions {
+                IgnoreNullValues = true,
                 Converters = { new DateTimeConverter() }
             };
 
             string result = await _DBConnection.GetFromMainDBWithQueryString(commandString);
-			dbSchema = JsonSerializer.Deserialize<DBSchema>(result, options);
+            dbSchema = JsonSerializer.Deserialize<DBSchema>(result, options);
 
-			int index = 0;
-			int days = 0;
-			var errortime = new Dictionary<string, int>();
-			int i = 0;
+            Dictionary<string, int> errortime = ErrorCount(dbSchema);
+            SaveResultToCSV(errortime);
 
-			//sortér result via timer
-			while (i < dbSchema.hits.hits.Length && days < 90000) {
-				//tids limit som kan addes til
-				
-				DateTime timelimit = DateTime.Now.AddDays(-days);
+            IMachineLearning check = new MachineLearningService();
+            check.CheckForSpikes();
 
-				errortime.Add(timelimit.ToShortDateString(), 0);
-				int ii = 0;
-				while (i < dbSchema.hits.hits.Length && DateTime.Parse(dbSchema.hits.hits[i]._source.timestamp).ToShortDateString().Contains(timelimit.ToShortDateString())) {
-					i++;
-					ii++;
-				}
-				errortime[timelimit.ToShortDateString()] = ii;
-				index++;
-				days++;
-			}
+            var option = new JsonSerializerOptions {
+                IgnoreNullValues = true
+            };
 
-			foreach (var error in errortime) {
-				if (error.Value != 0) {
-					Debug.WriteLine(error.ToString());
-				}
-			}
-			Debug.WriteLine("Length of hits: " + dbSchema.hits.hits.Length);
+            var jsonstrings = new String(JsonSerializer.Serialize(result, option));
+            return jsonstrings;
+        }
 
-			/**
-				* Method for creating csv with timestamp and amount of errors per hour
-				*/
-			//before your loop
-			var csv = new StringBuilder();
-			string rootDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../"));
-			string modelPath = Path.Combine(rootDir, "Data", "ElkTestModel.csv");
-			Stopwatch timer = Stopwatch.StartNew();			
+        private static void SaveResultToCSV(Dictionary<string, int> errortime) {
+            /**
+             * Method for creating csv with timestamp and amount of errors per hour
+             */
+            //before your loop
+            var csv = new StringBuilder();
+            string rootDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../"));
+            string modelPath = Path.Combine(rootDir, "Data", "ElkTestModel.csv");
+            Stopwatch timer = Stopwatch.StartNew();
 
-			using (var w = new StreamWriter(modelPath))	{
+            using (var w = new StreamWriter(modelPath)) {
 
 
-				for (int errorTimeIndex = 0; errorTimeIndex < errortime.Keys.Count(); errorTimeIndex++)	{
-					//in your loop
-					if (errortime.ElementAt(errorTimeIndex).Value != 0)	{
-						var first = errortime.ElementAt(errorTimeIndex).Key.ToString();
-						var second = errortime.ElementAt(errorTimeIndex).Value;
-						var line = string.Format("{0};{1}", first, second);
+                for (int errorTimeIndex = 0; errorTimeIndex < errortime.Keys.Count(); errorTimeIndex++) {
+                    //in your loop
+                    if (errortime.ElementAt(errorTimeIndex).Value != 0) {
+                        var first = errortime.ElementAt(errorTimeIndex).Key.ToString();
+                        var second = errortime.ElementAt(errorTimeIndex).Value;
+                        var line = string.Format("{0};{1}", first, second);
 
-						//Suggestion made by KyleMit
-						var newLine = string.Format("{0};{1}", first, second);
-						//csv.AppendLine(newLine);
-						w.WriteLine(line);
-						w.Flush();
-						Debug.WriteLine("this is for loop run: " + errorTimeIndex);
-					}
-				}
-			}
+                        //Suggestion made by KyleMit
+                        var newLine = string.Format("{0};{1}", first, second);
+                        //csv.AppendLine(newLine);
+                        w.WriteLine(line);
+                        w.Flush();
+                        Debug.WriteLine("this is for loop run: " + errorTimeIndex);
+                    }
+                }
+            }
 
-			timer.Stop();
-			TimeSpan timespan = timer.Elapsed;
-			string elaps = String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10);
-			Debug.WriteLine("Done and took: " + elaps);
-			DateTime t = DateTime.Now;
-			Debug.WriteLine("This is current date: " + t.ToShortDateString());
+            timer.Stop();
+            TimeSpan timespan = timer.Elapsed;
+            string elaps = String.Format("{0:00}:{1:00}:{2:00}", timespan.Minutes, timespan.Seconds, timespan.Milliseconds / 10);
+            Debug.WriteLine("Done and took: " + elaps);
+            DateTime t = DateTime.Now;
+            Debug.WriteLine("This is current date: " + t.ToShortDateString());
+        }
 
-			IMachineLearning check = new MachineLearningService();
-			check.CheckForSpikes();
+        private static Dictionary<string, int> ErrorCount(DBSchema dbSchema) {
+            int index = 0;
+            int days = 0;
+            var errortime = new Dictionary<string, int>();
+            int i = 0;
+
+            //sortér result via timer
+            while (i < dbSchema.hits.hits.Length && days < 365) {
+                //tids limit som kan addes til
+
+                DateTime timelimit = DateTime.Now.AddDays(-days);
+
+                errortime.Add(timelimit.ToShortDateString(), 0);
+                int ii = 0;
+                while (i < dbSchema.hits.hits.Length && DateTime.Parse(dbSchema.hits.hits[i]._source.timestamp).ToShortDateString().Contains(timelimit.ToShortDateString())) {
+                    i++;
+                    ii++;
+                }
+                errortime[timelimit.ToShortDateString()] = ii;
+                index++;
+                days++;
+            }
+
+            foreach (var error in errortime) {
+                if (error.Value != 0) {
+                    Debug.WriteLine(error.ToString());
+                }
+            }
+            Debug.WriteLine("Length of hits: " + dbSchema.hits.hits.Length);
+            return errortime;
+        }
 
 
 
-			var option = new JsonSerializerOptions {
-				IgnoreNullValues = true
-			};
-
-			var jsonstrings = new String(JsonSerializer.Serialize(result, option));
-			return jsonstrings;
-		}
-
-
-
-		// GET api/<ValuesController>/5
-		//name need to change to what it does this is just temps
-		[HttpGet("project/{error}")]
+        // GET api/<ValuesController>/5
+        //name need to change to what it does this is just temps
+        [HttpGet("project/{error}")]
 		public async Task<DBSchema> CheckForError(string error) {
             DBSchema result = new DBSchema();
 
