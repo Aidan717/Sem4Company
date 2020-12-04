@@ -87,7 +87,7 @@ namespace Web_API_Service.Controllers {
 
             using (var w = new StreamWriter(modelPath)) {
 
-
+				w.WriteLine("date;numError");
                 for (int errorTimeIndex = 0; errorTimeIndex < errortime.Keys.Count(); errorTimeIndex++) {
                     //in your loop
                     if (errortime.ElementAt(errorTimeIndex).Value != 0) {
