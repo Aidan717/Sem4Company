@@ -87,7 +87,7 @@ namespace Web_API_Service.Controllers {
 
             using (var w = new StreamWriter(modelPath)) {
 
-
+				w.WriteLine("date;numError");
                 for (int errorTimeIndex = 0; errorTimeIndex < errortime.Keys.Count(); errorTimeIndex++) {
                     //in your loop
                     if (errortime.ElementAt(errorTimeIndex).Value != 0) {
@@ -221,7 +221,7 @@ namespace Web_API_Service.Controllers {
 		
 
 		[HttpGet("FillDB/{amount}")]
-		public async Task<ResponseStatus> AbuseThisGeneraterShort(int amount) {
+		public async Task<ResponseStatus> AbuseThisGeneraterShort(int amount) {			
 			IDBInfoGenerater jsons = new DBInfoGenerater();
 			int i = 0;			
 
@@ -239,7 +239,6 @@ namespace Web_API_Service.Controllers {
 				while (i < amount) {
 
 					var jsn = jsons.GetNewData();
-
 					StringContent jsonstring = new StringContent(JsonSerializer.Serialize(jsn, seOptions), Encoding.UTF8, "application/json");
 					respondStatus = JsonSerializer.Deserialize<ResponseStatus>(await _DBConnection.InsertInToMainDB(jsonstring), deOptions);
 
