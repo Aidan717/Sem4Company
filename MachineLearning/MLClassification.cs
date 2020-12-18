@@ -51,7 +51,7 @@ namespace MachineLearning {
 
         public static IEstimator<ITransformer> BuildAndTrainModel(IDataView trainingDataView, IEstimator<ITransformer> pipeline) {
             var trainingPipeline = pipeline.Append(_mlContext.MulticlassClassification.Trainers.SdcaMaximumEntropy("Label", "Features"))
-        .Append(_mlContext.Transforms.Conversion.MapKeyToValue("PredictedLabel"));
+                .Append(_mlContext.Transforms.Conversion.MapKeyToValue("PredictedLabel"));
 
             _trainedModel = trainingPipeline.Fit(trainingDataView);
 
