@@ -49,7 +49,7 @@ namespace Web_API_Service.Controllers {
 
 		//Robins metode
 		[HttpGet("dbschema/getalldb")]
-		public async Task<ActionResult<string>> GetDbSchema() {
+		public async Task<ActionResult<string>> GetAllDb() {
             DBSchema dbSchema = new DBSchema();
             string commandString = "_search?q=_exists_:\"*exception*\"&sort=timestamp:desc&size=10000&track_scores=true";
 
