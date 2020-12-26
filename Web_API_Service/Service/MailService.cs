@@ -94,9 +94,9 @@ namespace Web_API_Service.Service {
 
             builder.HtmlBody = warningRequest.body;
 
-            email.Sender = MailboxAddress.Parse(_mailSettings.mailReciever);
+            email.Sender = MailboxAddress.Parse(_mailSettings.mailSender);
             //email.To.Add(MailboxAddress.Parse(warningRequest.ToEmail));
-            email.To.Add(MailboxAddress.Parse(_mailSettings.mailSender));
+            email.To.Add(MailboxAddress.Parse(_mailSettings.mailReciever));
             //email.Subject = warningRequest.Subject;
             email.Subject = "Error for HTTPRequest";
             email.Body = builder.ToMessageBody();
